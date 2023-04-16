@@ -14,7 +14,10 @@ pub enum Instruction {
     Add(Register, u8),
 
     /// Rather than fail parsing we'll return an invalid instruction
-    Unknown,
+    Invalid(u16),
+
+    /// This is a placeholder for as long as we don't have all the instructions in
+    Unknown(u16),
 }
 
 impl Instruction {
@@ -42,7 +45,7 @@ impl From<u16> for Instruction {
         match first_nibble {
             6 => Self::parse_store(instruction),
             7 => Self::parse_add(instruction),
-            _ => Self::Unknown,
+            _ => Self::Unknown(instruction),
         }
     }
 }
@@ -56,7 +59,8 @@ impl Chip8 {
             Add(register, value) => self
                 .registers
                 .set(register, self.registers.get(register) + value),
-            Unknown => panic!("Unknown instruction executed!"),
+            Invalid(instruction) => panic!("Invalid instruction {instruction} executed!"),
+            Unknown(instruction) => panic!("Unknown instruction {instruction} executed!"),
         }
     }
 }
