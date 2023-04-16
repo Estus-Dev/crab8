@@ -1,3 +1,5 @@
+use std::{fmt, fmt::Display};
+
 /// Chip8 represents the current state of the entire machine.
 /// https://github.com/mattmikolay/chip-8/wiki/CHIP%E2%80%908-Technical-Reference
 #[derive(Default, Debug)]
@@ -56,5 +58,55 @@ impl Chip8 {
     /// https://github.com/mattmikolay/chip-8/wiki/CHIP%E2%80%908-Technical-Reference#data-registers
     pub fn set_register(&mut self, register: Register, value: u8) {
         self.registers[register as usize] = value;
+    }
+
+    fn dump_registers(&self) -> String {
+        // Get each register
+        (0x00..=0x0F)
+            .map(|r| r.try_into().expect("0x00..=0x0F are all the registers"))
+            // Get each register with its value in the format `V0=0x00`
+            .map(|r| format!("{:?}={:#04X}", r, self.get_register(r)))
+            // .join(" ")
+            .fold(String::new(), |rs, r| rs + &r + " ")
+    }
+}
+
+impl Display for Chip8 {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> fmt::Result {
+        writeln!(f, "CHIP-8")?;
+        write!(f, "\tRegisters: {}", self.dump_registers())?;
+
+        Ok(())
+    }
+}
+
+impl TryFrom<i32> for Register {
+    type Error = ();
+
+    fn try_from(value: i32) -> Result<Self, Self::Error> {
+        use Register::*;
+
+        match value {
+            i if i == V0 as i32 => Ok(V0),
+            i if i == V1 as i32 => Ok(V1),
+            i if i == V2 as i32 => Ok(V2),
+            i if i == V2 as i32 => Ok(V2),
+            i if i == V3 as i32 => Ok(V3),
+            i if i == V4 as i32 => Ok(V4),
+            i if i == V5 as i32 => Ok(V5),
+            i if i == V6 as i32 => Ok(V6),
+            i if i == V7 as i32 => Ok(V7),
+            i if i == V8 as i32 => Ok(V8),
+            i if i == V9 as i32 => Ok(V9),
+            i if i == VA as i32 => Ok(VA),
+            i if i == VB as i32 => Ok(VB),
+            i if i == VC as i32 => Ok(VC),
+            i if i == VD as i32 => Ok(VD),
+            i if i == VE as i32 => Ok(VE),
+            i if i == VF as i32 => Ok(VF),
+
+            // TODO: Use a proper error
+            _ => Err(()),
+        }
     }
 }

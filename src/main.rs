@@ -9,5 +9,5 @@ fn main() {
     chip8.set_register(V8, 16);
     chip8.set_register(VF, 255);
 
-    println!("{chip8:?}");
+    println!("{chip8}");
 }
