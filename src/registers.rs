@@ -2,7 +2,7 @@ use std::{fmt, fmt::Debug, fmt::Display};
 
 /// The CHIP-8 has 16 8-bit general-purpose registers, V0-VF.
 /// https://github.com/mattmikolay/chip-8/wiki/CHIP%E2%80%908-Technical-Reference#data-registers
-#[derive(Default)]
+#[derive(Default, PartialEq, Eq)]
 pub struct Registers([u8; 16]);
 
 impl Registers {
@@ -44,8 +44,14 @@ impl Display for Registers {
     }
 }
 
+impl From<[u8; 16]> for Registers {
+    fn from(value: [u8; 16]) -> Self {
+        Registers(value)
+    }
+}
+
 /// General use registers on the CHIP-8 are named V0-VF.
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 #[allow(non_snake_case)]
 pub enum Register {
     /// V0 is a general use register.
@@ -86,25 +92,33 @@ impl TryFrom<usize> for Register {
     type Error = ();
 
     fn try_from(value: usize) -> Result<Self, Self::Error> {
+        Register::try_from(value as u16)
+    }
+}
+
+impl TryFrom<u16> for Register {
+    type Error = ();
+
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
         use Register::*;
 
         match value {
-            i if i == V0 as usize => Ok(V0),
-            i if i == V1 as usize => Ok(V1),
-            i if i == V2 as usize => Ok(V2),
-            i if i == V3 as usize => Ok(V3),
-            i if i == V4 as usize => Ok(V4),
-            i if i == V5 as usize => Ok(V5),
-            i if i == V6 as usize => Ok(V6),
-            i if i == V7 as usize => Ok(V7),
-            i if i == V8 as usize => Ok(V8),
-            i if i == V9 as usize => Ok(V9),
-            i if i == VA as usize => Ok(VA),
-            i if i == VB as usize => Ok(VB),
-            i if i == VC as usize => Ok(VC),
-            i if i == VD as usize => Ok(VD),
-            i if i == VE as usize => Ok(VE),
-            i if i == VF as usize => Ok(VF),
+            i if i == V0 as u16 => Ok(V0),
+            i if i == V1 as u16 => Ok(V1),
+            i if i == V2 as u16 => Ok(V2),
+            i if i == V3 as u16 => Ok(V3),
+            i if i == V4 as u16 => Ok(V4),
+            i if i == V5 as u16 => Ok(V5),
+            i if i == V6 as u16 => Ok(V6),
+            i if i == V7 as u16 => Ok(V7),
+            i if i == V8 as u16 => Ok(V8),
+            i if i == V9 as u16 => Ok(V9),
+            i if i == VA as u16 => Ok(VA),
+            i if i == VB as u16 => Ok(VB),
+            i if i == VC as u16 => Ok(VC),
+            i if i == VD as u16 => Ok(VD),
+            i if i == VE as u16 => Ok(VE),
+            i if i == VF as u16 => Ok(VF),
 
             // TODO: Use a proper error
             _ => Err(()),
