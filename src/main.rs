@@ -1,4 +1,4 @@
-use chip_8::*;
+use chip_8::prelude::*;
 
 fn main() {
     use Register::*;

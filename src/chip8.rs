@@ -1,4 +1,4 @@
-use crate::registers::*;
+use crate::prelude::*;
 use std::{fmt, fmt::Display};
 
 /// Chip8 represents the current state of the entire machine.
