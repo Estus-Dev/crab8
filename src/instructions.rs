@@ -33,6 +33,10 @@ pub enum Instruction {
     /// Value: 8XY4 where X is the register and NN is the value to add
     AddRegister { to: Register, with: Register },
 
+    /// Subtract a value from the specified register and flag VF on borrow
+    /// Value: 8XY5 where X is the register and NN is the value to subtract
+    SubtractRegister { from: Register, with: Register },
+
     /// Rather than fail parsing we'll return an invalid instruction
     Invalid(u16),
 
@@ -71,6 +75,7 @@ impl Instruction {
             2 => Self::And { to: x, with: y },
             3 => Self::Xor { to: x, with: y },
             4 => Self::AddRegister { to: x, with: y },
+            5 => Self::SubtractRegister { from: x, with: y },
             _ => Self::Invalid(instruction),
         }
     }
@@ -126,6 +131,20 @@ impl Chip8 {
                 }
 
                 self.registers.set(to, total);
+                self.registers.set(VF, wrap);
+            }
+
+            SubtractRegister { from, with } => {
+                let from_value = self.registers.get(from);
+                let with_value = self.registers.get(with);
+                let total = from_value.wrapping_sub(with_value);
+                let mut wrap = 0x00;
+
+                if total > from_value {
+                    wrap = 0x01;
+                }
+
+                self.registers.set(from, total);
                 self.registers.set(VF, wrap);
             }
 
@@ -309,6 +328,30 @@ mod test {
     }
 
     #[test]
+    fn test_subtract_register_with_carry() {
+        let mut chip8 = Chip8::default();
+
+        assert_eq!(chip8.registers, 0x00000000000000000000000000000000.into());
+
+        chip8.exec(Store(V0, 0x12));
+        chip8.exec(Store(V3, 0x89));
+
+        assert_eq!(chip8.registers, 0x12000089000000000000000000000000.into());
+
+        chip8.exec(SubtractRegister { from: V3, with: V0 });
+
+        assert_eq!(chip8.registers, 0x12000077000000000000000000000000.into());
+
+        chip8.exec(SubtractRegister { from: V0, with: V3 });
+
+        assert_eq!(chip8.registers, 0x9B000077000000000000000000000001.into());
+
+        chip8.exec(SubtractRegister { from: V0, with: V3 });
+
+        assert_eq!(chip8.registers, 0x24000077000000000000000000000000.into());
+    }
+
+    #[test]
     fn test_instruction_from() {
         let cases = [
             (0x64AC, Store(V4, 0xAC)),
@@ -331,6 +374,8 @@ mod test {
             (0x8AF3, Xor { to: VA, with: VF }),
             (0x8DE4, AddRegister { to: VD, with: VE }),
             (0x8C44, AddRegister { to: VC, with: V4 }),
+            (0x8E05, SubtractRegister { from: VE, with: V0 }),
+            (0x8725, SubtractRegister { from: V7, with: V2 }),
         ];
 
         for case in cases {
