@@ -1,3 +1,7 @@
+use chip_8::*;
+
 fn main() {
-    println!("Hello, world!");
+    let registers = Registers::default();
+
+    println!("{registers:?}");
 }
