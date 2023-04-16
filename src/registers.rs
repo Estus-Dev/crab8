@@ -92,7 +92,6 @@ impl TryFrom<usize> for Register {
             i if i == V0 as usize => Ok(V0),
             i if i == V1 as usize => Ok(V1),
             i if i == V2 as usize => Ok(V2),
-            i if i == V2 as usize => Ok(V2),
             i if i == V3 as usize => Ok(V3),
             i if i == V4 as usize => Ok(V4),
             i if i == V5 as usize => Ok(V5),
