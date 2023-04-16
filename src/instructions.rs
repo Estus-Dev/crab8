@@ -90,20 +90,27 @@ impl Chip8 {
 
         match instruction.into() {
             Store(register, value) => self.registers.set(register, value),
+
             Add(register, value) => self
                 .registers
                 .set(register, self.registers.get(register) + value),
+
             Copy { to, from } => self.registers.set(to, self.registers.get(from)),
+
             Or { to, with } => self
                 .registers
                 .set(to, self.registers.get(to) | self.registers.get(with)),
+
             And { to, with } => self
                 .registers
                 .set(to, self.registers.get(to) & self.registers.get(with)),
+
             Xor { to, with } => self
                 .registers
                 .set(to, self.registers.get(to) ^ self.registers.get(with)),
+
             Invalid(instruction) => panic!("Invalid instruction {instruction} executed!"),
+
             Unknown(instruction) => panic!("Unknown instruction {instruction} executed!"),
         }
     }
