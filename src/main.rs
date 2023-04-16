@@ -5,9 +5,9 @@ fn main() {
 
     let mut chip8 = Chip8::default();
 
-    chip8.set_register(V2, 8);
-    chip8.set_register(V8, 16);
-    chip8.set_register(VF, 255);
+    chip8.registers.set(V2, 8);
+    chip8.registers.set(V8, 16);
+    chip8.registers.set(VF, 255);
 
     println!("{chip8}");
 }
