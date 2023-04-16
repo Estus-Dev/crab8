@@ -22,15 +22,15 @@ pub enum Instruction {
     Or { to: Register, with: Register },
 
     /// Bitwise AND two registers, storing the result
-    /// Value: 8XY1 where X is the destination and Y is the AND value
+    /// Value: 8XY2 where X is the destination and Y is the AND value
     And { to: Register, with: Register },
 
     /// Bitwise XOR two registers, storing the result
-    /// Value: 8XY1 where X is the destination and Y is the XOR value
+    /// Value: 8XY3 where X is the destination and Y is the XOR value
     Xor { to: Register, with: Register },
 
     /// Add a value to the specified register and carry the result to VF
-    /// Value: 8XNN where X is the register and NN is the value to add
+    /// Value: 8XY4 where X is the register and NN is the value to add
     AddRegister { to: Register, with: Register },
 
     /// Rather than fail parsing we'll return an invalid instruction
