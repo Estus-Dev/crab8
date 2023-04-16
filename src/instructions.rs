@@ -99,7 +99,7 @@ impl Chip8 {
 
             Add(register, value) => self
                 .registers
-                .set(register, self.registers.get(register) + value),
+                .set(register, self.registers.get(register).wrapping_add(value)),
 
             Copy { to, from } => self.registers.set(to, self.registers.get(from)),
 
@@ -178,6 +178,14 @@ mod test {
         chip8.exec(Add(V5, 0x47));
 
         assert_eq!(chip8.registers, 0x46000000004700000000000000000000.into());
+
+        chip8.exec(Store(V2, 0xAA));
+
+        assert_eq!(chip8.registers, 0x4600AA00004700000000000000000000.into());
+
+        chip8.exec(Add(V2, 0x66));
+
+        assert_eq!(chip8.registers, 0x46001000004700000000000000000000.into());
     }
 
     #[test]
