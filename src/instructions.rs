@@ -25,6 +25,10 @@ pub enum Instruction {
     /// Value: 8XY1 where X is the destination and Y is the AND value
     And { to: Register, with: Register },
 
+    /// Bitwise XOR two registers, storing the result
+    /// Value: 8XY1 where X is the destination and Y is the XOR value
+    Xor { to: Register, with: Register },
+
     /// Rather than fail parsing we'll return an invalid instruction
     Invalid(u16),
 
@@ -61,6 +65,7 @@ impl Instruction {
             0 => Self::Copy { to: x, from: y },
             1 => Self::Or { to: x, with: y },
             2 => Self::And { to: x, with: y },
+            3 => Self::Xor { to: x, with: y },
             _ => Self::Invalid(instruction),
         }
     }
@@ -95,6 +100,9 @@ impl Chip8 {
             And { to, with } => self
                 .registers
                 .set(to, self.registers.get(to) & self.registers.get(with)),
+            Xor { to, with } => self
+                .registers
+                .set(to, self.registers.get(to) ^ self.registers.get(with)),
             Invalid(instruction) => panic!("Invalid instruction {instruction} executed!"),
             Unknown(instruction) => panic!("Unknown instruction {instruction} executed!"),
         }
@@ -217,6 +225,31 @@ mod test {
     }
 
     #[test]
+    fn test_xor() {
+        let mut chip8 = Chip8::default();
+
+        assert_eq!(chip8.registers, 0x00000000000000000000000000000000.into());
+
+        chip8.exec(Store(V0, 0b00100100));
+        chip8.exec(Store(V1, 0b00111000));
+
+        assert_eq!(chip8.registers.get(V0), 0b00100100);
+        assert_eq!(chip8.registers.get(V1), 0b00111000);
+
+        chip8.exec(Xor { to: V0, with: V1 });
+
+        assert_eq!(chip8.registers.get(V0), 0b00011100);
+        assert_eq!(chip8.registers.get(V1), 0b00111000);
+
+        chip8.exec(Store(V6, 0b00000000));
+
+        chip8.exec(Xor { to: V6, with: V1 });
+
+        assert_eq!(chip8.registers.get(V6), 0b00111000);
+        assert_eq!(chip8.registers.get(V1), 0b00111000);
+    }
+
+    #[test]
     fn test_instruction_from() {
         let cases = [
             (0x64AC, Store(V4, 0xAC)),
@@ -235,6 +268,8 @@ mod test {
             (0x8401, Or { to: V4, with: V0 }),
             (0x8E12, And { to: VE, with: V1 }),
             (0x86B2, And { to: V6, with: VB }),
+            (0x8933, Xor { to: V9, with: V3 }),
+            (0x8AF3, Xor { to: VA, with: VF }),
         ];
 
         for case in cases {
