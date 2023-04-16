@@ -1,6 +1,6 @@
 use chip_8::prelude::*;
 
-fn main() -> Result<(), ()> {
+fn main() {
     use Instruction::*;
     use Register::*;
 
@@ -14,6 +14,4 @@ fn main() -> Result<(), ()> {
     chip8.exec(0x8710);
 
     println!("{chip8}");
-
-    Ok(())
 }

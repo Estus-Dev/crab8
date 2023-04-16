@@ -191,7 +191,7 @@ mod test {
     }
 
     #[test]
-    fn test_store_from() -> Result<(), ()> {
+    fn test_store_from() {
         let cases = [
             (0x64AC, Store(V4, 0xAC)),
             (0x6000, Store(V0, 0x00)),
@@ -202,12 +202,10 @@ mod test {
         for case in cases {
             assert_eq!(Instruction::from(case.0), case.1);
         }
-
-        Ok(())
     }
 
     #[test]
-    fn test_add_from() -> Result<(), ()> {
+    fn test_add_from() {
         let cases = [
             (0x74AC, Add(V4, 0xAC)),
             (0x7000, Add(V0, 0x00)),
@@ -218,8 +216,6 @@ mod test {
         for case in cases {
             assert_eq!(Instruction::from(case.0), case.1);
         }
-
-        Ok(())
     }
 
     #[test]
