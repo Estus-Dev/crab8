@@ -1,5 +1,7 @@
 use std::{fmt, fmt::Debug, fmt::Display};
 
+/// The CHIP-8 has 16 8-bit general-purpose registers, V0-VF.
+/// https://github.com/mattmikolay/chip-8/wiki/CHIP%E2%80%908-Technical-Reference#data-registers
 #[derive(Default)]
 pub struct Registers([u8; 16]);
 
@@ -42,9 +44,7 @@ impl Display for Registers {
     }
 }
 
-/// The CHIP-8 has 16 general-purpose registers, V0-VF.
-/// Each register is 8 bits wide.
-/// https://github.com/mattmikolay/chip-8/wiki/CHIP%E2%80%908-Technical-Reference#data-registers
+/// General use registers on the CHIP-8 are named V0-VF.
 #[derive(Clone, Copy, Debug)]
 #[allow(non_snake_case)]
 pub enum Register {
