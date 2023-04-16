@@ -1,27 +1,60 @@
-/// The CHIP-8 has 16 general-purpose registers, V0-VF.
-/// https://github.com/mattmikolay/chip-8/wiki/CHIP%E2%80%908-Technical-Reference#data-registers
-#[derive(Debug, Default)]
-#[allow(non_snake_case)]
-pub struct Registers {
-    V0: Register,
-    V1: Register,
-    V2: Register,
-    V3: Register,
-    V4: Register,
-    V5: Register,
-    V6: Register,
-    V7: Register,
-    V8: Register,
-    V9: Register,
-    VA: Register,
-    VB: Register,
-    VC: Register,
-    VD: Register,
-    VE: Register,
-    /// VF is often used as a flag but can also be used for general use
-    VF: Register,
+/// Chip8 represents the current state of the entire machine.
+/// https://github.com/mattmikolay/chip-8/wiki/CHIP%E2%80%908-Technical-Reference
+#[derive(Default, Debug)]
+pub struct Chip8 {
+    registers: [u8; 16],
 }
 
-/// General use registers on the CHIP-8 are 8-bits wide.
-#[derive(Debug, Default)]
-struct Register(u8);
+/// The CHIP-8 has 16 general-purpose registers, V0-VF.
+/// Each register is 8 bits wide.
+/// https://github.com/mattmikolay/chip-8/wiki/CHIP%E2%80%908-Technical-Reference#data-registers
+#[derive(Clone, Copy, Debug)]
+#[allow(non_snake_case)]
+pub enum Register {
+    /// V0 is a general use register.
+    V0 = 0x00,
+    /// V1 is a general use register.
+    V1 = 0x01,
+    /// V2 is a general use register.
+    V2 = 0x02,
+    /// V3 is a general use register.
+    V3 = 0x03,
+    /// V4 is a general use register.
+    V4 = 0x04,
+    /// V5 is a general use register.
+    V5 = 0x05,
+    /// V6 is a general use register.
+    V6 = 0x06,
+    /// V7 is a general use register.
+    V7 = 0x07,
+    /// V8 is a general use register.
+    V8 = 0x08,
+    /// V9 is a general use register.
+    V9 = 0x09,
+    /// VA is a general use register.
+    VA = 0x0A,
+    /// VB is a general use register.
+    VB = 0x0B,
+    /// VC is a general use register.
+    VC = 0x0C,
+    /// VD is a general use register.
+    VD = 0x0D,
+    /// VE is a general use register.
+    VE = 0x0E,
+    /// VF is a general use reigster that is often used as a flag.
+    VF = 0x0F,
+}
+
+impl Chip8 {
+    /// Get the value of the selected register
+    /// https://github.com/mattmikolay/chip-8/wiki/CHIP%E2%80%908-Technical-Reference#data-registers
+    pub fn get_register(&self, register: Register) -> u8 {
+        self.registers[register as usize]
+    }
+
+    /// Set the value of the selected register
+    /// https://github.com/mattmikolay/chip-8/wiki/CHIP%E2%80%908-Technical-Reference#data-registers
+    pub fn set_register(&mut self, register: Register, value: u8) {
+        self.registers[register as usize] = value;
+    }
+}
