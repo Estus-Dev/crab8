@@ -161,36 +161,16 @@ mod test {
     }
 
     #[test]
-    fn test_store_from() {
+    fn test_instruction_from() {
         let cases = [
             (0x64AC, Store(V4, 0xAC)),
             (0x6000, Store(V0, 0x00)),
             (0x6123, Store(V1, 0x23)),
             (0x6FFF, Store(VF, 0xFF)),
-        ];
-
-        for case in cases {
-            assert_eq!(Instruction::from(case.0), case.1);
-        }
-    }
-
-    #[test]
-    fn test_add_from() {
-        let cases = [
             (0x74AC, Add(V4, 0xAC)),
             (0x7000, Add(V0, 0x00)),
             (0x7123, Add(V1, 0x23)),
             (0x7FFF, Add(VF, 0xFF)),
-        ];
-
-        for case in cases {
-            assert_eq!(Instruction::from(case.0), case.1);
-        }
-    }
-
-    #[test]
-    fn test_copy_from() {
-        let cases = [
             (0x84A0, Copy { to: V4, from: VA }),
             (0x8000, Copy { to: V0, from: V0 }),
             (0x8120, Copy { to: V1, from: V2 }),
