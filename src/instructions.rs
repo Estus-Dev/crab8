@@ -13,8 +13,7 @@ pub enum Instruction {
     /// Value: 7XNN where X is the register and NN is the value to add
     Add(Register, u8),
 
-    /// We don't need to fail parsing once we have all the arguments
-    /// So for now we'll return a placeholder instruction
+    /// Rather than fail parsing we'll return an invalid instruction
     Unknown,
 }
 
@@ -57,7 +56,6 @@ impl Chip8 {
             Add(register, value) => self
                 .registers
                 .set(register, self.registers.get(register) + value),
-            // While this can panic, it can only do so until we have all the instructions
             Unknown => panic!("Unknown instruction executed!"),
         }
     }
