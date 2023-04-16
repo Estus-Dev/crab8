@@ -54,7 +54,7 @@ impl From<[u8; 16]> for Registers {
 impl From<u128> for Registers {
     #[allow(clippy::identity_op, clippy::erasing_op)]
     /// Convert from hex octets to Registers from left to right (little endian)
-    /// Primarily for testing purposes.
+    /// Used for quick test literals.
     fn from(mut value: u128) -> Self {
         value = u128::from_le(value);
 
