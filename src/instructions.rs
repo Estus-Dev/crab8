@@ -161,6 +161,29 @@ mod test {
     }
 
     #[test]
+    fn test_or() {
+        let mut chip8 = Chip8::default();
+
+        assert_eq!(chip8.registers, 0x00000000000000000000000000000000.into());
+
+        chip8.exec(Store(V0, 0b00100100));
+
+        assert_eq!(chip8.registers.get(V0), 0b00100100);
+
+        chip8.exec(Store(V1, 0b00111000));
+        chip8.exec(Or { to: V0, with: V1 });
+
+        assert_eq!(chip8.registers.get(V0), 0b00111100);
+        assert_eq!(chip8.registers.get(V1), 0b00111000);
+
+        chip8.exec(Store(V6, 0b00000000));
+        chip8.exec(Or { to: V6, with: V1 });
+
+        assert_eq!(chip8.registers.get(V6), 0b00111000);
+        assert_eq!(chip8.registers.get(V1), 0b00111000);
+    }
+
+    #[test]
     fn test_instruction_from() {
         let cases = [
             (0x64AC, Store(V4, 0xAC)),
