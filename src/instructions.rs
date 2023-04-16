@@ -1,3 +1,5 @@
+use core::panic;
+
 use crate::prelude::*;
 
 /// Chip-8 instructions are 32-bit values that may contain data
@@ -10,6 +12,10 @@ pub enum Instruction {
     /// Add a value to the specified register
     /// Value: 7XNN where X is the register and NN is the value to add
     Add(Register, u8),
+
+    /// We don't need to fail parsing once we have all the arguments
+    /// So for now we'll return a placeholder instruction
+    Unknown,
 }
 
 impl Instruction {
@@ -30,29 +36,29 @@ impl Instruction {
     }
 }
 
-impl TryFrom<u16> for Instruction {
-    type Error = ();
-
-    fn try_from(instruction: u16) -> Result<Self, Self::Error> {
+impl From<u16> for Instruction {
+    fn from(instruction: u16) -> Self {
         let first_nibble = ((instruction & 0xF000) >> 12) as u8;
 
         match first_nibble {
-            6 => Ok(Self::parse_store(instruction)),
-            7 => Ok(Self::parse_add(instruction)),
-            _ => Err(()),
+            6 => Self::parse_store(instruction),
+            7 => Self::parse_add(instruction),
+            _ => Self::Unknown,
         }
     }
 }
 
 impl Chip8 {
-    pub fn exec(&mut self, instruction: Instruction) {
+    pub fn exec(&mut self, instruction: impl Into<Instruction>) {
         use Instruction::*;
 
-        match instruction {
+        match instruction.into() {
             Store(register, value) => self.registers.set(register, value),
             Add(register, value) => self
                 .registers
                 .set(register, self.registers.get(register) + value),
+            // While this can panic, it can only do so until we have all the instructions
+            Unknown => panic!("Unknown instruction executed!"),
         }
     }
 }
@@ -135,7 +141,7 @@ mod test {
         ];
 
         for case in cases {
-            assert_eq!(Instruction::try_from(case.0)?, case.1);
+            assert_eq!(Instruction::from(case.0), case.1);
         }
 
         Ok(())
@@ -151,7 +157,7 @@ mod test {
         ];
 
         for case in cases {
-            assert_eq!(Instruction::try_from(case.0)?, case.1);
+            assert_eq!(Instruction::from(case.0), case.1);
         }
 
         Ok(())

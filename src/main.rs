@@ -8,9 +8,9 @@ fn main() -> Result<(), ()> {
 
     chip8.exec(Store(V2, 8));
     chip8.exec(Store(V8, 16));
-    chip8.exec(Instruction::try_from(0x6FFF)?);
+    chip8.exec(0x6FFF);
     chip8.exec(Add(V1, 0x12));
-    chip8.exec(Instruction::try_from(0x7168)?);
+    chip8.exec(0x7168);
 
     println!("{chip8}");
 
