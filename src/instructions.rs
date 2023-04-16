@@ -6,6 +6,10 @@ pub enum Instruction {
     /// Store a value in the specified register
     /// Value: 6XNN where X is the register and NN is the value to store
     Store(Register, u8),
+
+    /// Add a value to the specified register
+    /// Value: 7XNN where X is the register and NN is the value to add
+    Add(Register, u8),
 }
 
 impl Instruction {
@@ -15,6 +19,14 @@ impl Instruction {
         let value = (instruction & 0x00FF) as u8;
 
         Instruction::Store(register, value)
+    }
+
+    fn parse_add(instruction: u16) -> Instruction {
+        let register =
+            Register::try_from((instruction & 0x0F00) >> 8).expect("A nibble is a valid register");
+        let value = (instruction & 0x00FF) as u8;
+
+        Instruction::Add(register, value)
     }
 }
 
@@ -26,6 +38,7 @@ impl TryFrom<u16> for Instruction {
 
         match first_nibble {
             6 => Ok(Self::parse_store(instruction)),
+            7 => Ok(Self::parse_add(instruction)),
             _ => Err(()),
         }
     }
@@ -37,6 +50,9 @@ impl Chip8 {
 
         match instruction {
             Store(register, value) => self.registers.set(register, value),
+            Add(register, value) => self
+                .registers
+                .set(register, self.registers.get(register) + value),
         }
     }
 }
@@ -79,12 +95,59 @@ mod test {
     }
 
     #[test]
+    fn test_add() {
+        let mut chip8 = Chip8::default();
+
+        assert_eq!(
+            chip8.registers,
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0].into()
+        );
+
+        chip8.exec(Store(V0, 0x12));
+
+        assert_eq!(
+            chip8.registers,
+            [0x12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0].into()
+        );
+
+        chip8.exec(Add(V0, 0x34));
+
+        assert_eq!(
+            chip8.registers,
+            [0x46, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0].into()
+        );
+
+        chip8.exec(Add(V5, 0x47));
+
+        assert_eq!(
+            chip8.registers,
+            [0x46, 0, 0, 0, 0, 0x47, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0].into()
+        );
+    }
+
+    #[test]
     fn test_store_from() -> Result<(), ()> {
         let cases = [
             (0x64AC, Store(V4, 0xAC)),
             (0x6000, Store(V0, 0x00)),
             (0x6123, Store(V1, 0x23)),
             (0x6FFF, Store(VF, 0xFF)),
+        ];
+
+        for case in cases {
+            assert_eq!(Instruction::try_from(case.0)?, case.1);
+        }
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_add_from() -> Result<(), ()> {
+        let cases = [
+            (0x74AC, Add(V4, 0xAC)),
+            (0x7000, Add(V0, 0x00)),
+            (0x7123, Add(V1, 0x23)),
+            (0x7FFF, Add(VF, 0xFF)),
         ];
 
         for case in cases {
