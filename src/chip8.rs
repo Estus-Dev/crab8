@@ -5,6 +5,8 @@ use std::{fmt, fmt::Display};
 /// https://github.com/mattmikolay/chip-8/wiki/CHIP%E2%80%908-Technical-Reference
 #[derive(Default, Debug)]
 pub struct Chip8 {
+    /// The CHIP-8 has 16 8-bit general-purpose registers, V0-VF.
+    /// https://github.com/mattmikolay/chip-8/wiki/CHIP%E2%80%908-Technical-Reference#data-registers
     pub registers: Registers,
 }
 
