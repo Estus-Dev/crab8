@@ -17,6 +17,10 @@ pub enum Instruction {
     /// Value: 8XY0 where X is the destination and Y is the source
     Copy { to: Register, from: Register },
 
+    /// Bitwise OR two registers, storing the result
+    /// Value: 8XY1 where X is the destination and Y is the OR value
+    Or { to: Register, with: Register },
+
     /// Rather than fail parsing we'll return an invalid instruction
     Invalid(u16),
 
@@ -51,6 +55,7 @@ impl Instruction {
 
         match last_nibble {
             0 => Self::Copy { to: x, from: y },
+            1 => Self::Or { to: x, with: y },
             _ => Self::Invalid(instruction),
         }
     }
@@ -79,6 +84,9 @@ impl Chip8 {
                 .registers
                 .set(register, self.registers.get(register) + value),
             Copy { to, from } => self.registers.set(to, self.registers.get(from)),
+            Or { to, with } => self
+                .registers
+                .set(to, self.registers.get(to) | self.registers.get(with)),
             Invalid(instruction) => panic!("Invalid instruction {instruction} executed!"),
             Unknown(instruction) => panic!("Unknown instruction {instruction} executed!"),
         }
@@ -95,100 +103,61 @@ mod test {
     fn test_store() {
         let mut chip8 = Chip8::default();
 
-        assert_eq!(
-            chip8.registers,
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0].into()
-        );
+        assert_eq!(chip8.registers, 0x00000000000000000000000000000000.into());
 
         chip8.exec(Store(V0, 0xFF));
 
-        assert_eq!(
-            chip8.registers,
-            [0xFF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0].into()
-        );
+        assert_eq!(chip8.registers, 0xFF000000000000000000000000000000.into());
 
         chip8.exec(Store(V5, 0x24));
 
-        assert_eq!(
-            chip8.registers,
-            [0xFF, 0, 0, 0, 0, 0x24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0].into()
-        );
+        assert_eq!(chip8.registers, 0xFF000000002400000000000000000000.into());
 
         chip8.exec(Store(V5, 0x00));
 
-        assert_eq!(
-            chip8.registers,
-            [0xFF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0].into()
-        );
+        assert_eq!(chip8.registers, 0xFF000000000000000000000000000000.into());
     }
 
     #[test]
     fn test_add() {
         let mut chip8 = Chip8::default();
 
-        assert_eq!(
-            chip8.registers,
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0].into()
-        );
+        assert_eq!(chip8.registers, 0x00000000000000000000000000000000.into());
 
         chip8.exec(Store(V0, 0x12));
 
-        assert_eq!(
-            chip8.registers,
-            [0x12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0].into()
-        );
+        assert_eq!(chip8.registers, 0x12000000000000000000000000000000.into());
 
         chip8.exec(Add(V0, 0x34));
 
-        assert_eq!(
-            chip8.registers,
-            [0x46, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0].into()
-        );
+        assert_eq!(chip8.registers, 0x46000000000000000000000000000000.into());
 
         chip8.exec(Add(V5, 0x47));
 
-        assert_eq!(
-            chip8.registers,
-            [0x46, 0, 0, 0, 0, 0x47, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0].into()
-        );
+        assert_eq!(chip8.registers, 0x46000000004700000000000000000000.into());
     }
 
     #[test]
     fn test_copy() {
         let mut chip8 = Chip8::default();
 
-        assert_eq!(
-            chip8.registers,
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0].into()
-        );
+        assert_eq!(chip8.registers, 0x00000000000000000000000000000000.into());
 
         chip8.exec(Store(V0, 0x12));
 
-        assert_eq!(
-            chip8.registers,
-            [0x12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0].into()
-        );
+        assert_eq!(chip8.registers, 0x12000000000000000000000000000000.into());
 
         chip8.exec(Copy { to: V1, from: V0 });
 
-        assert_eq!(
-            chip8.registers,
-            [0x12, 0x12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0].into()
-        );
+        assert_eq!(chip8.registers, 0x12120000000000000000000000000000.into());
 
         chip8.exec(Store(V1, 0x63));
 
-        assert_eq!(
-            chip8.registers,
-            [0x12, 0x63, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0].into()
-        );
+        assert_eq!(chip8.registers, 0x12630000000000000000000000000000.into());
 
         chip8.exec(Copy { to: V8, from: V1 });
 
-        assert_eq!(
-            chip8.registers,
-            [0x12, 0x63, 0, 0, 0, 0, 0, 0, 0x63, 0, 0, 0, 0, 0, 0, 0].into()
-        );
+        assert_eq!(chip8.registers, 0x12630000000000006300000000000000.into());
     }
 
     #[test]

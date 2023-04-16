@@ -50,6 +50,35 @@ impl From<[u8; 16]> for Registers {
     }
 }
 
+#[cfg(test)]
+impl From<u128> for Registers {
+    #[allow(clippy::identity_op, clippy::erasing_op)]
+    /// Convert from hex octets to Registers from left to right (little endian)
+    /// Primarily for testing purposes.
+    fn from(mut value: u128) -> Self {
+        value = u128::from_le(value);
+
+        Registers([
+            ((value & 0xFF000000000000000000000000000000) >> (8 * 0xF)) as u8,
+            ((value & 0x00FF0000000000000000000000000000) >> (8 * 0xE)) as u8,
+            ((value & 0x0000FF00000000000000000000000000) >> (8 * 0xD)) as u8,
+            ((value & 0x000000FF000000000000000000000000) >> (8 * 0xC)) as u8,
+            ((value & 0x00000000FF0000000000000000000000) >> (8 * 0xB)) as u8,
+            ((value & 0x0000000000FF00000000000000000000) >> (8 * 0xA)) as u8,
+            ((value & 0x000000000000FF000000000000000000) >> (8 * 0x9)) as u8,
+            ((value & 0x00000000000000FF0000000000000000) >> (8 * 0x8)) as u8,
+            ((value & 0x0000000000000000FF00000000000000) >> (8 * 0x7)) as u8,
+            ((value & 0x000000000000000000FF000000000000) >> (8 * 0x6)) as u8,
+            ((value & 0x00000000000000000000FF0000000000) >> (8 * 0x5)) as u8,
+            ((value & 0x0000000000000000000000FF00000000) >> (8 * 0x4)) as u8,
+            ((value & 0x000000000000000000000000FF000000) >> (8 * 0x3)) as u8,
+            ((value & 0x00000000000000000000000000FF0000) >> (8 * 0x2)) as u8,
+            ((value & 0x0000000000000000000000000000FF00) >> (8 * 0x1)) as u8,
+            ((value & 0x000000000000000000000000000000FF) >> (8 * 0x0)) as u8,
+        ])
+    }
+}
+
 /// General use registers on the CHIP-8 are named V0-VF.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 #[allow(non_snake_case)]
@@ -122,6 +151,35 @@ impl TryFrom<u16> for Register {
 
             // TODO: Use a proper error
             _ => Err(()),
+        }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn test_registers_from_u128() {
+        let cases: [(u128, [u8; 16]); 2] = [
+            (
+                0x000000000000000000000000000000FF,
+                [
+                    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, //
+                    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF,
+                ],
+            ),
+            (
+                0x0123456789ABCDEF0123456789ABCDEF,
+                [
+                    0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF, //
+                    0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF,
+                ],
+            ),
+        ];
+
+        for case in cases {
+            assert_eq!(Registers::from(case.0), Registers::from(case.1));
         }
     }
 }
