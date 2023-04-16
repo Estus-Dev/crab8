@@ -46,7 +46,7 @@ impl Display for Registers {
 
 impl From<[u8; 16]> for Registers {
     fn from(value: [u8; 16]) -> Self {
-        Registers(value)
+        Self(value)
     }
 }
 
@@ -58,7 +58,7 @@ impl From<u128> for Registers {
     fn from(mut value: u128) -> Self {
         value = u128::from_le(value);
 
-        Registers([
+        Self([
             ((value & 0xFF000000000000000000000000000000) >> (8 * 0xF)) as u8,
             ((value & 0x00FF0000000000000000000000000000) >> (8 * 0xE)) as u8,
             ((value & 0x0000FF00000000000000000000000000) >> (8 * 0xD)) as u8,
