@@ -175,6 +175,8 @@ mod test {
             (0x8000, Copy { to: V0, from: V0 }),
             (0x8120, Copy { to: V1, from: V2 }),
             (0x8FF0, Copy { to: VF, from: VF }),
+            (0x8AD1, Or { to: VA, with: VD }),
+            (0x8401, Or { to: V4, with: V0 }),
         ];
 
         for case in cases {
