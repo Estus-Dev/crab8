@@ -11,6 +11,7 @@ fn main() -> Result<(), ()> {
     chip8.exec(0x6FFF);
     chip8.exec(Add(V1, 0x12));
     chip8.exec(0x7168);
+    chip8.exec(0x8710);
 
     println!("{chip8}");
 

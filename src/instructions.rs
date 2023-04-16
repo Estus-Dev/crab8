@@ -13,6 +13,10 @@ pub enum Instruction {
     /// Value: 7XNN where X is the register and NN is the value to add
     Add(Register, u8),
 
+    /// Copy a value between registers
+    /// Value: 8XY0 where X is the destination and Y is the source
+    Copy { to: Register, from: Register },
+
     /// Rather than fail parsing we'll return an invalid instruction
     Invalid(u16),
 
@@ -36,6 +40,20 @@ impl Instruction {
 
         Instruction::Add(register, value)
     }
+
+    fn parse_register_to_register(instruction: u16) -> Instruction {
+        let last_nibble = (instruction & 0x000F) as u8;
+
+        let x =
+            Register::try_from((instruction & 0x0F00) >> 8).expect("A nibble is a valid register");
+        let y =
+            Register::try_from((instruction & 0x00F0) >> 4).expect("A nibble is a valid register");
+
+        match last_nibble {
+            0 => Self::Copy { to: x, from: y },
+            _ => Self::Invalid(instruction),
+        }
+    }
 }
 
 impl From<u16> for Instruction {
@@ -45,6 +63,7 @@ impl From<u16> for Instruction {
         match first_nibble {
             6 => Self::parse_store(instruction),
             7 => Self::parse_add(instruction),
+            8 => Self::parse_register_to_register(instruction),
             _ => Self::Unknown(instruction),
         }
     }
@@ -59,6 +78,7 @@ impl Chip8 {
             Add(register, value) => self
                 .registers
                 .set(register, self.registers.get(register) + value),
+            Copy { to, from } => self.registers.set(to, self.registers.get(from)),
             Invalid(instruction) => panic!("Invalid instruction {instruction} executed!"),
             Unknown(instruction) => panic!("Unknown instruction {instruction} executed!"),
         }
@@ -133,6 +153,43 @@ mod test {
         );
     }
 
+    fn test_copy() {
+        let mut chip8 = Chip8::default();
+
+        assert_eq!(
+            chip8.registers,
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0].into()
+        );
+
+        chip8.exec(Store(V0, 0x12));
+
+        assert_eq!(
+            chip8.registers,
+            [0x12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0].into()
+        );
+
+        chip8.exec(Copy { to: V1, from: V0 });
+
+        assert_eq!(
+            chip8.registers,
+            [0x12, 0x12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0].into()
+        );
+
+        chip8.exec(Store(V1, 0x63));
+
+        assert_eq!(
+            chip8.registers,
+            [0x12, 0x63, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0].into()
+        );
+
+        chip8.exec(Copy { to: V8, from: V2 });
+
+        assert_eq!(
+            chip8.registers,
+            [0x12, 0x63, 0, 0, 0, 0, 0, 0, 0x63, 0, 0, 0, 0, 0, 0, 0].into()
+        );
+    }
+
     #[test]
     fn test_store_from() -> Result<(), ()> {
         let cases = [
@@ -163,5 +220,19 @@ mod test {
         }
 
         Ok(())
+    }
+
+    #[test]
+    fn test_copy_from() {
+        let cases = [
+            (0x84A0, Copy { to: V4, from: VA }),
+            (0x8000, Copy { to: V0, from: V0 }),
+            (0x8120, Copy { to: V1, from: V2 }),
+            (0x8FF0, Copy { to: VF, from: VF }),
+        ];
+
+        for case in cases {
+            assert_eq!(Instruction::from(case.0), case.1);
+        }
     }
 }
