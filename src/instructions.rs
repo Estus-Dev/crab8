@@ -153,6 +153,7 @@ mod test {
         );
     }
 
+    #[test]
     fn test_copy() {
         let mut chip8 = Chip8::default();
 
@@ -182,7 +183,7 @@ mod test {
             [0x12, 0x63, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0].into()
         );
 
-        chip8.exec(Copy { to: V8, from: V2 });
+        chip8.exec(Copy { to: V8, from: V1 });
 
         assert_eq!(
             chip8.registers,
