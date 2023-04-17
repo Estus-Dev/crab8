@@ -15,27 +15,27 @@ pub enum Instruction {
 
     /// Copy a value between registers
     /// Value: 8XY0 where X is the destination and Y is the source
-    Copy { to: Register, from: Register },
+    Copy(Register, Register),
 
     /// Bitwise OR two registers, storing the result
     /// Value: 8XY1 where X is the destination and Y is the OR value
-    Or { to: Register, with: Register },
+    Or(Register, Register),
 
     /// Bitwise AND two registers, storing the result
     /// Value: 8XY2 where X is the destination and Y is the AND value
-    And { to: Register, with: Register },
+    And(Register, Register),
 
     /// Bitwise XOR two registers, storing the result
     /// Value: 8XY3 where X is the destination and Y is the XOR value
-    Xor { to: Register, with: Register },
+    Xor(Register, Register),
 
     /// Add a value to the specified register and carry the result to VF
     /// Value: 8XY4 where X is the register and NN is the value to add
-    AddRegister { to: Register, with: Register },
+    AddRegister(Register, Register),
 
     /// Subtract a value from the specified register and flag VF on borrow
     /// Value: 8XY5 where X is the register and NN is the value to subtract
-    SubtractRegister { from: Register, with: Register },
+    SubtractRegister(Register, Register),
 
     /// Rather than fail parsing we'll return an invalid instruction
     Invalid(u16),
@@ -70,12 +70,12 @@ impl Instruction {
             Register::try_from((instruction & 0x00F0) >> 4).expect("A nibble is a valid register");
 
         match last_nibble {
-            0 => Self::Copy { to: x, from: y },
-            1 => Self::Or { to: x, with: y },
-            2 => Self::And { to: x, with: y },
-            3 => Self::Xor { to: x, with: y },
-            4 => Self::AddRegister { to: x, with: y },
-            5 => Self::SubtractRegister { from: x, with: y },
+            0 => Self::Copy(x, y),
+            1 => Self::Or(x, y),
+            2 => Self::And(x, y),
+            3 => Self::Xor(x, y),
+            4 => Self::AddRegister(x, y),
+            5 => Self::SubtractRegister(x, y),
             _ => Self::Invalid(instruction),
         }
     }
@@ -106,21 +106,21 @@ impl Chip8 {
                 .registers
                 .set(register, self.registers.get(register).wrapping_add(value)),
 
-            Copy { to, from } => self.registers.set(to, self.registers.get(from)),
+            Copy(to, from) => self.registers.set(to, self.registers.get(from)),
 
-            Or { to, with } => self
+            Or(to, with) => self
                 .registers
                 .set(to, self.registers.get(to) | self.registers.get(with)),
 
-            And { to, with } => self
+            And(to, with) => self
                 .registers
                 .set(to, self.registers.get(to) & self.registers.get(with)),
 
-            Xor { to, with } => self
+            Xor(to, with) => self
                 .registers
                 .set(to, self.registers.get(to) ^ self.registers.get(with)),
 
-            AddRegister { to, with } => {
+            AddRegister(to, with) => {
                 let to_value = self.registers.get(to);
                 let with_value = self.registers.get(with);
                 let total = to_value.wrapping_add(with_value);
@@ -134,7 +134,7 @@ impl Chip8 {
                 self.registers.set(VF, wrap);
             }
 
-            SubtractRegister { from, with } => {
+            SubtractRegister(from, with) => {
                 let from_value = self.registers.get(from);
                 let with_value = self.registers.get(with);
                 let total = from_value.wrapping_sub(with_value);
@@ -217,7 +217,7 @@ mod test {
 
         assert_eq!(chip8.registers, 0x12000000000000000000000000000000.into());
 
-        chip8.exec(Copy { to: V1, from: V0 });
+        chip8.exec(Copy(V1, V0));
 
         assert_eq!(chip8.registers, 0x12120000000000000000000000000000.into());
 
@@ -225,7 +225,7 @@ mod test {
 
         assert_eq!(chip8.registers, 0x12630000000000000000000000000000.into());
 
-        chip8.exec(Copy { to: V8, from: V1 });
+        chip8.exec(Copy(V8, V1));
 
         assert_eq!(chip8.registers, 0x12630000000000006300000000000000.into());
     }
@@ -241,13 +241,13 @@ mod test {
         assert_eq!(chip8.registers.get(V0), 0b00100100);
 
         chip8.exec(Store(V1, 0b00111000));
-        chip8.exec(Or { to: V0, with: V1 });
+        chip8.exec(Or(V0, V1));
 
         assert_eq!(chip8.registers.get(V0), 0b00111100);
         assert_eq!(chip8.registers.get(V1), 0b00111000);
 
         chip8.exec(Store(V6, 0b00000000));
-        chip8.exec(Or { to: V6, with: V1 });
+        chip8.exec(Or(V6, V1));
 
         assert_eq!(chip8.registers.get(V6), 0b00111000);
         assert_eq!(chip8.registers.get(V1), 0b00111000);
@@ -265,14 +265,14 @@ mod test {
         assert_eq!(chip8.registers.get(V0), 0b00100100);
         assert_eq!(chip8.registers.get(V1), 0b00111000);
 
-        chip8.exec(And { to: V0, with: V1 });
+        chip8.exec(And(V0, V1));
 
         assert_eq!(chip8.registers.get(V0), 0b00100000);
         assert_eq!(chip8.registers.get(V1), 0b00111000);
 
         chip8.exec(Store(V6, 0b00000000));
 
-        chip8.exec(Or { to: V6, with: V1 });
+        chip8.exec(Or(V6, V1));
 
         assert_eq!(chip8.registers.get(V6), 0b00111000);
         assert_eq!(chip8.registers.get(V1), 0b00111000);
@@ -290,14 +290,14 @@ mod test {
         assert_eq!(chip8.registers.get(V0), 0b00100100);
         assert_eq!(chip8.registers.get(V1), 0b00111000);
 
-        chip8.exec(Xor { to: V0, with: V1 });
+        chip8.exec(Xor(V0, V1));
 
         assert_eq!(chip8.registers.get(V0), 0b00011100);
         assert_eq!(chip8.registers.get(V1), 0b00111000);
 
         chip8.exec(Store(V6, 0b00000000));
 
-        chip8.exec(Xor { to: V6, with: V1 });
+        chip8.exec(Xor(V6, V1));
 
         assert_eq!(chip8.registers.get(V6), 0b00111000);
         assert_eq!(chip8.registers.get(V1), 0b00111000);
@@ -314,15 +314,15 @@ mod test {
 
         assert_eq!(chip8.registers, 0x12000089000000000000000000000000.into());
 
-        chip8.exec(AddRegister { to: V3, with: V0 });
+        chip8.exec(AddRegister(V3, V0));
 
         assert_eq!(chip8.registers, 0x1200009B000000000000000000000000.into());
 
-        chip8.exec(AddRegister { to: V0, with: V3 });
+        chip8.exec(AddRegister(V0, V3));
 
         assert_eq!(chip8.registers, 0xAD00009B000000000000000000000000.into());
 
-        chip8.exec(AddRegister { to: V0, with: V3 });
+        chip8.exec(AddRegister(V0, V3));
 
         assert_eq!(chip8.registers, 0x4800009B000000000000000000000001.into());
     }
@@ -338,15 +338,15 @@ mod test {
 
         assert_eq!(chip8.registers, 0x12000089000000000000000000000000.into());
 
-        chip8.exec(SubtractRegister { from: V3, with: V0 });
+        chip8.exec(SubtractRegister(V3, V0));
 
         assert_eq!(chip8.registers, 0x12000077000000000000000000000000.into());
 
-        chip8.exec(SubtractRegister { from: V0, with: V3 });
+        chip8.exec(SubtractRegister(V0, V3));
 
         assert_eq!(chip8.registers, 0x9B000077000000000000000000000001.into());
 
-        chip8.exec(SubtractRegister { from: V0, with: V3 });
+        chip8.exec(SubtractRegister(V0, V3));
 
         assert_eq!(chip8.registers, 0x24000077000000000000000000000000.into());
     }
@@ -362,20 +362,20 @@ mod test {
             (0x7000, Add(V0, 0x00)),
             (0x7123, Add(V1, 0x23)),
             (0x7FFF, Add(VF, 0xFF)),
-            (0x84A0, Copy { to: V4, from: VA }),
-            (0x8000, Copy { to: V0, from: V0 }),
-            (0x8120, Copy { to: V1, from: V2 }),
-            (0x8FF0, Copy { to: VF, from: VF }),
-            (0x8AD1, Or { to: VA, with: VD }),
-            (0x8401, Or { to: V4, with: V0 }),
-            (0x8E12, And { to: VE, with: V1 }),
-            (0x86B2, And { to: V6, with: VB }),
-            (0x8933, Xor { to: V9, with: V3 }),
-            (0x8AF3, Xor { to: VA, with: VF }),
-            (0x8DE4, AddRegister { to: VD, with: VE }),
-            (0x8C44, AddRegister { to: VC, with: V4 }),
-            (0x8E05, SubtractRegister { from: VE, with: V0 }),
-            (0x8725, SubtractRegister { from: V7, with: V2 }),
+            (0x84A0, Copy(V4, VA)),
+            (0x8000, Copy(V0, V0)),
+            (0x8120, Copy(V1, V2)),
+            (0x8FF0, Copy(VF, VF)),
+            (0x8AD1, Or(VA, VD)),
+            (0x8401, Or(V4, V0)),
+            (0x8E12, And(VE, V1)),
+            (0x86B2, And(V6, VB)),
+            (0x8933, Xor(V9, V3)),
+            (0x8AF3, Xor(VA, VF)),
+            (0x8DE4, AddRegister(VD, VE)),
+            (0x8C44, AddRegister(VC, V4)),
+            (0x8E05, SubtractRegister(VE, V0)),
+            (0x8725, SubtractRegister(V7, V2)),
         ];
 
         for case in cases {
