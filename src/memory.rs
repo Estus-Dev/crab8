@@ -47,6 +47,20 @@ impl TryFrom<u16> for Address {
 
 pub struct Memory([u8; 4096]);
 
+impl Memory {
+    /// Get the value of an Address in memory.
+    pub fn get(&self, address: Address) -> u8 {
+        // The safety of this relies on not being able to construct an invalid Address.
+        // This also assumed 4096 sized memory. For 2048 sized memory that needs a smaller Address.
+        self.0[address.0 as usize]
+    }
+
+    /// Set the value of an address in memory.
+    pub fn set(&mut self, address: Address, value: u8) {
+        self.0[address.0 as usize] = value;
+    }
+}
+
 impl Debug for Memory {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         const CHUNK_SIZE: usize = 16;
