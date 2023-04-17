@@ -21,6 +21,10 @@ pub struct Chip8 {
     /// https://github.com/mattmikolay/chip-8/wiki/CHIP%E2%80%908-Technical-Reference#address-register
     pub address_register: Address,
 
+    /// The PC contains the address of the next instruction to be executed.
+    /// Techinically PC is often 16-bits wide but addresses above 0xF000 are inaccessible.
+    pub program_counter: Address,
+
     /// The CHIP-8 has 16 8-bit general-purpose registers, V0-VF.
     /// https://github.com/mattmikolay/chip-8/wiki/CHIP%E2%80%908-Technical-Reference#data-registers
     pub registers: Registers,
@@ -33,7 +37,8 @@ impl Chip8 {}
 impl Default for Chip8 {
     fn default() -> Self {
         Self {
-            address_register: Address::starting_address(),
+            address_register: Address::default(),
+            program_counter: Address::starting_address(),
             registers: Default::default(),
             memory: Default::default(),
         }
@@ -44,6 +49,7 @@ impl Display for Chip8 {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         writeln!(f, "CHIP-8\n")?;
         writeln!(f, "\tAddress Register (I): {}", self.address_register)?;
+        writeln!(f, "\tProgram Counter (PC): {}", self.program_counter)?;
         writeln!(f, "\tRegisters: {}", self.registers)?;
         writeln!(f)?;
         writeln!(f, "{}", self.memory)?;

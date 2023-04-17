@@ -101,7 +101,7 @@ impl Chip8 {
         use Instruction::*;
 
         match instruction.into() {
-            Jump(address) => self.address_register.set(address),
+            Jump(address) => self.program_counter.set(address),
             Store(register, value) => self.registers.set(register, value),
             Add(register, value) => self.exec_add(register, value),
             Copy(register, other) => self.exec_copy(register, other),
@@ -216,11 +216,11 @@ mod test {
 
         let mut chip8 = Chip8::default();
 
-        assert_eq!(chip8.address_register.get(), 0x200);
+        assert_eq!(chip8.program_counter.get(), 0x200);
 
         for instruction in cases {
             chip8.exec(instruction);
-            assert_eq!(chip8.address_register.get(), instruction & 0x0FFF);
+            assert_eq!(chip8.program_counter.get(), instruction & 0x0FFF);
         }
     }
 
