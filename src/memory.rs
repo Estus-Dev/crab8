@@ -44,3 +44,38 @@ impl TryFrom<u16> for Address {
         }
     }
 }
+
+pub struct Memory([u8; 4096]);
+
+impl Debug for Memory {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        const CHUNK_SIZE: usize = 16;
+
+        writeln!(f, "       00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F")?;
+
+        for (i, row) in self.0.chunks(CHUNK_SIZE).enumerate() {
+            let bytes_string = row
+                .iter()
+                .map(|&b| format!("{b:#04X?}").replace("0x", ""))
+                .fold("".to_owned(), |bytes_string, s| bytes_string + " " + &s)
+                .trim()
+                .to_owned();
+
+            writeln!(f, "{:#05X}: {bytes_string}", i * CHUNK_SIZE)?
+        }
+
+        Ok(())
+    }
+}
+
+impl Default for Memory {
+    fn default() -> Self {
+        Self([0x00; 4096])
+    }
+}
+
+impl Display for Memory {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(f, "{self:?}")
+    }
+}
