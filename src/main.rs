@@ -2,7 +2,6 @@ use chip_8::prelude::*;
 
 fn main() {
     use Instruction::*;
-    use Register::*;
 
     let mut chip8 = Chip8::default();
 

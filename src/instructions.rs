@@ -148,8 +148,6 @@ impl Chip8 {
     }
 
     fn exec_add_register(&mut self, register: Register, other: Register) {
-        use Register::*;
-
         let starting_value = self.registers.get(register);
         let value = self.registers.get(other);
         let result = starting_value.wrapping_add(value);
@@ -161,8 +159,6 @@ impl Chip8 {
     }
 
     fn exec_subtract_register(&mut self, register: Register, other: Register) {
-        use Register::*;
-
         let starting_value = self.registers.get(register);
         let value = self.registers.get(other);
         let result = starting_value.wrapping_sub(value);
@@ -173,8 +169,6 @@ impl Chip8 {
     }
 
     fn exec_shift_right(&mut self, register: Register, other: Register) {
-        use Register::*;
-
         let value = self.registers.get(other);
         let result = value >> 1;
         let least_significant_bit = value & 0b00000001;
@@ -184,8 +178,6 @@ impl Chip8 {
     }
 
     fn exec_sub_from_register(&mut self, register: Register, other: Register) {
-        use Register::*;
-
         let starting_value = self.registers.get(other);
         let value = self.registers.get(register);
         let result = starting_value.wrapping_sub(value);
@@ -196,8 +188,6 @@ impl Chip8 {
     }
 
     fn exec_shift_left(&mut self, register: Register, other: Register) {
-        use Register::*;
-
         let value = self.registers.get(other);
         let result = value << 1;
         let most_significant_bit = (value & 0b10000000) >> 7;
