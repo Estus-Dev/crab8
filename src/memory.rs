@@ -23,7 +23,7 @@ impl Address {
 
 impl Debug for Address {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        write!(f, "Address({:#000x?})", self.0)
+        write!(f, "Address({:#05x?})", self.0)
     }
 }
 
