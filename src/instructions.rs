@@ -70,12 +70,12 @@ impl Instruction {
             Register::try_from((instruction & 0x00F0) >> 4).expect("A nibble is a valid register");
 
         match last_nibble {
-            0 => Self::Copy(x, y),
-            1 => Self::Or(x, y),
-            2 => Self::And(x, y),
-            3 => Self::Xor(x, y),
-            4 => Self::AddRegister(x, y),
-            5 => Self::SubtractRegister(x, y),
+            0x0 => Self::Copy(x, y),
+            0x1 => Self::Or(x, y),
+            0x2 => Self::And(x, y),
+            0x3 => Self::Xor(x, y),
+            0x4 => Self::AddRegister(x, y),
+            0x5 => Self::SubtractRegister(x, y),
             _ => Self::Invalid(instruction),
         }
     }
@@ -86,9 +86,9 @@ impl From<u16> for Instruction {
         let first_nibble = ((instruction & 0xF000) >> 12) as u8;
 
         match first_nibble {
-            6 => Self::parse_store(instruction),
-            7 => Self::parse_add(instruction),
-            8 => Self::parse_register_to_register(instruction),
+            0x6 => Self::parse_store(instruction),
+            0x7 => Self::parse_add(instruction),
+            0x8 => Self::parse_register_to_register(instruction),
             _ => Self::Unknown(instruction),
         }
     }
