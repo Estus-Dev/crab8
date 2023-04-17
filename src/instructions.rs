@@ -5,6 +5,10 @@ use crate::prelude::*;
 /// Chip-8 instructions are 32-bit values that may contain data
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Instruction {
+    /// Jump moves the instruction pointer to the specified Address
+    /// Value: 1NNN where NNN is the address
+    Jump(Address),
+
     /// Store a value in the specified register
     /// Value: 6XNN where X is the register and NN is the value to store
     Store(Register, u8),
@@ -66,10 +70,11 @@ impl From<u16> for Instruction {
         let y = Register::try_from((instruction & 0x00F0) >> 4) //
             .expect("A nibble is a valid register");
         let value = (instruction & 0x00FF) as u8;
-        let _address = Address::try_from(instruction & 0x0FFF) //
+        let address = Address::try_from(instruction & 0x0FFF) //
             .expect("Addresses can be any value from 0x0000 to 0x0FFF");
 
         match operator {
+            0x1 => Self::Jump(address),
             0x6 => Self::Store(x, value),
             0x7 => Self::Add(x, value),
 
@@ -96,6 +101,7 @@ impl Chip8 {
         use Instruction::*;
 
         match instruction.into() {
+            Jump(address) => self.address_register.set(address),
             Store(register, value) => self.registers.set(register, value),
             Add(register, value) => self.exec_add(register, value),
             Copy(register, other) => self.exec_copy(register, other),
@@ -203,6 +209,20 @@ impl Chip8 {
 mod test {
     use super::Instruction::*;
     use crate::prelude::*;
+
+    #[test]
+    fn test_jump() {
+        let cases = [0x1000, 0x1234, 0x1FFF, 0x1CED, 0x12BA];
+
+        let mut chip8 = Chip8::default();
+
+        assert_eq!(chip8.address_register.get(), 0x200);
+
+        for instruction in cases {
+            chip8.exec(instruction);
+            assert_eq!(chip8.address_register.get(), instruction & 0x0FFF);
+        }
+    }
 
     #[test]
     fn test_store() {
@@ -489,8 +509,11 @@ mod test {
     }
 
     #[test]
-    fn test_instruction_from() {
+    fn test_instruction_from() -> Result<(), ()> {
         let cases = [
+            (0x1000, Jump(0x000.try_into()?)),
+            (0x1234, Jump(0x234.try_into()?)),
+            (0x1ABC, Jump(0xABC.try_into()?)),
             (0x64AC, Store(V4, 0xAC)),
             (0x6000, Store(V0, 0x00)),
             (0x6123, Store(V1, 0x23)),
@@ -524,5 +547,7 @@ mod test {
         for case in cases {
             assert_eq!(Instruction::from(case.0), case.1);
         }
+
+        Ok(())
     }
 }
