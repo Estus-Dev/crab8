@@ -4,6 +4,12 @@
 pub struct Address(u16);
 
 impl Address {
+    /// CHIP-8 programs are loaded starting at 0x200.
+    /// Values below this are reserved for the interpreter.
+    pub fn starting_address() -> Address {
+        Self(0x200)
+    }
+
     pub fn get(&self) -> u16 {
         self.0
     }

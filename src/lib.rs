@@ -31,7 +31,7 @@ impl Chip8 {}
 impl Default for Chip8 {
     fn default() -> Self {
         Self {
-            address_register: Address::try_from(0x200).expect("0x200 is a valid address"),
+            address_register: Address::starting_address(),
             registers: Default::default(),
         }
     }
