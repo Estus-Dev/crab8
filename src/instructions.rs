@@ -30,11 +30,11 @@ pub enum Instruction {
     Xor(Register, Register),
 
     /// Add a value to the specified register and carry the result to VF
-    /// Value: 8XY4 where X is the register and NN is the value to add
+    /// Value: 8XY4 where X is the register and Y is the register to add
     AddRegister(Register, Register),
 
     /// Subtract a value from the specified register and flag VF on borrow
-    /// Value: 8XY5 where X is the register and NN is the value to subtract
+    /// Value: 8XY5 where X is the register and Y is the register to subtract
     SubtractRegister(Register, Register),
 
     /// Rather than fail parsing we'll return an invalid instruction
