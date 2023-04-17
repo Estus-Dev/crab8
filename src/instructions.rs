@@ -66,6 +66,8 @@ impl From<u16> for Instruction {
         let y = Register::try_from((instruction & 0x00F0) >> 4) //
             .expect("A nibble is a valid register");
         let value = (instruction & 0x00FF) as u8;
+        let _address = Address::try_from(instruction & 0x0FFF) //
+            .expect("Addresses can be any value from 0x0000 to 0x0FFF");
 
         match operator {
             0x6 => Self::Store(x, value),

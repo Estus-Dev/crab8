@@ -1,8 +1,10 @@
 mod instructions;
+mod memory;
 mod registers;
 
 pub mod prelude {
     pub use crate::instructions::Instruction;
+    pub use crate::memory::Address;
     pub use crate::registers::{Register, Register::*, Registers};
     pub use crate::Chip8;
 }
