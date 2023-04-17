@@ -45,6 +45,11 @@ pub enum Instruction {
     /// Value: 8XYE where X is the destination and Y is the value to be shifted
     ShiftLeft(Register, Register),
 
+    /// Subtract the value in the specified register from another register and flag VF on borrow
+    /// The difference between this and SubtractRegister is the order, they go to the same register
+    /// Value: 8XY7 where X is the register and Y is the register to subtract from
+    SubtractFromRegister(Register, Register),
+
     /// Rather than fail parsing we'll return an invalid instruction
     Invalid(u16),
 
@@ -74,6 +79,7 @@ impl From<u16> for Instruction {
                 0x4 => Self::AddRegister(x, y),
                 0x5 => Self::SubtractRegister(x, y),
                 0x6 => Self::ShiftRight(x, y),
+                0x7 => Self::SubtractFromRegister(x, y),
                 0xE => Self::ShiftLeft(x, y),
                 _ => Self::Invalid(instruction),
             },
@@ -97,6 +103,7 @@ impl Chip8 {
             AddRegister(register, other) => self.exec_add_register(register, other),
             SubtractRegister(register, other) => self.exec_subtract_register(register, other),
             ShiftRight(register, other) => self.exec_shift_right(register, other),
+            SubtractFromRegister(register, other) => self.exec_sub_from_register(register, other),
             ShiftLeft(register, other) => self.exec_shift_left(register, other),
             Invalid(instruction) => panic!("Invalid instruction {instruction} executed!"),
             Unknown(instruction) => panic!("Unknown instruction {instruction} executed!"),
@@ -174,6 +181,18 @@ impl Chip8 {
 
         self.registers.set(register, result);
         self.registers.set(VF, least_significant_bit);
+    }
+
+    fn exec_sub_from_register(&mut self, register: Register, other: Register) {
+        use Register::*;
+
+        let starting_value = self.registers.get(other);
+        let value = self.registers.get(register);
+        let result = starting_value.wrapping_sub(value);
+        let borrow = if result > starting_value { 0x01 } else { 0x00 };
+
+        self.registers.set(register, result);
+        self.registers.set(VF, borrow);
     }
 
     fn exec_shift_left(&mut self, register: Register, other: Register) {
@@ -420,6 +439,30 @@ mod test {
     }
 
     #[test]
+    fn test_sub_from_register_with_carry() {
+        let mut chip8 = Chip8::default();
+
+        assert_eq!(chip8.registers, 0x00000000000000000000000000000000.into());
+
+        chip8.exec(Store(V0, 0x89));
+        chip8.exec(Store(V3, 0x12));
+
+        assert_eq!(chip8.registers, 0x89000012000000000000000000000000.into());
+
+        chip8.exec(SubtractFromRegister(V3, V0));
+
+        assert_eq!(chip8.registers, 0x89000077000000000000000000000000.into());
+
+        chip8.exec(SubtractFromRegister(V0, V3));
+
+        assert_eq!(chip8.registers, 0xEE000077000000000000000000000001.into());
+
+        chip8.exec(SubtractFromRegister(V2, V0));
+
+        assert_eq!(chip8.registers, 0xEE00EE77000000000000000000000000.into());
+    }
+
+    #[test]
     fn test_shift_left() {
         let mut chip8 = Chip8::default();
 
@@ -481,6 +524,8 @@ mod test {
             (0x8725, SubtractRegister(V7, V2)),
             (0x8126, ShiftRight(V1, V2)),
             (0x8546, ShiftRight(V5, V4)),
+            (0x8D57, SubtractFromRegister(VD, V5)),
+            (0x8AA7, SubtractFromRegister(VA, VA)),
             (0x89FE, ShiftLeft(V9, VF)),
             (0x8CAE, ShiftLeft(VC, VA)),
         ];
