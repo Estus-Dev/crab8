@@ -200,7 +200,6 @@ impl Chip8 {
 #[cfg(test)]
 mod test {
     use super::Instruction::*;
-    use super::Register::*;
     use crate::prelude::*;
 
     #[test]
