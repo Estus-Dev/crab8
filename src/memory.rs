@@ -1,7 +1,17 @@
 /// The CHIP-8 has 12-bit addresses, allowing up to 4096 bytes of memory.
 /// https://github.com/mattmikolay/chip-8/wiki/CHIP%E2%80%908-Technical-Reference#storage-in-memory
-#[derive(Default, PartialEq, Eq)]
+#[derive(Debug, Default, PartialEq, Eq)]
 pub struct Address(u16);
+
+impl Address {
+    pub fn get(&self) -> u16 {
+        self.0
+    }
+
+    pub fn set(&mut self, address: Address) {
+        self.0 = address.get();
+    }
+}
 
 impl TryFrom<u16> for Address {
     type Error = ();
