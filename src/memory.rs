@@ -70,7 +70,19 @@ impl Debug for Memory {
 
 impl Default for Memory {
     fn default() -> Self {
-        Self([0x00; 4096])
+        let mut default = Self([0x00; 4096]);
+
+        // Fill reserved address space with 0xFF for visualization purposes.
+
+        for address in 0x000..0x200 {
+            default.0[address] = 0xFF;
+        }
+
+        for address in 0xE90..=0xFFF {
+            default.0[address] = 0xFF;
+        }
+
+        default
     }
 }
 
