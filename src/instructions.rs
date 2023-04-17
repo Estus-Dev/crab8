@@ -107,75 +107,105 @@ impl From<u16> for Instruction {
 impl Chip8 {
     pub fn exec(&mut self, instruction: impl Into<Instruction>) {
         use Instruction::*;
-        use Register::*;
 
         match instruction.into() {
             Store(register, value) => self.registers.set(register, value),
-
-            Add(register, value) => self
-                .registers
-                .set(register, self.registers.get(register).wrapping_add(value)),
-
-            Copy(to, from) => self.registers.set(to, self.registers.get(from)),
-
-            Or(to, with) => self
-                .registers
-                .set(to, self.registers.get(to) | self.registers.get(with)),
-
-            And(to, with) => self
-                .registers
-                .set(to, self.registers.get(to) & self.registers.get(with)),
-
-            Xor(to, with) => self
-                .registers
-                .set(to, self.registers.get(to) ^ self.registers.get(with)),
-
-            AddRegister(to, with) => {
-                let to_value = self.registers.get(to);
-                let with_value = self.registers.get(with);
-                let total = to_value.wrapping_add(with_value);
-                let mut wrap = 0x00;
-
-                if total < to_value || total < with_value {
-                    wrap = 0x01;
-                }
-
-                self.registers.set(to, total);
-                self.registers.set(VF, wrap);
-            }
-
-            SubtractRegister(from, with) => {
-                let from_value = self.registers.get(from);
-                let with_value = self.registers.get(with);
-                let total = from_value.wrapping_sub(with_value);
-                let mut wrap = 0x00;
-
-                if total > from_value {
-                    wrap = 0x01;
-                }
-
-                self.registers.set(from, total);
-                self.registers.set(VF, wrap);
-            }
-
-            ShiftRight(to, from) => {
-                let value = self.registers.get(from);
-
-                self.registers.set(to, value >> 1);
-                self.registers.set(VF, value & 0b00000001);
-            }
-
-            ShiftLeft(to, from) => {
-                let value = self.registers.get(from);
-
-                self.registers.set(to, value << 1);
-                self.registers.set(VF, (value & 0b10000000) >> 7);
-            }
-
+            Add(register, value) => self.exec_add(register, value),
+            Copy(register, other) => self.exec_copy(register, other),
+            Or(register, other) => self.exec_or(register, other),
+            And(register, other) => self.exec_and(register, other),
+            Xor(register, other) => self.exec_xor(register, other),
+            AddRegister(register, other) => self.exec_add_register(register, other),
+            SubtractRegister(register, other) => self.exec_subtract_register(register, other),
+            ShiftRight(register, other) => self.exec_shift_right(register, other),
+            ShiftLeft(register, other) => self.exec_shift_left(register, other),
             Invalid(instruction) => panic!("Invalid instruction {instruction} executed!"),
-
             Unknown(instruction) => panic!("Unknown instruction {instruction} executed!"),
         }
+    }
+
+    fn exec_add(&mut self, register: Register, value: u8) {
+        let starting_value = self.registers.get(register);
+        let result = starting_value.wrapping_add(value);
+
+        self.registers.set(register, result);
+    }
+
+    fn exec_copy(&mut self, register: Register, other: Register) {
+        let value = self.registers.get(other);
+
+        self.registers.set(register, value);
+    }
+
+    fn exec_or(&mut self, register: Register, other: Register) {
+        let starting_value = self.registers.get(register);
+        let value = self.registers.get(other);
+        let result = starting_value | value;
+
+        self.registers.set(register, result);
+    }
+
+    fn exec_and(&mut self, register: Register, other: Register) {
+        let starting_value = self.registers.get(register);
+        let value = self.registers.get(other);
+        let result = starting_value & value;
+
+        self.registers.set(register, result);
+    }
+
+    fn exec_xor(&mut self, register: Register, other: Register) {
+        let starting_value = self.registers.get(register);
+        let value = self.registers.get(other);
+        let result = starting_value ^ value;
+
+        self.registers.set(register, result);
+    }
+
+    fn exec_add_register(&mut self, register: Register, other: Register) {
+        use Register::*;
+
+        let starting_value = self.registers.get(register);
+        let value = self.registers.get(other);
+        let result = starting_value.wrapping_add(value);
+        let carry = result < starting_value || result < value;
+        let carry = if carry { 0x01 } else { 0x00 };
+
+        self.registers.set(register, result);
+        self.registers.set(VF, carry);
+    }
+
+    fn exec_subtract_register(&mut self, register: Register, other: Register) {
+        use Register::*;
+
+        let starting_value = self.registers.get(register);
+        let value = self.registers.get(other);
+        let result = starting_value.wrapping_sub(value);
+        let borrow = if result > starting_value { 0x01 } else { 0x00 };
+
+        self.registers.set(register, result);
+        self.registers.set(VF, borrow);
+    }
+
+    fn exec_shift_right(&mut self, register: Register, other: Register) {
+        use Register::*;
+
+        let value = self.registers.get(other);
+        let result = value >> 1;
+        let least_significant_bit = value & 0b00000001;
+
+        self.registers.set(register, result);
+        self.registers.set(VF, least_significant_bit);
+    }
+
+    fn exec_shift_left(&mut self, register: Register, other: Register) {
+        use Register::*;
+
+        let value = self.registers.get(other);
+        let result = value << 1;
+        let most_significant_bit = (value & 0b10000000) >> 7;
+
+        self.registers.set(register, result);
+        self.registers.set(VF, most_significant_bit);
     }
 }
 
