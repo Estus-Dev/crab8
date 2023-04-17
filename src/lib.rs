@@ -16,8 +16,8 @@ use std::{fmt, fmt::Display};
 /// https://github.com/mattmikolay/chip-8/wiki/CHIP%E2%80%908-Technical-Reference
 #[derive(Debug)]
 pub struct Chip8 {
-    /// The CHIP-8 has a 12-bit address register named I that points to the next instruction.
-    /// Technically I is 16-bits wide but addresses above 0xF000 are inaccessible.
+    /// The CHIP-8 has a 12-bit address register named I for pointing to memory.
+    /// Technically I is often 16-bits wide but addresses above 0xF000 are inaccessible.
     /// https://github.com/mattmikolay/chip-8/wiki/CHIP%E2%80%908-Technical-Reference#address-register
     pub address_register: Address,
 
