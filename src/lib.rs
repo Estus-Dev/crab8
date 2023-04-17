@@ -38,9 +38,10 @@ impl Default for Chip8 {
 }
 
 impl Display for Chip8 {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> fmt::Result {
-        writeln!(f, "CHIP-8")?;
-        write!(f, "\tRegisters: {}", self.registers)?;
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        writeln!(f, "CHIP-8\n")?;
+        writeln!(f, "\tAddress Register (I): {}", self.address_register)?;
+        writeln!(f, "\tRegisters: {}", self.registers)?;
 
         Ok(())
     }

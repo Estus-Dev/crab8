@@ -1,6 +1,8 @@
+use std::{fmt, fmt::Debug, fmt::Display, fmt::Formatter};
+
 /// The CHIP-8 has 12-bit addresses, allowing up to 4096 bytes of memory.
 /// https://github.com/mattmikolay/chip-8/wiki/CHIP%E2%80%908-Technical-Reference#storage-in-memory
-#[derive(Debug, Default, PartialEq, Eq)]
+#[derive(Default, PartialEq, Eq)]
 pub struct Address(u16);
 
 impl Address {
@@ -16,6 +18,18 @@ impl Address {
 
     pub fn set(&mut self, address: Address) {
         self.0 = address.get();
+    }
+}
+
+impl Debug for Address {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(f, "Address({:#000x?})", self.0)
+    }
+}
+
+impl Display for Address {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(f, "{self:?}")
     }
 }
 
