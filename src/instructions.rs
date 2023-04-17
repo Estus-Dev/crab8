@@ -37,6 +37,14 @@ pub enum Instruction {
     /// Value: 8XY5 where X is the register and Y is the register to subtract
     SubtractRegister(Register, Register),
 
+    /// Shift the value of Y right one bit and store in X, storing the shifted bit in VF
+    /// Value: 8XY6 where X is the destination and Y is the value to be shifted
+    ShiftRight(Register, Register),
+
+    /// Shift the value of Y left one bit and store in X, storing the shifted bit in VF
+    /// Value: 8XYE where X is the destination and Y is the value to be shifted
+    ShiftLeft(Register, Register),
+
     /// Rather than fail parsing we'll return an invalid instruction
     Invalid(u16),
 
@@ -76,6 +84,8 @@ impl Instruction {
             0x3 => Self::Xor(x, y),
             0x4 => Self::AddRegister(x, y),
             0x5 => Self::SubtractRegister(x, y),
+            0x6 => Self::ShiftRight(x, y),
+            0xE => Self::ShiftLeft(x, y),
             _ => Self::Invalid(instruction),
         }
     }
@@ -146,6 +156,20 @@ impl Chip8 {
 
                 self.registers.set(from, total);
                 self.registers.set(VF, wrap);
+            }
+
+            ShiftRight(to, from) => {
+                let value = self.registers.get(from);
+
+                self.registers.set(to, value >> 1);
+                self.registers.set(VF, value & 0b00000001);
+            }
+
+            ShiftLeft(to, from) => {
+                let value = self.registers.get(from);
+
+                self.registers.set(to, value << 1);
+                self.registers.set(VF, (value & 0b10000000) >> 7);
             }
 
             Invalid(instruction) => panic!("Invalid instruction {instruction} executed!"),
@@ -352,6 +376,76 @@ mod test {
     }
 
     #[test]
+    fn test_shift_right() {
+        let mut chip8 = Chip8::default();
+
+        assert_eq!(chip8.registers, 0x00000000000000000000000000000000.into());
+
+        chip8.exec(Store(V0, 0b00100100));
+
+        assert_eq!(chip8.registers.get(V0), 0b00100100);
+
+        chip8.exec(ShiftRight(V1, V0));
+
+        assert_eq!(chip8.registers.get(V0), 0b00100100);
+        assert_eq!(chip8.registers.get(V1), 0b00010010);
+        assert_eq!(chip8.registers.get(VF), 0x00);
+
+        chip8.exec(ShiftRight(V2, V1));
+
+        assert_eq!(chip8.registers.get(V1), 0b00010010);
+        assert_eq!(chip8.registers.get(V2), 0b00001001);
+        assert_eq!(chip8.registers.get(VF), 0x00);
+
+        chip8.exec(ShiftRight(V3, V2));
+
+        assert_eq!(chip8.registers.get(V2), 0b00001001);
+        assert_eq!(chip8.registers.get(V3), 0b00000100);
+        assert_eq!(chip8.registers.get(VF), 0x01);
+
+        chip8.exec(ShiftRight(V4, V3));
+
+        assert_eq!(chip8.registers.get(V3), 0b00000100);
+        assert_eq!(chip8.registers.get(V4), 0b00000010);
+        assert_eq!(chip8.registers.get(VF), 0x00);
+    }
+
+    #[test]
+    fn test_shift_left() {
+        let mut chip8 = Chip8::default();
+
+        assert_eq!(chip8.registers, 0x00000000000000000000000000000000.into());
+
+        chip8.exec(Store(V0, 0b00100100));
+
+        assert_eq!(chip8.registers.get(V0), 0b00100100);
+
+        chip8.exec(ShiftLeft(V1, V0));
+
+        assert_eq!(chip8.registers.get(V0), 0b00100100);
+        assert_eq!(chip8.registers.get(V1), 0b01001000);
+        assert_eq!(chip8.registers.get(VF), 0x00);
+
+        chip8.exec(ShiftLeft(V2, V1));
+
+        assert_eq!(chip8.registers.get(V1), 0b01001000);
+        assert_eq!(chip8.registers.get(V2), 0b10010000);
+        assert_eq!(chip8.registers.get(VF), 0x00);
+
+        chip8.exec(ShiftLeft(V3, V2));
+
+        assert_eq!(chip8.registers.get(V2), 0b10010000);
+        assert_eq!(chip8.registers.get(V3), 0b00100000);
+        assert_eq!(chip8.registers.get(VF), 0x01);
+
+        chip8.exec(ShiftLeft(V4, V3));
+
+        assert_eq!(chip8.registers.get(V3), 0b00100000);
+        assert_eq!(chip8.registers.get(V4), 0b01000000);
+        assert_eq!(chip8.registers.get(VF), 0x00);
+    }
+
+    #[test]
     fn test_instruction_from() {
         let cases = [
             (0x64AC, Store(V4, 0xAC)),
@@ -376,6 +470,10 @@ mod test {
             (0x8C44, AddRegister(VC, V4)),
             (0x8E05, SubtractRegister(VE, V0)),
             (0x8725, SubtractRegister(V7, V2)),
+            (0x8126, ShiftRight(V1, V2)),
+            (0x8546, ShiftRight(V5, V4)),
+            (0x89FE, ShiftLeft(V9, VF)),
+            (0x8CAE, ShiftLeft(VC, VA)),
         ];
 
         for case in cases {
