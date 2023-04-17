@@ -52,53 +52,32 @@ pub enum Instruction {
     Unknown(u16),
 }
 
-impl Instruction {
-    fn parse_store(instruction: u16) -> Instruction {
-        let register =
-            Register::try_from((instruction & 0x0F00) >> 8).expect("A nibble is a valid register");
-        let value = (instruction & 0x00FF) as u8;
-
-        Instruction::Store(register, value)
-    }
-
-    fn parse_add(instruction: u16) -> Instruction {
-        let register =
-            Register::try_from((instruction & 0x0F00) >> 8).expect("A nibble is a valid register");
-        let value = (instruction & 0x00FF) as u8;
-
-        Instruction::Add(register, value)
-    }
-
-    fn parse_register_to_register(instruction: u16) -> Instruction {
-        let last_nibble = (instruction & 0x000F) as u8;
-
-        let x =
-            Register::try_from((instruction & 0x0F00) >> 8).expect("A nibble is a valid register");
-        let y =
-            Register::try_from((instruction & 0x00F0) >> 4).expect("A nibble is a valid register");
-
-        match last_nibble {
-            0x0 => Self::Copy(x, y),
-            0x1 => Self::Or(x, y),
-            0x2 => Self::And(x, y),
-            0x3 => Self::Xor(x, y),
-            0x4 => Self::AddRegister(x, y),
-            0x5 => Self::SubtractRegister(x, y),
-            0x6 => Self::ShiftRight(x, y),
-            0xE => Self::ShiftLeft(x, y),
-            _ => Self::Invalid(instruction),
-        }
-    }
-}
-
 impl From<u16> for Instruction {
     fn from(instruction: u16) -> Self {
-        let first_nibble = ((instruction & 0xF000) >> 12) as u8;
+        let operator = ((instruction & 0xF000) >> 12) as u8;
+        let sub_operator = (instruction & 0x000F) as u8;
+        let x = Register::try_from((instruction & 0x0F00) >> 8) //
+            .expect("A nibble is a valid register");
+        let y = Register::try_from((instruction & 0x00F0) >> 4) //
+            .expect("A nibble is a valid register");
+        let value = (instruction & 0x00FF) as u8;
 
-        match first_nibble {
-            0x6 => Self::parse_store(instruction),
-            0x7 => Self::parse_add(instruction),
-            0x8 => Self::parse_register_to_register(instruction),
+        match operator {
+            0x6 => Self::Store(x, value),
+            0x7 => Self::Add(x, value),
+
+            0x8 => match sub_operator {
+                0x0 => Self::Copy(x, y),
+                0x1 => Self::Or(x, y),
+                0x2 => Self::And(x, y),
+                0x3 => Self::Xor(x, y),
+                0x4 => Self::AddRegister(x, y),
+                0x5 => Self::SubtractRegister(x, y),
+                0x6 => Self::ShiftRight(x, y),
+                0xE => Self::ShiftLeft(x, y),
+                _ => Self::Invalid(instruction),
+            },
+
             _ => Self::Unknown(instruction),
         }
     }
