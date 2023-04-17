@@ -8,7 +8,7 @@ pub struct Address(u16);
 impl Address {
     /// CHIP-8 programs are loaded starting at 0x200.
     /// Values below this are reserved for the interpreter.
-    pub fn starting_address() -> Address {
+    pub fn initial_instruction() -> Address {
         Self(0x200)
     }
 

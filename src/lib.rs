@@ -38,7 +38,7 @@ impl Default for Chip8 {
     fn default() -> Self {
         Self {
             address_register: Address::default(),
-            program_counter: Address::starting_address(),
+            program_counter: Address::initial_instruction(),
             registers: Default::default(),
             memory: Default::default(),
         }
