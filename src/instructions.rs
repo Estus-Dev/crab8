@@ -354,7 +354,7 @@ impl Chip8 {
     fn exec_jump_offset(&mut self, address: Address) {
         let offset = self.registers.get(V0);
         // UNDEFINED BEHAVIOR: I'm choosing to implement overflow by wrapping.
-        let result = address.wrapping_add(offset);
+        let result = address.wrapping_add(offset as u16);
 
         self.program_counter.set(result);
     }
@@ -416,7 +416,7 @@ impl Chip8 {
     fn exec_add_address(&mut self, register: Register) {
         let current_value = self.address_register;
         let value = self.registers.get(register);
-        let result = current_value.wrapping_add(value);
+        let result = current_value.wrapping_add(value as u16);
 
         self.address_register.set(result);
     }

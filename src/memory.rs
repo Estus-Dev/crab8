@@ -36,7 +36,7 @@ impl Address {
     }
 
     /// Add a byte to the given Address and return a new Address.
-    pub fn wrapping_add(&self, value: u8) -> Address {
+    pub fn wrapping_add(&self, value: u16) -> Address {
         Address((self.0 + value as u16) & 0x0FFF)
     }
 
