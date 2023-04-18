@@ -87,6 +87,14 @@ pub enum Instruction {
     /// Value: CXNN where X is the register and NN is the bitmask to apply
     Rand(Register, u8),
 
+    /// Skip the next instruction if the key stored in the specified register is pressed.
+    /// Value: EX9E where X is the register
+    IfNotPressed(Register),
+
+    /// Skip the next instruction if the key stored in the specified register is not pressed.
+    /// Value: EXA1 where X is the register
+    IfPressed(Register),
+
     /// Rather than fail parsing we'll return an invalid instruction
     Invalid(u16),
 
@@ -132,6 +140,8 @@ impl From<u16> for Instruction {
             0xA => Self::StoreAddress(address),
             0xB => Self::JumpOffset(address),
             0xC => Self::Rand(x, value),
+            0xE if value == 0x9E => Self::IfNotPressed(x),
+            0xE if value == 0xA1 => Self::IfPressed(x),
 
             _ => Self::Unknown(instruction),
         }
@@ -163,6 +173,8 @@ impl Chip8 {
             StoreAddress(address) => self.exec_store_address(address),
             JumpOffset(address) => self.exec_jump_offset(address),
             Rand(register, bitmask) => self.exec_rand(register, bitmask),
+            IfNotPressed(register) => self.exec_if_not_pressed(register),
+            IfPressed(register) => self.exec_if_pressed(register),
             Invalid(instruction) => panic!("Invalid instruction {instruction} executed!"),
             Unknown(instruction) => panic!("Unknown instruction {instruction} executed!"),
         }
@@ -323,6 +335,36 @@ impl Chip8 {
         let result = random::<u8>() & bitmask;
 
         self.registers.set(register, result);
+    }
+
+    fn exec_if_not_pressed(&mut self, register: Register) {
+        let key = self.registers.get(register);
+        let pressed = if key <= 0xF {
+            self.input
+                .is_key_pressed(key.try_into().expect("A nibble is a valid key"))
+        } else {
+            false
+        };
+
+        if pressed {
+            self.program_counter
+                .set(self.program_counter.wrapping_add(1));
+        }
+    }
+
+    fn exec_if_pressed(&mut self, register: Register) {
+        let key = self.registers.get(register);
+        let pressed = if key <= 0xF {
+            self.input
+                .is_key_pressed(key.try_into().expect("A nibble is a valid key"))
+        } else {
+            false
+        };
+
+        if !pressed {
+            self.program_counter
+                .set(self.program_counter.wrapping_add(1));
+        }
     }
 }
 
@@ -813,6 +855,120 @@ mod test {
     }
 
     #[test]
+    // TODO: Most of these tests should use some form of property-based testing
+    fn test_is_not_pressed() -> Result<(), ()> {
+        let mut chip8 = Chip8::default();
+
+        for register in (0x0..=0x0F).map(|r| Register::try_from(r as usize).unwrap()) {
+            for pressed_key in (0x0..=0x0F).map(|key| Key::try_from(key).unwrap()) {
+                chip8.input = Input::build().set_pressed(pressed_key, true).build();
+
+                for key in (0x0..=0x0F).map(|key| Key::try_from(key).unwrap()) {
+                    let starting_pc = chip8.program_counter.get();
+                    let incremented_pc = chip8.program_counter.wrapping_add(1).get();
+
+                    chip8.registers.set(register, key as u8);
+                    chip8.exec(IfNotPressed(register));
+
+                    let pc = chip8.program_counter.get();
+
+                    if key != pressed_key {
+                        assert_eq!(pc, starting_pc);
+                    } else {
+                        assert_eq!(pc, incremented_pc);
+                    }
+                }
+            }
+        }
+
+        let second_pressed_key = Key::try_from(0xC)?;
+
+        for register in (0x0..=0x0F).map(|r| Register::try_from(r as usize).unwrap()) {
+            for pressed_key in (0x0..=0x0F).map(|key| Key::try_from(key).unwrap()) {
+                chip8.input = Input::build()
+                    .set_pressed(pressed_key, true)
+                    .set_pressed(second_pressed_key, true)
+                    .build();
+
+                for key in (0x0..=0x0F).map(|key| Key::try_from(key).unwrap()) {
+                    let starting_pc = chip8.program_counter.get();
+                    let incremented_pc = chip8.program_counter.wrapping_add(1).get();
+
+                    chip8.registers.set(register, key as u8);
+                    chip8.exec(IfNotPressed(register));
+
+                    let pc = chip8.program_counter.get();
+
+                    if key != pressed_key && key != second_pressed_key {
+                        assert_eq!(pc, starting_pc);
+                    } else {
+                        assert_eq!(pc, incremented_pc);
+                    }
+                }
+            }
+        }
+
+        Ok(())
+    }
+
+    #[test]
+    // TODO: Most of these tests should use some form of property-based testing
+    fn test_is_pressed() -> Result<(), ()> {
+        let mut chip8 = Chip8::default();
+
+        for register in (0x0..=0x0F).map(|r| Register::try_from(r as usize).unwrap()) {
+            for pressed_key in (0x0..=0x0F).map(|key| Key::try_from(key).unwrap()) {
+                chip8.input = Input::build().set_pressed(pressed_key, true).build();
+
+                for key in (0x0..=0x0F).map(|key| Key::try_from(key).unwrap()) {
+                    let starting_pc = chip8.program_counter.get();
+                    let incremented_pc = chip8.program_counter.wrapping_add(1).get();
+
+                    chip8.registers.set(register, key as u8);
+                    chip8.exec(IfPressed(register));
+
+                    let pc = chip8.program_counter.get();
+
+                    if key == pressed_key {
+                        assert_eq!(pc, starting_pc);
+                    } else {
+                        assert_eq!(pc, incremented_pc);
+                    }
+                }
+            }
+        }
+
+        let second_pressed_key = Key::try_from(0xC)?;
+
+        for register in (0x0..=0x0F).map(|r| Register::try_from(r as usize).unwrap()) {
+            for pressed_key in (0x0..=0x0F).map(|key| Key::try_from(key).unwrap()) {
+                chip8.input = Input::build()
+                    .set_pressed(pressed_key, true)
+                    .set_pressed(second_pressed_key, true)
+                    .build();
+
+                for key in (0x0..=0x0F).map(|key| Key::try_from(key).unwrap()) {
+                    let starting_pc = chip8.program_counter.get();
+                    let incremented_pc = chip8.program_counter.wrapping_add(1).get();
+
+                    chip8.registers.set(register, key as u8);
+                    chip8.exec(IfPressed(register));
+
+                    let pc = chip8.program_counter.get();
+
+                    if key == pressed_key || key == second_pressed_key {
+                        assert_eq!(pc, starting_pc);
+                    } else {
+                        assert_eq!(pc, incremented_pc);
+                    }
+                }
+            }
+        }
+
+        Ok(())
+    }
+
+    #[test]
     fn test_rand() {
         // TODO: I don't know how I want to approach testing this.
         // The bitmask needs to be tested too.
@@ -873,6 +1029,16 @@ mod test {
             (0xBD62, JumpOffset(0xD62.try_into()?)),
             (0xC700, Rand(V7, 0x00)),
             (0xC12F, Rand(V1, 0x2F)),
+            (0xE09E, IfNotPressed(V0)),
+            (0xE69E, IfNotPressed(V6)),
+            (0xEA9E, IfNotPressed(VA)),
+            (0xE2A1, IfPressed(V2)),
+            (0xE9A1, IfPressed(V9)),
+            (0xEBA1, IfPressed(VB)),
+            (0xE09F, Unknown(0xE09F)), // TODO: Should be invalid
+            (0xE1A2, Unknown(0xE1A2)), // TODO: Should be invalid
+            (0xE200, Unknown(0xE200)), // TODO: Should be invalid
+            (0xE3FF, Unknown(0xE3FF)), // TODO: Should be invalid
         ];
 
         for case in cases {

@@ -1,3 +1,4 @@
+use crate::prelude::*;
 use std::{fmt, fmt::Debug, fmt::Display};
 
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -18,6 +19,48 @@ pub enum Key {
     KeyD = 0xD,
     KeyE = 0xE,
     KeyF = 0xF,
+}
+
+impl Debug for Key {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let key = format!("{:#X}", *self as usize).replace("0x", "");
+
+        write!(f, "Key({key})")
+    }
+}
+
+impl Display for Key {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let key = format!("{:#X}", *self as usize).replace("0x", "");
+
+        write!(f, "{key}")
+    }
+}
+
+impl TryFrom<u8> for Key {
+    type Error = ();
+
+    fn try_from(value: u8) -> Result<Self, Self::Error> {
+        match value {
+            0x0 => Ok(Key0),
+            0x1 => Ok(Key1),
+            0x2 => Ok(Key2),
+            0x3 => Ok(Key3),
+            0x4 => Ok(Key4),
+            0x5 => Ok(Key5),
+            0x6 => Ok(Key6),
+            0x7 => Ok(Key7),
+            0x8 => Ok(Key8),
+            0x9 => Ok(Key9),
+            0xA => Ok(KeyA),
+            0xB => Ok(KeyB),
+            0xC => Ok(KeyC),
+            0xD => Ok(KeyD),
+            0xE => Ok(KeyE),
+            0xF => Ok(KeyF),
+            _ => Err(()),
+        }
+    }
 }
 
 #[derive(Clone, Copy, Default)]
