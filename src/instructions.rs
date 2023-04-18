@@ -21,6 +21,10 @@ pub enum Instruction {
     /// Value: 4XNN where X is the register and NN is the value to store
     If(Register, u8),
 
+    /// Skip the next instruction if the current values of both registers are equal.
+    /// Value: 5XY0 where X and Y are the registers to compare
+    IfNotRegisters(Register, Register),
+
     /// Store a value in the specified register
     /// Value: 6XNN where X is the register and NN is the value to store
     Store(Register, u8),
@@ -94,6 +98,10 @@ impl From<u16> for Instruction {
             0x2 => Self::Call(address),
             0x3 => Self::IfNot(x, value),
             0x4 => Self::If(x, value),
+            0x5 => match sub_operator {
+                0x0 => Self::IfNotRegisters(x, y),
+                _ => Self::Invalid(instruction),
+            },
             0x6 => Self::Store(x, value),
             0x7 => Self::Add(x, value),
 
@@ -126,6 +134,7 @@ impl Chip8 {
             Call(address) => self.exec_call(address),
             IfNot(register, value) => self.exec_if_not(register, value),
             If(register, value) => self.exec_if(register, value),
+            IfNotRegisters(register, other) => self.exec_if_not_registers(register, other),
             Store(register, value) => self.exec_store(register, value),
             Add(register, value) => self.exec_add(register, value),
             Copy(register, other) => self.exec_copy(register, other),
@@ -167,6 +176,16 @@ impl Chip8 {
         let current_value = self.registers.get(register);
 
         if current_value != value {
+            self.program_counter
+                .set(self.program_counter.wrapping_add(1));
+        }
+    }
+
+    fn exec_if_not_registers(&mut self, register: Register, other: Register) {
+        let current_value = self.registers.get(register);
+        let value = self.registers.get(other);
+
+        if current_value == value {
             self.program_counter
                 .set(self.program_counter.wrapping_add(1));
         }
@@ -354,6 +373,40 @@ mod test {
             let previous_pc = chip8.program_counter.get();
 
             chip8.exec(Store(register, value));
+            chip8.exec(instruction);
+
+            let pc = chip8.program_counter.get();
+
+            if skipped {
+                assert_eq!(pc, previous_pc + 1);
+            } else {
+                assert_eq!(pc, previous_pc);
+            }
+        }
+    }
+
+    #[test]
+    fn test_if_not_register() {
+        let cases = [
+            (0x5000u16, 0x00u8, 0x00u8, true),
+            (0x5010, 0xF5, 0xF5, true),
+            (0x5010, 0xF5, 0x52, false),
+            (0x5640, 0x42, 0x42, true),
+            (0x5640, 0x46, 0x45, false),
+        ];
+
+        let mut chip8 = Chip8::default();
+
+        for (instruction, x_value, y_value, skipped) in cases {
+            let x = Register::try_from((instruction & 0x0F00) >> 8) //
+                .expect("A nibble is a valid register");
+            let y = Register::try_from((instruction & 0x00F0) >> 4) //
+                .expect("A nibble is a valid register");
+
+            let previous_pc = chip8.program_counter.get();
+
+            chip8.exec(Store(x, x_value));
+            chip8.exec(Store(y, y_value));
             chip8.exec(instruction);
 
             let pc = chip8.program_counter.get();
