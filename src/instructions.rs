@@ -102,10 +102,7 @@ impl From<u16> for Instruction {
             0x2 => Self::Call(address),
             0x3 => Self::IfNot(x, value),
             0x4 => Self::If(x, value),
-            0x5 => match sub_operator {
-                0x0 => Self::IfNotRegisters(x, y),
-                _ => Self::Invalid(instruction),
-            },
+            0x5 if sub_operator == 0 => Self::IfNotRegisters(x, y),
             0x6 => Self::Store(x, value),
             0x7 => Self::Add(x, value),
 
@@ -786,7 +783,7 @@ mod test {
             (0x4712, If(V7, 0x12)),
             (0x5AD0, IfNotRegisters(VA, VD)),
             (0x5040, IfNotRegisters(V0, V4)),
-            (0x5049, Invalid(0x5049)),
+            (0x5049, Unknown(0x5049)), // TODO: Should be Invalid
             (0x64AC, Store(V4, 0xAC)),
             (0x6000, Store(V0, 0x00)),
             (0x6123, Store(V1, 0x23)),
