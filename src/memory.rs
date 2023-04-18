@@ -28,6 +28,11 @@ impl Address {
         Self(INITIAL_PC)
     }
 
+    /// Add a byte to the given Address and return a new Address.
+    pub fn wrapping_add(&self, value: u8) -> Address {
+        Address((self.0 + value as u16) & 0x0FFF)
+    }
+
     pub fn get(&self) -> u16 {
         self.0
     }

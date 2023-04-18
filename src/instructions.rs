@@ -54,6 +54,10 @@ pub enum Instruction {
     /// Value: 8XY7 where X is the register and Y is the register to subtract from
     SubtractFromRegister(Register, Register),
 
+    /// Jump moves the instruction pointer to the specified Address offset by the value of V0.
+    /// Value: BNNN where NNN is the address
+    JumpOffset(Address),
+
     /// Rather than fail parsing we'll return an invalid instruction
     Invalid(u16),
 
@@ -91,6 +95,8 @@ impl From<u16> for Instruction {
                 _ => Self::Invalid(instruction),
             },
 
+            0xB => Self::JumpOffset(address),
+
             _ => Self::Unknown(instruction),
         }
     }
@@ -113,6 +119,7 @@ impl Chip8 {
             ShiftRight(register, other) => self.exec_shift_right(register, other),
             SubtractFromRegister(register, other) => self.exec_sub_from_register(register, other),
             ShiftLeft(register, other) => self.exec_shift_left(register, other),
+            JumpOffset(address) => self.exec_jump_offset(address),
             Invalid(instruction) => panic!("Invalid instruction {instruction} executed!"),
             Unknown(instruction) => panic!("Unknown instruction {instruction} executed!"),
         }
@@ -202,6 +209,14 @@ impl Chip8 {
 
         self.registers.set(register, result);
         self.registers.set(VF, most_significant_bit);
+    }
+
+    fn exec_jump_offset(&mut self, address: Address) {
+        let offset = self.registers.get(V0);
+        // UNDEFINED BEHAVIOR: I'm choosing to implement overflow by wrapping.
+        let result = address.wrapping_add(offset);
+
+        self.program_counter.set(result);
     }
 }
 
@@ -506,6 +521,24 @@ mod test {
         assert_eq!(chip8.registers.get(V3), 0b00100000);
         assert_eq!(chip8.registers.get(V4), 0b01000000);
         assert_eq!(chip8.registers.get(VF), 0x00);
+    }
+
+    #[test]
+    fn test_jump_offset() {
+        let cases = [
+            (0xB000u16, 0x00u8, 0x000u16),
+            (0xB123, 0x00, 0x123),
+            (0xB123, 0x45, 0x168),
+        ];
+
+        let mut chip8 = Chip8::default();
+
+        for (instruction, offset, expected) in cases {
+            chip8.registers.set(V0, offset);
+            chip8.exec(instruction);
+
+            assert_eq!(chip8.program_counter.get(), expected);
+        }
     }
 
     #[test]
