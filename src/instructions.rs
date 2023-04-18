@@ -74,6 +74,10 @@ pub enum Instruction {
     /// Value: 9XY0 where X and Y are the registers to compare
     IfRegisters(Register, Register),
 
+    /// Store a memory address in I.
+    /// Value: ANNN where NNN is the address to store.
+    StoreAddress(Address),
+
     /// Jump moves the instruction pointer to the specified Address offset by the value of V0.
     /// Value: BNNN where NNN is the address
     JumpOffset(Address),
@@ -120,6 +124,7 @@ impl From<u16> for Instruction {
             },
 
             0x9 if sub_operator == 0x00 => Self::IfRegisters(x, y),
+            0xA => Self::StoreAddress(address),
             0xB => Self::JumpOffset(address),
 
             _ => Self::Unknown(instruction),
@@ -149,6 +154,7 @@ impl Chip8 {
             SubtractFromRegister(register, other) => self.exec_sub_from_register(register, other),
             ShiftLeft(register, other) => self.exec_shift_left(register, other),
             IfRegisters(register, other) => self.exec_if_registers(register, other),
+            StoreAddress(address) => self.exec_store_address(address),
             JumpOffset(address) => self.exec_jump_offset(address),
             Invalid(instruction) => panic!("Invalid instruction {instruction} executed!"),
             Unknown(instruction) => panic!("Unknown instruction {instruction} executed!"),
@@ -292,6 +298,10 @@ impl Chip8 {
             self.program_counter
                 .set(self.program_counter.wrapping_add(1));
         }
+    }
+
+    fn exec_store_address(&mut self, address: Address) {
+        self.address_register.set(address);
     }
 
     fn exec_jump_offset(&mut self, address: Address) {
@@ -751,6 +761,27 @@ mod test {
     }
 
     #[test]
+    fn test_store_address() -> Result<(), ()> {
+        let mut chip8 = Chip8::default();
+
+        assert_eq!(chip8.address_register, 0x000.try_into()?);
+
+        chip8.exec(StoreAddress(0xFFF.try_into()?));
+
+        assert_eq!(chip8.address_register, 0xFFF.try_into()?);
+
+        chip8.exec(StoreAddress(0x032.try_into()?));
+
+        assert_eq!(chip8.address_register, 0x032.try_into()?);
+
+        chip8.exec(StoreAddress(0x14E.try_into()?));
+
+        assert_eq!(chip8.address_register, 0x14E.try_into()?);
+
+        Ok(())
+    }
+
+    #[test]
     fn test_jump_offset() {
         let cases = [
             (0xB000u16, 0x00u8, 0x000u16),
@@ -815,6 +846,9 @@ mod test {
             (0x9AD0, IfRegisters(VA, VD)),
             (0x9040, IfRegisters(V0, V4)),
             (0x9049, Unknown(0x9049)), // TODO: Should be invalid
+            (0xA000, StoreAddress(0x000.try_into()?)),
+            (0xA123, StoreAddress(0x123.try_into()?)),
+            (0xAF24, StoreAddress(0xF24.try_into()?)),
             (0xBFFF, JumpOffset(0xFFF.try_into()?)),
             (0xB631, JumpOffset(0x631.try_into()?)),
             (0xBD62, JumpOffset(0xD62.try_into()?)),
