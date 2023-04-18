@@ -84,6 +84,7 @@ impl Debug for Memory {
         writeln!(f, "       00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F")?;
 
         for (i, row) in self.0.chunks(CHUNK_SIZE).enumerate() {
+            let row_address = CHUNK_SIZE * i;
             let bytes_string = row
                 .iter()
                 .map(|&b| format!("{b:#04X?}").replace("0x", ""))
@@ -91,7 +92,7 @@ impl Debug for Memory {
                 .trim()
                 .to_owned();
 
-            writeln!(f, "{:#05X}: {bytes_string}", i * CHUNK_SIZE)?
+            writeln!(f, "{row_address:#05X}: {bytes_string}")?
         }
 
         Ok(())
