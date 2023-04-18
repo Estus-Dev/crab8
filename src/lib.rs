@@ -1,3 +1,4 @@
+mod input;
 mod instructions;
 mod memory;
 mod registers;
@@ -5,6 +6,7 @@ mod stack;
 mod timer;
 
 pub mod prelude {
+    pub use crate::input::{Input, Key, Key::*};
     pub use crate::instructions::Instruction;
     pub use crate::memory::{Address, Memory};
     pub use crate::registers::{Register, Register::*, Registers};
@@ -40,6 +42,8 @@ pub struct Chip8 {
     pub stack: Stack,
 
     pub memory: Memory,
+
+    pub input: Input,
 }
 
 impl Chip8 {}
@@ -54,6 +58,7 @@ impl Default for Chip8 {
             sound: Default::default(),
             stack: Default::default(),
             memory: Default::default(),
+            input: Default::default(),
         }
     }
 }
@@ -65,6 +70,8 @@ impl Display for Chip8 {
         writeln!(f, "\tProgram Counter (PC): {}", self.program_counter)?;
         writeln!(f, "\tRegisters: {}", self.registers)?;
         writeln!(f, "\tDelay: {}\tSound: {}", self.delay, self.sound)?;
+        writeln!(f)?;
+        writeln!(f, "\tInput: {}", self.input)?;
         writeln!(f)?;
         writeln!(f, "\tStack: {}", self.stack)?;
         writeln!(f)?;

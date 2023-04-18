@@ -15,6 +15,11 @@ fn main() -> Result<(), ()> {
     chip8.stack.push(0x234.try_into()?)?;
     chip8.stack.push(0x345.try_into()?)?;
 
+    chip8.input = Input::build()
+        .set_pressed(Key5, true)
+        .set_pressed(KeyF, true)
+        .build();
+
     println!("{chip8}");
 
     Ok(())
