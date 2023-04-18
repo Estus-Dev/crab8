@@ -677,6 +677,8 @@ mod test {
             (0x2101, Call(0x101.try_into()?)),
             (0x242E, Call(0x42E.try_into()?)),
             (0x2C5D, Call(0xC5D.try_into()?)),
+            (0x3271, IfNot(V2, 0x71)),
+            (0x3EDD, IfNot(VE, 0xDD)),
             (0x4567, If(V5, 0x67)),
             (0x4712, If(V7, 0x12)),
             (0x64AC, Store(V4, 0xAC)),
