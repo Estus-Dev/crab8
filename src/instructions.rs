@@ -108,7 +108,7 @@ pub enum Instruction {
     SetSound(Register),
 
     /// Add the value of the specified register to the address register
-    /// Value: FX1E
+    /// Value: FX1E where X is the register
     AddAddress(Register),
 
     /// Rather than fail parsing we'll return an invalid instruction
