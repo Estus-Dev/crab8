@@ -1,3 +1,4 @@
+mod character;
 mod input;
 mod instructions;
 mod memory;
@@ -6,6 +7,7 @@ mod stack;
 mod timer;
 
 pub mod prelude {
+    pub use crate::character::{Character, Character::*};
     pub use crate::input::{Input, Key, Key::*};
     pub use crate::instructions::Instruction;
     pub use crate::memory::{Address, Memory};
