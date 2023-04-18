@@ -583,6 +583,9 @@ mod test {
             (0x8AA7, SubtractFromRegister(VA, VA)),
             (0x89FE, ShiftLeft(V9, VF)),
             (0x8CAE, ShiftLeft(VC, VA)),
+            (0xBFFF, JumpOffset(0xFFF.try_into()?)),
+            (0xB631, JumpOffset(0x631.try_into()?)),
+            (0xBD62, JumpOffset(0xD62.try_into()?)),
         ];
 
         for case in cases {
