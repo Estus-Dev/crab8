@@ -18,10 +18,10 @@ const LAST_ADDRESS: u16 = 0xFFF;
 const LAST_SAFE_ADDRESS: u16 = LAST_ADDRESS - 352;
 
 // Character sprites are 5 bytes wide.
-const CHAR_SPRITE_WIDTH: u16 = 5;
+pub const CHAR_SPRITE_WIDTH: u16 = 5;
 
 /// The end of the starting reserved addresses will be used for sprite data.
-const FIRST_CHAR_ADDRESS: u16 = FIRST_SAFE_ADDRESS - (16 * CHAR_SPRITE_WIDTH as u16);
+pub const FIRST_CHAR_ADDRESS: u16 = FIRST_SAFE_ADDRESS - (16 * CHAR_SPRITE_WIDTH);
 
 /// The CHIP-8 has 12-bit addresses, allowing up to 4096 bytes of memory.
 /// https://github.com/mattmikolay/chip-8/wiki/CHIP%E2%80%908-Technical-Reference#storage-in-memory

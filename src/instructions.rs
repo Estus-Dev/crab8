@@ -1,6 +1,7 @@
 use core::panic;
 use rand::random;
 
+use crate::memory::{CHAR_SPRITE_WIDTH, FIRST_CHAR_ADDRESS};
 use crate::prelude::*;
 
 /// Chip-8 instructions are 32-bit values that may contain data
@@ -111,6 +112,10 @@ pub enum Instruction {
     /// Value: FX1E where X is the register
     AddAddress(Register),
 
+    /// Set the address register to the sprite data for the character in the specified register.
+    /// Value: FX29 where X is the register
+    LoadSprite(Register),
+
     /// Rather than fail parsing we'll return an invalid instruction
     Invalid(u16),
 
@@ -164,6 +169,7 @@ impl From<u16> for Instruction {
                 0x15 => Self::SetDelay(x),
                 0x18 => Self::SetSound(x),
                 0x1E => Self::AddAddress(x),
+                0x29 => Self::LoadSprite(x),
                 _ => Self::Invalid(instruction),
             },
 
@@ -203,6 +209,7 @@ impl Chip8 {
             SetDelay(register) => self.exec_set_delay(register),
             SetSound(register) => self.exec_set_sound(register),
             AddAddress(register) => self.exec_add_address(register),
+            LoadSprite(register) => self.exec_load_sprite(register),
             Invalid(instruction) => panic!("Invalid instruction {instruction} executed!"),
             Unknown(instruction) => panic!("Unknown instruction {instruction} executed!"),
         }
@@ -420,12 +427,26 @@ impl Chip8 {
 
         self.address_register.set(result);
     }
+
+    fn exec_load_sprite(&mut self, register: Register) {
+        let first_address =
+            Address::try_from(FIRST_CHAR_ADDRESS).expect("First char address is a valid address");
+        let current_value = self.registers.get(register);
+        let character = Character::try_from(current_value).unwrap_or(Char0);
+        let offset = CHAR_SPRITE_WIDTH * character as u16;
+        let result = first_address.wrapping_add(offset);
+
+        self.address_register.set(result);
+    }
 }
 
 #[cfg(test)]
 mod test {
     use super::Instruction::*;
-    use crate::prelude::*;
+    use crate::{
+        memory::{CHAR_SPRITE_WIDTH, FIRST_CHAR_ADDRESS},
+        prelude::*,
+    };
 
     #[test]
     fn test_jump() {
@@ -1105,6 +1126,31 @@ mod test {
     }
 
     #[test]
+    fn test_load_sprite() {
+        let mut chip8 = Chip8::default();
+        let mut offset = 0x00;
+
+        assert_eq!(chip8.address_register.get(), 0x000);
+
+        chip8.exec(Store(V5, 0x00));
+        chip8.exec(LoadSprite(V5));
+
+        assert_eq!(chip8.address_register.get(), FIRST_CHAR_ADDRESS + offset);
+
+        chip8.exec(Store(V3, 0x04));
+        chip8.exec(LoadSprite(V3));
+
+        offset = 0x04 * CHAR_SPRITE_WIDTH;
+        assert_eq!(chip8.address_register.get(), FIRST_CHAR_ADDRESS + offset);
+
+        chip8.exec(Store(VB, 0x0F));
+        chip8.exec(LoadSprite(VB));
+
+        offset = 0x0F * CHAR_SPRITE_WIDTH;
+        assert_eq!(chip8.address_register.get(), FIRST_CHAR_ADDRESS + offset);
+    }
+
+    #[test]
     fn test_instruction_from() -> Result<(), ()> {
         let cases = [
             (0x1000, Jump(0x000.try_into()?)),
@@ -1182,6 +1228,8 @@ mod test {
             (0xF01E, AddAddress(V0)),
             (0xF41E, AddAddress(V4)),
             (0xF41F, Invalid(0xF41F)),
+            (0xF129, LoadSprite(V1)),
+            (0xF729, LoadSprite(V7)),
         ];
 
         for case in cases {
