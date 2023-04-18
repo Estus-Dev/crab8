@@ -95,6 +95,18 @@ pub enum Instruction {
     /// Value: EXA1 where X is the register
     IfPressed(Register),
 
+    /// Read the value of the delay timer to the specified register
+    /// Value: FX07 where X is the register
+    ReadDelay(Register),
+
+    /// Set the delay timer to the value of the specified register
+    /// Value: FX15 where X is the register
+    SetDelay(Register),
+
+    /// Set the sound timer to the value of the specified register
+    /// Value: FX18 where X is the register
+    SetSound(Register),
+
     /// Rather than fail parsing we'll return an invalid instruction
     Invalid(u16),
 
@@ -143,6 +155,13 @@ impl From<u16> for Instruction {
             0xE if value == 0x9E => Self::IfNotPressed(x),
             0xE if value == 0xA1 => Self::IfPressed(x),
 
+            0xF => match value {
+                0x07 => Self::ReadDelay(x),
+                0x15 => Self::SetDelay(x),
+                0x18 => Self::SetSound(x),
+                _ => Self::Invalid(instruction),
+            },
+
             _ => Self::Unknown(instruction),
         }
     }
@@ -175,6 +194,9 @@ impl Chip8 {
             Rand(register, bitmask) => self.exec_rand(register, bitmask),
             IfNotPressed(register) => self.exec_if_not_pressed(register),
             IfPressed(register) => self.exec_if_pressed(register),
+            ReadDelay(register) => self.exec_read_delay(register),
+            SetDelay(register) => self.exec_set_delay(register),
+            SetSound(register) => self.exec_set_sound(register),
             Invalid(instruction) => panic!("Invalid instruction {instruction} executed!"),
             Unknown(instruction) => panic!("Unknown instruction {instruction} executed!"),
         }
@@ -365,6 +387,24 @@ impl Chip8 {
             self.program_counter
                 .set(self.program_counter.wrapping_add(1));
         }
+    }
+
+    fn exec_read_delay(&mut self, register: Register) {
+        let result = self.delay.get();
+
+        self.registers.set(register, result);
+    }
+
+    fn exec_set_delay(&mut self, register: Register) {
+        let result = self.registers.get(register);
+
+        self.delay.set(result);
+    }
+
+    fn exec_set_sound(&mut self, register: Register) {
+        let result = self.registers.get(register);
+
+        self.sound.set(result);
     }
 }
 
@@ -975,6 +1015,54 @@ mod test {
     }
 
     #[test]
+    fn test_delay_timer() {
+        let mut chip8 = Chip8::default();
+
+        assert_eq!(chip8.delay.get(), 0x00);
+
+        chip8.exec(Store(V5, 0x14));
+        chip8.exec(SetDelay(V5));
+
+        assert_eq!(chip8.delay.get(), 0x14);
+
+        chip8.exec(ReadDelay(V8));
+
+        assert_eq!(chip8.registers.get(V8), 0x14);
+
+        chip8.tick();
+
+        assert_eq!(chip8.delay.get(), 0x13);
+
+        chip8.exec(ReadDelay(V8));
+
+        assert_eq!(chip8.registers.get(V8), 0x13);
+
+        chip8.exec(Store(V0, 0xFF));
+        chip8.exec(SetDelay(V0));
+        chip8.exec(ReadDelay(VF));
+
+        assert_eq!(chip8.registers.get(VF), 0xFF);
+    }
+
+    #[test]
+    fn test_sound_timer() {
+        let mut chip8 = Chip8::default();
+
+        assert_eq!(chip8.sound.get(), 0x00);
+
+        chip8.exec(Store(V5, 0x14));
+        chip8.exec(SetSound(V5));
+
+        assert_eq!(chip8.sound.get(), 0x14);
+
+        chip8.tick();
+
+        assert_eq!(chip8.sound.get(), 0x13);
+
+        chip8.exec(Store(V0, 0xFF));
+        chip8.exec(SetSound(V0));
+    }
+    #[test]
     fn test_instruction_from() -> Result<(), ()> {
         let cases = [
             (0x1000, Jump(0x000.try_into()?)),
@@ -1039,6 +1127,16 @@ mod test {
             (0xE1A2, Unknown(0xE1A2)), // TODO: Should be invalid
             (0xE200, Unknown(0xE200)), // TODO: Should be invalid
             (0xE3FF, Unknown(0xE3FF)), // TODO: Should be invalid
+            (0xF507, ReadDelay(V5)),
+            (0xF207, ReadDelay(V2)),
+            (0xF000, Invalid(0xF000)),
+            (0xF114, Invalid(0xF114)),
+            (0xF115, SetDelay(V1)),
+            (0xF015, SetDelay(V0)),
+            (0xFA16, Invalid(0xFA16)),
+            (0xFC17, Invalid(0xFC17)),
+            (0xFB18, SetSound(VB)),
+            (0xF618, SetSound(V6)),
         ];
 
         for case in cases {
