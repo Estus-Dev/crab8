@@ -18,7 +18,7 @@ const LAST_ADDRESS: u16 = 0xFFF;
 const LAST_SAFE_ADDRESS: u16 = LAST_ADDRESS - 352;
 
 // Character sprites are 5 bytes wide.
-const CHAR_SPRITE_WIDTH: usize = 5;
+const CHAR_SPRITE_WIDTH: u16 = 5;
 
 /// The end of the starting reserved addresses will be used for sprite data.
 const FIRST_CHAR_ADDRESS: u16 = FIRST_SAFE_ADDRESS - (16 * CHAR_SPRITE_WIDTH as u16);
@@ -122,7 +122,7 @@ impl Default for Memory {
 
         // Fill in sprite data
         for (char, address) in (FIRST_CHAR_ADDRESS..FIRST_SAFE_ADDRESS)
-            .step_by(CHAR_SPRITE_WIDTH)
+            .step_by(CHAR_SPRITE_WIDTH as usize)
             .enumerate()
         {
             println!("{FIRST_CHAR_ADDRESS}, {FIRST_SAFE_ADDRESS}");
