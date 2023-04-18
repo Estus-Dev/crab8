@@ -107,8 +107,8 @@ impl Chip8 {
         use Instruction::*;
 
         match instruction.into() {
-            Jump(address) => self.program_counter.set(address),
-            Store(register, value) => self.registers.set(register, value),
+            Jump(address) => self.exec_jump(address),
+            Store(register, value) => self.exec_store(register, value),
             Add(register, value) => self.exec_add(register, value),
             Copy(register, other) => self.exec_copy(register, other),
             Or(register, other) => self.exec_or(register, other),
@@ -123,6 +123,14 @@ impl Chip8 {
             Invalid(instruction) => panic!("Invalid instruction {instruction} executed!"),
             Unknown(instruction) => panic!("Unknown instruction {instruction} executed!"),
         }
+    }
+
+    fn exec_jump(&mut self, address: Address) {
+        self.program_counter.set(address);
+    }
+
+    fn exec_store(&mut self, register: Register, value: u8) {
+        self.registers.set(register, value);
     }
 
     fn exec_add(&mut self, register: Register, value: u8) {
