@@ -13,6 +13,10 @@ pub enum Instruction {
     /// Value: 2NNN where NNN is the address
     Call(Address),
 
+    /// Skip the next instruction if the current value of the register is equal to this value.
+    /// Value: 3XNN where X is the register and NN is the value to compare
+    IfNot(Register, u8),
+
     /// Store a value in the specified register
     /// Value: 6XNN where X is the register and NN is the value to store
     Store(Register, u8),
@@ -84,6 +88,7 @@ impl From<u16> for Instruction {
         match operator {
             0x1 => Self::Jump(address),
             0x2 => Self::Call(address),
+            0x3 => Self::IfNot(x, value),
             0x6 => Self::Store(x, value),
             0x7 => Self::Add(x, value),
 
@@ -114,6 +119,7 @@ impl Chip8 {
         match instruction.into() {
             Jump(address) => self.exec_jump(address),
             Call(address) => self.exec_call(address),
+            IfNot(register, value) => self.exec_if_not(register, value),
             Store(register, value) => self.exec_store(register, value),
             Add(register, value) => self.exec_add(register, value),
             Copy(register, other) => self.exec_copy(register, other),
@@ -140,6 +146,15 @@ impl Chip8 {
             .push(self.program_counter)
             .expect("Stack Overflow");
         self.program_counter.set(address);
+    }
+
+    fn exec_if_not(&mut self, register: Register, value: u8) {
+        let current_value = self.registers.get(register);
+
+        if current_value == value {
+            self.program_counter
+                .set(self.program_counter.wrapping_add(1));
+        }
     }
 
     fn exec_store(&mut self, register: Register, value: u8) {
@@ -274,6 +289,36 @@ mod test {
         }
 
         Ok(())
+    }
+
+    #[test]
+    fn test_if_not() {
+        let cases = [
+            (0x3000u16, 0x00u8, true),
+            (0x3000, 0x01, false),
+            (0x3642, 0x42, true),
+            (0x3642, 0x46, false),
+        ];
+
+        let mut chip8 = Chip8::default();
+
+        for (instruction, value, skipped) in cases {
+            let register = Register::try_from((instruction & 0x0F00) >> 8) //
+                .expect("A nibble is a valid register");
+
+            let previous_pc = chip8.program_counter.get();
+
+            chip8.exec(Store(register, value));
+            chip8.exec(instruction);
+
+            let pc = chip8.program_counter.get();
+
+            if skipped {
+                assert_eq!(pc, previous_pc + 1);
+            } else {
+                assert_eq!(pc, previous_pc);
+            }
+        }
     }
 
     #[test]
