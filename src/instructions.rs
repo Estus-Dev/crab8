@@ -18,7 +18,7 @@ pub enum Instruction {
     IfNot(Register, u8),
 
     /// Skip the next instruction if the current value of the register is not equal to this value.
-    /// Value: 3XNN where X is the register and NN is the value to store
+    /// Value: 4XNN where X is the register and NN is the value to store
     If(Register, u8),
 
     /// Store a value in the specified register
