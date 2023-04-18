@@ -70,6 +70,10 @@ pub enum Instruction {
     /// Value: 8XY7 where X is the register and Y is the register to subtract from
     SubtractFromRegister(Register, Register),
 
+    /// Skip the next instruction if the current values of both registers are not equal.
+    /// Value: 9XY0 where X and Y are the registers to compare
+    IfRegisters(Register, Register),
+
     /// Jump moves the instruction pointer to the specified Address offset by the value of V0.
     /// Value: BNNN where NNN is the address
     JumpOffset(Address),
@@ -118,6 +122,7 @@ impl From<u16> for Instruction {
                 _ => Self::Invalid(instruction),
             },
 
+            0x9 if sub_operator == 0x00 => Self::IfRegisters(x, y),
             0xB => Self::JumpOffset(address),
 
             _ => Self::Unknown(instruction),
@@ -146,6 +151,7 @@ impl Chip8 {
             ShiftRight(register, other) => self.exec_shift_right(register, other),
             SubtractFromRegister(register, other) => self.exec_sub_from_register(register, other),
             ShiftLeft(register, other) => self.exec_shift_left(register, other),
+            IfRegisters(register, other) => self.exec_if_registers(register, other),
             JumpOffset(address) => self.exec_jump_offset(address),
             Invalid(instruction) => panic!("Invalid instruction {instruction} executed!"),
             Unknown(instruction) => panic!("Unknown instruction {instruction} executed!"),
@@ -279,6 +285,16 @@ impl Chip8 {
 
         self.registers.set(register, result);
         self.registers.set(VF, most_significant_bit);
+    }
+
+    fn exec_if_registers(&mut self, register: Register, other: Register) {
+        let current_value = self.registers.get(register);
+        let value = self.registers.get(other);
+
+        if current_value != value {
+            self.program_counter
+                .set(self.program_counter.wrapping_add(1));
+        }
     }
 
     fn exec_jump_offset(&mut self, address: Address) {
@@ -704,6 +720,40 @@ mod test {
     }
 
     #[test]
+    fn test_if_register() {
+        let cases = [
+            (0x9000u16, 0x00u8, 0x00u8, false),
+            (0x9010, 0xF5, 0xF5, false),
+            (0x9010, 0xF5, 0x52, true),
+            (0x9640, 0x42, 0x42, false),
+            (0x9640, 0x46, 0x45, true),
+        ];
+
+        let mut chip8 = Chip8::default();
+
+        for (instruction, x_value, y_value, skipped) in cases {
+            let x = Register::try_from((instruction & 0x0F00) >> 8) //
+                .expect("A nibble is a valid register");
+            let y = Register::try_from((instruction & 0x00F0) >> 4) //
+                .expect("A nibble is a valid register");
+
+            let previous_pc = chip8.program_counter.get();
+
+            chip8.exec(Store(x, x_value));
+            chip8.exec(Store(y, y_value));
+            chip8.exec(instruction);
+
+            let pc = chip8.program_counter.get();
+
+            if skipped {
+                assert_eq!(pc, previous_pc + 1);
+            } else {
+                assert_eq!(pc, previous_pc);
+            }
+        }
+    }
+
+    #[test]
     fn test_jump_offset() {
         let cases = [
             (0xB000u16, 0x00u8, 0x000u16),
@@ -762,6 +812,9 @@ mod test {
             (0x8AA7, SubtractFromRegister(VA, VA)),
             (0x89FE, ShiftLeft(V9, VF)),
             (0x8CAE, ShiftLeft(VC, VA)),
+            (0x9AD0, IfRegisters(VA, VD)),
+            (0x9040, IfRegisters(V0, V4)),
+            (0x9049, Unknown(0x9049)), // TODO: Should be invalid
             (0xBFFF, JumpOffset(0xFFF.try_into()?)),
             (0xB631, JumpOffset(0x631.try_into()?)),
             (0xBD62, JumpOffset(0xD62.try_into()?)),
