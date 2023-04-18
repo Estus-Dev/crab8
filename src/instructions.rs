@@ -1,4 +1,5 @@
 use core::panic;
+use rand::random;
 
 use crate::prelude::*;
 
@@ -82,6 +83,10 @@ pub enum Instruction {
     /// Value: BNNN where NNN is the address
     JumpOffset(Address),
 
+    /// Generate a random value in the specified register with a given bitmask
+    /// Value: CXNN where X is the register and NN is the bitmask to apply
+    Rand(Register, u8),
+
     /// Rather than fail parsing we'll return an invalid instruction
     Invalid(u16),
 
@@ -126,6 +131,7 @@ impl From<u16> for Instruction {
             0x9 if sub_operator == 0x00 => Self::IfRegisters(x, y),
             0xA => Self::StoreAddress(address),
             0xB => Self::JumpOffset(address),
+            0xC => Self::Rand(x, value),
 
             _ => Self::Unknown(instruction),
         }
@@ -156,6 +162,7 @@ impl Chip8 {
             IfRegisters(register, other) => self.exec_if_registers(register, other),
             StoreAddress(address) => self.exec_store_address(address),
             JumpOffset(address) => self.exec_jump_offset(address),
+            Rand(register, bitmask) => self.exec_rand(register, bitmask),
             Invalid(instruction) => panic!("Invalid instruction {instruction} executed!"),
             Unknown(instruction) => panic!("Unknown instruction {instruction} executed!"),
         }
@@ -310,6 +317,12 @@ impl Chip8 {
         let result = address.wrapping_add(offset);
 
         self.program_counter.set(result);
+    }
+
+    fn exec_rand(&mut self, register: Register, bitmask: u8) {
+        let result = random::<u8>() & bitmask;
+
+        self.registers.set(register, result);
     }
 }
 
@@ -800,6 +813,12 @@ mod test {
     }
 
     #[test]
+    fn test_rand() {
+        // TODO: I don't know how I want to approach testing this.
+        // The bitmask needs to be tested too.
+    }
+
+    #[test]
     fn test_instruction_from() -> Result<(), ()> {
         let cases = [
             (0x1000, Jump(0x000.try_into()?)),
@@ -852,6 +871,8 @@ mod test {
             (0xBFFF, JumpOffset(0xFFF.try_into()?)),
             (0xB631, JumpOffset(0x631.try_into()?)),
             (0xBD62, JumpOffset(0xD62.try_into()?)),
+            (0xC700, Rand(V7, 0x00)),
+            (0xC12F, Rand(V1, 0x2F)),
         ];
 
         for case in cases {
