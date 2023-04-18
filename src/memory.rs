@@ -1,5 +1,21 @@
 use std::{fmt, fmt::Debug, fmt::Display, fmt::Formatter};
 
+/// The first accessible memory address is 0x000.
+const FIRST_ADDRESS: u16 = 0x000;
+
+/// The first safe memory address is 0x200.
+/// Values below this address are reserved for the CHIP-8 interpreter.
+const FIRST_SAFE_ADDRESS: u16 = 0x200;
+
+/// The program counter is initialized to 0x200 to start.
+const INITIAL_PC: u16 = FIRST_SAFE_ADDRESS;
+
+/// The last memory address is 0xFFF, giving 4096 bytes of memory total.
+const LAST_ADDRESS: u16 = 0xFFF;
+
+/// The last 352 bytes are reserved for "variables and display refresh".
+const LAST_SAFE_ADDRESS: u16 = LAST_ADDRESS - 353;
+
 /// The CHIP-8 has 12-bit addresses, allowing up to 4096 bytes of memory.
 /// https://github.com/mattmikolay/chip-8/wiki/CHIP%E2%80%908-Technical-Reference#storage-in-memory
 #[derive(Copy, Clone, Default, PartialEq, Eq)]
@@ -9,7 +25,7 @@ impl Address {
     /// CHIP-8 programs are loaded starting at 0x200.
     /// Values below this are reserved for the interpreter.
     pub fn initial_instruction() -> Address {
-        Self(0x200)
+        Address(INITIAL_PC)
     }
 
     pub fn get(&self) -> u16 {
@@ -37,7 +53,7 @@ impl TryFrom<u16> for Address {
     type Error = ();
 
     fn try_from(value: u16) -> Result<Self, Self::Error> {
-        if value < 0xF000 {
+        if value <= LAST_ADDRESS {
             Ok(Self(value))
         } else {
             Err(())
@@ -88,12 +104,12 @@ impl Default for Memory {
 
         // Fill reserved address space with 0xFF for visualization purposes.
 
-        for address in 0x000..0x200 {
-            default.0[address] = 0xFF;
+        for address in FIRST_ADDRESS..FIRST_SAFE_ADDRESS {
+            default.0[address as usize] = 0xFF;
         }
 
-        for address in 0xE90..=0xFFF {
-            default.0[address] = 0xFF;
+        for address in (LAST_SAFE_ADDRESS + 1)..=LAST_ADDRESS {
+            default.0[address as usize] = 0xFF;
         }
 
         default
