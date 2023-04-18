@@ -107,6 +107,10 @@ pub enum Instruction {
     /// Value: FX18 where X is the register
     SetSound(Register),
 
+    /// Add the value of the specified register to the address register
+    /// Value: FX1E
+    AddAddress(Register),
+
     /// Rather than fail parsing we'll return an invalid instruction
     Invalid(u16),
 
@@ -159,6 +163,7 @@ impl From<u16> for Instruction {
                 0x07 => Self::ReadDelay(x),
                 0x15 => Self::SetDelay(x),
                 0x18 => Self::SetSound(x),
+                0x1E => Self::AddAddress(x),
                 _ => Self::Invalid(instruction),
             },
 
@@ -197,6 +202,7 @@ impl Chip8 {
             ReadDelay(register) => self.exec_read_delay(register),
             SetDelay(register) => self.exec_set_delay(register),
             SetSound(register) => self.exec_set_sound(register),
+            AddAddress(register) => self.exec_add_address(register),
             Invalid(instruction) => panic!("Invalid instruction {instruction} executed!"),
             Unknown(instruction) => panic!("Unknown instruction {instruction} executed!"),
         }
@@ -405,6 +411,14 @@ impl Chip8 {
         let result = self.registers.get(register);
 
         self.sound.set(result);
+    }
+
+    fn exec_add_address(&mut self, register: Register) {
+        let current_value = self.address_register;
+        let value = self.registers.get(register);
+        let result = current_value.wrapping_add(value);
+
+        self.address_register.set(result);
     }
 }
 
@@ -1062,6 +1076,34 @@ mod test {
         chip8.exec(Store(V0, 0xFF));
         chip8.exec(SetSound(V0));
     }
+
+    #[test]
+    fn test_add_address() -> Result<(), ()> {
+        let mut chip8 = Chip8::default();
+
+        assert_eq!(chip8.address_register.get(), 0x000);
+
+        chip8.exec(AddAddress(V0));
+
+        assert_eq!(chip8.address_register.get(), 0x000);
+
+        chip8.exec(Store(V0, 0x15));
+        chip8.exec(AddAddress(V0));
+
+        assert_eq!(chip8.address_register.get(), 0x015);
+
+        chip8.exec(StoreAddress(0x123.try_into()?));
+
+        assert_eq!(chip8.address_register.get(), 0x123);
+
+        chip8.exec(Store(V6, 0x64));
+        chip8.exec(AddAddress(V6));
+
+        assert_eq!(chip8.address_register.get(), 0x187);
+
+        Ok(())
+    }
+
     #[test]
     fn test_instruction_from() -> Result<(), ()> {
         let cases = [
@@ -1137,6 +1179,9 @@ mod test {
             (0xFC17, Invalid(0xFC17)),
             (0xFB18, SetSound(VB)),
             (0xF618, SetSound(V6)),
+            (0xF01E, AddAddress(V0)),
+            (0xF41E, AddAddress(V4)),
+            (0xF41F, Invalid(0xF41F)),
         ];
 
         for case in cases {
