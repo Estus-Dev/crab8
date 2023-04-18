@@ -24,15 +24,15 @@ pub struct Address(u16);
 impl Address {
     /// CHIP-8 programs are loaded starting at 0x200.
     /// Values below this are reserved for the interpreter.
-    pub fn initial_instruction() -> Address {
-        Address(INITIAL_PC)
+    pub fn initial_instruction() -> Self {
+        Self(INITIAL_PC)
     }
 
     pub fn get(&self) -> u16 {
         self.0
     }
 
-    pub fn set(&mut self, address: Address) {
+    pub fn set(&mut self, address: Self) {
         self.0 = address.get();
     }
 }
