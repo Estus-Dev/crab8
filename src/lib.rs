@@ -46,7 +46,12 @@ pub struct Chip8 {
     pub input: Input,
 }
 
-impl Chip8 {}
+impl Chip8 {
+    pub fn tick(&mut self) {
+        self.delay.tick();
+        self.sound.tick();
+    }
+}
 
 impl Default for Chip8 {
     fn default() -> Self {
