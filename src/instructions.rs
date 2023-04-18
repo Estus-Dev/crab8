@@ -9,6 +9,10 @@ pub enum Instruction {
     /// Value: 1NNN where NNN is the address
     Jump(Address),
 
+    /// Call moves the PC to the specified address, pushing the current PC to the stack.
+    /// Value: 2NNN where NNN is the address
+    Call(Address),
+
     /// Store a value in the specified register
     /// Value: 6XNN where X is the register and NN is the value to store
     Store(Register, u8),
@@ -79,6 +83,7 @@ impl From<u16> for Instruction {
 
         match operator {
             0x1 => Self::Jump(address),
+            0x2 => Self::Call(address),
             0x6 => Self::Store(x, value),
             0x7 => Self::Add(x, value),
 
@@ -108,6 +113,7 @@ impl Chip8 {
 
         match instruction.into() {
             Jump(address) => self.exec_jump(address),
+            Call(address) => self.exec_call(address),
             Store(register, value) => self.exec_store(register, value),
             Add(register, value) => self.exec_add(register, value),
             Copy(register, other) => self.exec_copy(register, other),
@@ -126,6 +132,13 @@ impl Chip8 {
     }
 
     fn exec_jump(&mut self, address: Address) {
+        self.program_counter.set(address);
+    }
+
+    fn exec_call(&mut self, address: Address) {
+        self.stack
+            .push(self.program_counter)
+            .expect("Stack Overflow");
         self.program_counter.set(address);
     }
 
@@ -245,6 +258,22 @@ mod test {
             chip8.exec(instruction);
             assert_eq!(chip8.program_counter.get(), instruction & 0x0FFF);
         }
+    }
+
+    #[test]
+    fn test_call() -> Result<(), ()> {
+        let cases = [0x2000, 0x2234, 0x2FFF, 0x2CED, 0x22BA];
+
+        let mut chip8 = Chip8::default();
+        let mut last_pc = chip8.program_counter.get();
+
+        for instruction in cases {
+            chip8.exec(instruction);
+            assert_eq!(chip8.stack.pop()?.get(), last_pc);
+            last_pc = instruction & 0x0FFF;
+        }
+
+        Ok(())
     }
 
     #[test]
@@ -555,6 +584,9 @@ mod test {
             (0x1000, Jump(0x000.try_into()?)),
             (0x1234, Jump(0x234.try_into()?)),
             (0x1ABC, Jump(0xABC.try_into()?)),
+            (0x2101, Call(0x101.try_into()?)),
+            (0x242E, Call(0x42E.try_into()?)),
+            (0x2C5D, Call(0xC5D.try_into()?)),
             (0x64AC, Store(V4, 0xAC)),
             (0x6000, Store(V0, 0x00)),
             (0x6123, Store(V1, 0x23)),

@@ -5,6 +5,7 @@ use std::{fmt, fmt::Debug, fmt::Display, fmt::Formatter};
 /// allow for larger sizes.
 const MAX_STACK_DEPTH: usize = 256;
 
+#[derive(PartialEq, Eq)]
 /// The stack holds all previous PC values while executing one or more subroutines.
 /// The CHIP-8 requires at least 12 frames, but modern interpreters are encouraged to go higher.
 pub struct Stack {
