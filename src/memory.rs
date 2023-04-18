@@ -14,7 +14,7 @@ const INITIAL_PC: u16 = FIRST_SAFE_ADDRESS;
 const LAST_ADDRESS: u16 = 0xFFF;
 
 /// The last 352 bytes are reserved for "variables and display refresh".
-const LAST_SAFE_ADDRESS: u16 = LAST_ADDRESS - 353;
+const LAST_SAFE_ADDRESS: u16 = LAST_ADDRESS - 352;
 
 /// The CHIP-8 has 12-bit addresses, allowing up to 4096 bytes of memory.
 /// https://github.com/mattmikolay/chip-8/wiki/CHIP%E2%80%908-Technical-Reference#storage-in-memory
