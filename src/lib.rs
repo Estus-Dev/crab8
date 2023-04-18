@@ -1,11 +1,13 @@
 mod instructions;
 mod memory;
 mod registers;
+mod stack;
 
 pub mod prelude {
     pub use crate::instructions::Instruction;
     pub use crate::memory::{Address, Memory};
     pub use crate::registers::{Register, Register::*, Registers};
+    pub use crate::stack::Stack;
     pub use crate::Chip8;
 }
 
@@ -29,6 +31,8 @@ pub struct Chip8 {
     /// https://github.com/mattmikolay/chip-8/wiki/CHIP%E2%80%908-Technical-Reference#data-registers
     pub registers: Registers,
 
+    pub stack: Stack,
+
     pub memory: Memory,
 }
 
@@ -40,6 +44,7 @@ impl Default for Chip8 {
             address_register: Address::default(),
             program_counter: Address::initial_instruction(),
             registers: Default::default(),
+            stack: Default::default(),
             memory: Default::default(),
         }
     }
@@ -51,6 +56,8 @@ impl Display for Chip8 {
         writeln!(f, "\tAddress Register (I): {}", self.address_register)?;
         writeln!(f, "\tProgram Counter (PC): {}", self.program_counter)?;
         writeln!(f, "\tRegisters: {}", self.registers)?;
+        writeln!(f)?;
+        writeln!(f, "\tStack: {}", self.stack)?;
         writeln!(f)?;
         writeln!(f, "{}", self.memory)?;
 
