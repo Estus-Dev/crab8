@@ -148,7 +148,7 @@ impl From<u16> for Instruction {
                 _ => Self::Invalid(instruction),
             },
 
-            0x9 if sub_operator == 0x00 => Self::IfRegisters(x, y),
+            0x9 if sub_operator == 0x0 => Self::IfRegisters(x, y),
             0xA => Self::StoreAddress(address),
             0xB => Self::JumpOffset(address),
             0xC => Self::Rand(x, value),
