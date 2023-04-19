@@ -7,6 +7,10 @@ use crate::prelude::*;
 /// Chip-8 instructions are 32-bit values that may contain data
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Instruction {
+    /// Return from the latest subroutine.  Moves the PC to the top value of the stack.
+    /// Value: 00EE
+    Return,
+
     /// Jump moves the instruction pointer to the specified Address
     /// Value: 1NNN where NNN is the address
     Jump(Address),
@@ -152,6 +156,7 @@ impl From<u16> for Instruction {
             .expect("Addresses can be any value from 0x0000 to 0x0FFF");
 
         match operator {
+            0x0 if address.get() == 0x0EE => Self::Return,
             0x1 => Self::Jump(address),
             0x2 => Self::Call(address),
             0x3 => Self::IfNot(x, value),
@@ -202,6 +207,7 @@ impl Chip8 {
         use Instruction::*;
 
         match instruction.into() {
+            Return => self.exec_return(),
             Jump(address) => self.exec_jump(address),
             Call(address) => self.exec_call(address),
             IfNot(register, value) => self.exec_if_not(register, value),
@@ -235,6 +241,12 @@ impl Chip8 {
             Invalid(instruction) => panic!("Invalid instruction {instruction} executed!"),
             Unknown(instruction) => panic!("Unknown instruction {instruction} executed!"),
         }
+    }
+
+    fn exec_return(&mut self) {
+        let address = self.stack.pop().unwrap_or(Address::default());
+
+        self.program_counter.set(address);
     }
 
     fn exec_jump(&mut self, address: Address) {
@@ -517,13 +529,25 @@ mod test {
         let cases = [0x2000, 0x2234, 0x2FFF, 0x2CED, 0x22BA];
 
         let mut chip8 = Chip8::default();
-        let mut last_pc = chip8.program_counter.get();
 
         for instruction in cases {
             chip8.exec(instruction);
-            assert_eq!(chip8.stack.pop()?.get(), last_pc);
-            last_pc = instruction & 0x0FFF;
+            assert_eq!(chip8.program_counter.get(), instruction & 0x0FFF);
         }
+
+        for (i, address) in cases.iter().map(|a| a & 0x0FFF).rev().skip(1).enumerate() {
+            chip8.exec(Return);
+
+            assert_eq!(chip8.program_counter.get(), address, "{i}");
+        }
+
+        chip8.exec(Return);
+
+        assert_eq!(chip8.program_counter, Address::initial_instruction());
+
+        chip8.exec(Return);
+
+        assert_eq!(chip8.program_counter, Address::default());
 
         Ok(())
     }
@@ -1265,6 +1289,7 @@ mod test {
     #[test]
     fn test_instruction_from() -> Result<(), ()> {
         let cases = [
+            (0x00EE, Return),
             (0x1000, Jump(0x000.try_into()?)),
             (0x1234, Jump(0x234.try_into()?)),
             (0x1ABC, Jump(0xABC.try_into()?)),
