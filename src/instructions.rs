@@ -1360,7 +1360,7 @@ mod test {
             (0x4712, If(V7, 0x12)),
             (0x5AD0, IfNotRegisters(VA, VD)),
             (0x5040, IfNotRegisters(V0, V4)),
-            (0x5049, Unknown(0x5049)), // TODO: Should be Invalid
+            (0x5049, Invalid(0x5049)),
             (0x64AC, Store(V4, 0xAC)),
             (0x6000, Store(V0, 0x00)),
             (0x6123, Store(V1, 0x23)),
@@ -1391,7 +1391,7 @@ mod test {
             (0x8CAE, ShiftLeft(VC, VA)),
             (0x9AD0, IfRegisters(VA, VD)),
             (0x9040, IfRegisters(V0, V4)),
-            (0x9049, Unknown(0x9049)), // TODO: Should be invalid
+            (0x9049, Invalid(0x9049)),
             (0xA000, StoreAddress(0x000.try_into()?)),
             (0xA123, StoreAddress(0x123.try_into()?)),
             (0xAF24, StoreAddress(0xF24.try_into()?)),
@@ -1408,10 +1408,10 @@ mod test {
             (0xE2A1, IfPressed(V2)),
             (0xE9A1, IfPressed(V9)),
             (0xEBA1, IfPressed(VB)),
-            (0xE09F, Unknown(0xE09F)), // TODO: Should be invalid
-            (0xE1A2, Unknown(0xE1A2)), // TODO: Should be invalid
-            (0xE200, Unknown(0xE200)), // TODO: Should be invalid
-            (0xE3FF, Unknown(0xE3FF)), // TODO: Should be invalid
+            (0xE09F, Invalid(0xE09F)),
+            (0xE1A2, Invalid(0xE1A2)),
+            (0xE200, Invalid(0xE200)),
+            (0xE3FF, Invalid(0xE3FF)),
             (0xF507, ReadDelay(V5)),
             (0xF207, ReadDelay(V2)),
             (0xF000, Invalid(0xF000)),
