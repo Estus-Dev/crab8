@@ -1,4 +1,4 @@
-use chip_8::memory::{self, CHAR_SPRITE_WIDTH};
+use chip_8::memory::CHAR_SPRITE_WIDTH;
 use chip_8::prelude::*;
 
 fn main() -> Result<(), ()> {
