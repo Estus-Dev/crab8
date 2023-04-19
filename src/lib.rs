@@ -88,7 +88,7 @@ impl Display for Chip8 {
         writeln!(f, "\tStack: {}", self.stack)?;
         writeln!(f)?;
         writeln!(f, "{}", self.memory)?;
-        writeln!(f);
+        writeln!(f)?;
         writeln!(f, "{}", self.screen)?;
 
         Ok(())
