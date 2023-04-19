@@ -151,9 +151,6 @@ pub enum Instruction {
 
     /// Rather than fail parsing we'll return an invalid instruction
     Invalid(u16),
-
-    /// This is a placeholder for as long as we don't have all the instructions in
-    Unknown(u16),
 }
 
 impl From<u16> for Instruction {
@@ -213,7 +210,7 @@ impl From<u16> for Instruction {
                 _ => Self::Invalid(instruction),
             },
 
-            _ => Self::Unknown(instruction),
+            _ => Self::Invalid(instruction),
         }
     }
 }
@@ -258,7 +255,6 @@ impl Chip8 {
             Write(register) => self.exec_write(register),
             Read(register) => self.exec_read(register),
             Invalid(instruction) => panic!("Invalid instruction {instruction} executed!"),
-            Unknown(instruction) => panic!("Unknown instruction {instruction} executed!"),
         }
     }
 
