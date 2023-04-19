@@ -12,10 +12,20 @@ impl Registers {
         self.0[register as usize]
     }
 
+    pub fn get_range(&self, register: Register) -> &[u8] {
+        &self.0[0x0..=register as usize]
+    }
+
     /// Set the value of the selected register
     /// https://github.com/mattmikolay/chip-8/wiki/CHIP%E2%80%908-Technical-Reference#data-registers
     pub fn set(&mut self, register: Register, value: u8) {
         self.0[register as usize] = value;
+    }
+
+    pub fn set_range(&mut self, values: &[u8]) {
+        for (offset, &value) in values.iter().enumerate() {
+            self.0[offset] = value;
+        }
     }
 }
 

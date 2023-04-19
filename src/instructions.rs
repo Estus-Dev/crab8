@@ -122,6 +122,16 @@ pub enum Instruction {
     /// Value: FX33 where X is the register
     WriteDecimal(Register),
 
+    /// Writes the values of V0..=VX to the memory pointed to by the address register.
+    /// The address register is incremented by X + 1.
+    /// Value: FX55 where X is the final register
+    Write(Register),
+
+    /// Reads values from memory starting at the address register to fill the registers V0..=VX.
+    /// The address register is incremented by X + 1.
+    /// Value: FX65 where X is the final register
+    Read(Register),
+
     /// Rather than fail parsing we'll return an invalid instruction
     Invalid(u16),
 
@@ -177,6 +187,8 @@ impl From<u16> for Instruction {
                 0x1E => Self::AddAddress(x),
                 0x29 => Self::LoadSprite(x),
                 0x33 => Self::WriteDecimal(x),
+                0x55 => Self::Write(x),
+                0x65 => Self::Read(x),
                 _ => Self::Invalid(instruction),
             },
 
@@ -218,6 +230,8 @@ impl Chip8 {
             AddAddress(register) => self.exec_add_address(register),
             LoadSprite(register) => self.exec_load_sprite(register),
             WriteDecimal(register) => self.exec_write_decimal(register),
+            Write(register) => self.exec_write(register),
+            Read(register) => self.exec_read(register),
             Invalid(instruction) => panic!("Invalid instruction {instruction} executed!"),
             Unknown(instruction) => panic!("Unknown instruction {instruction} executed!"),
         }
@@ -458,6 +472,21 @@ impl Chip8 {
         ];
 
         self.memory.set_range(address, &bcd);
+    }
+
+    fn exec_write(&mut self, register: Register) {
+        let address = self.address_register;
+        let values = self.registers.get_range(register);
+
+        self.memory.set_range(address, values);
+    }
+
+    fn exec_read(&mut self, register: Register) {
+        let start = self.address_register;
+        let end = start.wrapping_add(1 + register as u16);
+        let values = self.memory.get_range(start, end);
+
+        self.registers.set_range(values);
     }
 }
 
@@ -1197,6 +1226,43 @@ mod test {
     }
 
     #[test]
+    fn test_read_write() -> Result<(), ()> {
+        let mut chip8 = Chip8::default();
+
+        chip8
+            .address_register
+            .set(Address::try_from(FIRST_CHAR_ADDRESS)?);
+        chip8.exec(Read(V4));
+        assert_eq!(chip8.registers.get_range(V4), Char0.sprite());
+
+        chip8.address_register.set(Address::try_from(0x210)?);
+
+        let result: [u8; 6] = [0x54, 0x74, 0x12, 0x62, 0xBE, 0xC0];
+
+        for (offset, &byte) in result.iter().enumerate() {
+            let register = Register::try_from(offset as u16)?;
+            chip8.exec(Store(register, byte));
+        }
+
+        chip8.exec(Write(V5));
+
+        let start = chip8.address_register;
+        let end = start.wrapping_add(result.len() as u16);
+        assert_eq!(chip8.memory.get_range(start, end), result);
+
+        for register in 0x0..=0xF {
+            let register = Register::try_from(register as u16)?;
+            chip8.exec(Store(register, 0xBC));
+        }
+
+        chip8.exec(Read(V5));
+
+        assert_eq!(chip8.registers.get_range(V5), result);
+
+        Ok(())
+    }
+
+    #[test]
     fn test_instruction_from() -> Result<(), ()> {
         let cases = [
             (0x1000, Jump(0x000.try_into()?)),
@@ -1278,6 +1344,10 @@ mod test {
             (0xF729, LoadSprite(V7)),
             (0xFE33, WriteDecimal(VE)),
             (0xF133, WriteDecimal(V1)),
+            (0xF055, Write(V0)),
+            (0xF555, Write(V5)),
+            (0xF565, Read(V5)),
+            (0xFA65, Read(VA)),
         ];
 
         for case in cases {
