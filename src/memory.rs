@@ -143,9 +143,7 @@ impl Default for Memory {
             .enumerate()
         {
             let char = Character::try_from(char as u8).expect("A nibble is a valid char");
-            for (offset, &byte) in char.sprite().iter().enumerate() {
-                default.0[address as usize + offset] = byte;
-            }
+            default.set_range(address.try_into().unwrap(), char.sprite());
         }
 
         // Fill starting reserved address space with 0xFF for visualization purposes.
