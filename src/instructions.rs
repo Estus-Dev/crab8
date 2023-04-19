@@ -116,6 +116,12 @@ pub enum Instruction {
     /// Value: FX29 where X is the register
     LoadSprite(Register),
 
+    /// Writes the value of the specified register to the memory pointed to by the address register.
+    /// The value will be written in Binary-Coded Decimal format, at 3 characters wide.
+    /// https://en.wikipedia.org/wiki/Binary-coded_decimal
+    /// Value: FX33 where X is the register
+    WriteDecimal(Register),
+
     /// Rather than fail parsing we'll return an invalid instruction
     Invalid(u16),
 
@@ -170,6 +176,7 @@ impl From<u16> for Instruction {
                 0x18 => Self::SetSound(x),
                 0x1E => Self::AddAddress(x),
                 0x29 => Self::LoadSprite(x),
+                0x33 => Self::WriteDecimal(x),
                 _ => Self::Invalid(instruction),
             },
 
@@ -210,6 +217,7 @@ impl Chip8 {
             SetSound(register) => self.exec_set_sound(register),
             AddAddress(register) => self.exec_add_address(register),
             LoadSprite(register) => self.exec_load_sprite(register),
+            WriteDecimal(register) => self.exec_write_decimal(register),
             Invalid(instruction) => panic!("Invalid instruction {instruction} executed!"),
             Unknown(instruction) => panic!("Unknown instruction {instruction} executed!"),
         }
@@ -437,6 +445,21 @@ impl Chip8 {
         let result = first_address.wrapping_add(offset);
 
         self.address_register.set(result);
+    }
+
+    #[allow(clippy::identity_op)]
+    fn exec_write_decimal(&mut self, register: Register) {
+        let address = self.address_register;
+        let current_value = self.registers.get(register);
+        let bcd = [
+            (current_value / 100) % 10,
+            (current_value / 10) % 10,
+            (current_value / 1) % 10,
+        ];
+
+        for (offset, &digit) in bcd.iter().enumerate() {
+            self.memory.set(address.wrapping_add(offset as u16), digit);
+        }
     }
 }
 
@@ -1150,6 +1173,31 @@ mod test {
         assert_eq!(chip8.address_register.get(), FIRST_CHAR_ADDRESS + offset);
     }
 
+    // This test uses bytes written in decimal for ease of use.
+    #[test]
+    fn test_write_decimal() -> Result<(), ()> {
+        let mut chip8 = Chip8::default();
+        let start = chip8.address_register;
+        let end = start.wrapping_add(3);
+
+        chip8.exec(Store(V8, 42));
+        chip8.exec(WriteDecimal(V8));
+
+        assert_eq!(chip8.memory.get_range(start, end), &[0, 4, 2]);
+
+        chip8.exec(StoreAddress(0x52C.try_into()?));
+
+        let start = chip8.address_register;
+        let end = start.wrapping_add(3);
+
+        chip8.exec(Store(V3, 120));
+        chip8.exec(WriteDecimal(V3));
+
+        assert_eq!(chip8.memory.get_range(start, end), &[1, 2, 0]);
+
+        Ok(())
+    }
+
     #[test]
     fn test_instruction_from() -> Result<(), ()> {
         let cases = [
@@ -1230,6 +1278,8 @@ mod test {
             (0xF41F, Invalid(0xF41F)),
             (0xF129, LoadSprite(V1)),
             (0xF729, LoadSprite(V7)),
+            (0xFE33, WriteDecimal(VE)),
+            (0xF133, WriteDecimal(V1)),
         ];
 
         for case in cases {

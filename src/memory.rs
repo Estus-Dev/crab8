@@ -83,6 +83,17 @@ impl Memory {
         self.0[address.0 as usize]
     }
 
+    pub fn get_range(&self, start: Address, end: Address) -> &[u8] {
+        let start = start.get() as usize;
+        let mut end = end.get() as usize;
+
+        if start >= end {
+            end = start;
+        }
+
+        &self.0[start..end]
+    }
+
     /// Set the value of an address in memory.
     pub fn set(&mut self, address: Address, value: u8) {
         self.0[address.0 as usize] = value;
