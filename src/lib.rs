@@ -1,11 +1,11 @@
-mod character;
-mod input;
-mod instructions;
-mod memory;
-mod registers;
-mod screen;
-mod stack;
-mod timer;
+pub mod character;
+pub mod input;
+pub mod instructions;
+pub mod memory;
+pub mod registers;
+pub mod screen;
+pub mod stack;
+pub mod timer;
 
 pub mod prelude {
     pub use crate::character::{Character, Character::*};
