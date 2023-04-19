@@ -521,6 +521,7 @@ impl Chip8 {
         let values = self.registers.get_range(register);
 
         self.memory.set_range(address, values);
+        self.address_register = self.address_register.wrapping_add(1 + register as u16);
     }
 
     fn exec_read(&mut self, register: Register) {
@@ -529,6 +530,7 @@ impl Chip8 {
         let values = self.memory.get_range(start, end);
 
         self.registers.set_range(values);
+        self.address_register = self.address_register.wrapping_add(1 + register as u16);
     }
 }
 
@@ -1298,14 +1300,15 @@ mod test {
     #[test]
     fn test_read_write() -> Result<(), ()> {
         let mut chip8 = Chip8::default();
+        let mut address = Address::try_from(FIRST_CHAR_ADDRESS)?;
 
-        chip8
-            .address_register
-            .set(Address::try_from(FIRST_CHAR_ADDRESS)?);
+        chip8.address_register.set(address);
         chip8.exec(Read(V4));
         assert_eq!(chip8.registers.get_range(V4), Char0.sprite());
+        assert_eq!(chip8.address_register, address.wrapping_add(4 + 1));
 
-        chip8.address_register.set(Address::try_from(0x210)?);
+        address = Address::try_from(0x210)?;
+        chip8.address_register.set(address);
 
         let result: [u8; 6] = [0x54, 0x74, 0x12, 0x62, 0xBE, 0xC0];
 
@@ -1315,8 +1318,9 @@ mod test {
         }
 
         chip8.exec(Write(V5));
+        assert_eq!(chip8.address_register, address.wrapping_add(5 + 1));
 
-        let start = chip8.address_register;
+        let start = address;
         let end = start.wrapping_add(result.len() as u16);
         assert_eq!(chip8.memory.get_range(start, end), result);
 
@@ -1325,6 +1329,7 @@ mod test {
             chip8.exec(Store(register, 0xBC));
         }
 
+        chip8.exec(StoreAddress(address));
         chip8.exec(Read(V5));
 
         assert_eq!(chip8.registers.get_range(V5), result);
