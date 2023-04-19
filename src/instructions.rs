@@ -7,6 +7,10 @@ use crate::prelude::*;
 /// Chip-8 instructions are 32-bit values that may contain data
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Instruction {
+    /// Clear the screen.
+    /// Value: 00E0
+    ClearScreen,
+
     /// Return from the latest subroutine.  Moves the PC to the top value of the stack.
     /// Value: 00EE
     Return,
@@ -156,6 +160,7 @@ impl From<u16> for Instruction {
             .expect("Addresses can be any value from 0x0000 to 0x0FFF");
 
         match operator {
+            0x0 if address.get() == 0x0E0 => Self::ClearScreen,
             0x0 if address.get() == 0x0EE => Self::Return,
             0x1 => Self::Jump(address),
             0x2 => Self::Call(address),
@@ -207,6 +212,7 @@ impl Chip8 {
         use Instruction::*;
 
         match instruction.into() {
+            ClearScreen => self.exec_clear_screen(),
             Return => self.exec_return(),
             Jump(address) => self.exec_jump(address),
             Call(address) => self.exec_call(address),
@@ -241,6 +247,10 @@ impl Chip8 {
             Invalid(instruction) => panic!("Invalid instruction {instruction} executed!"),
             Unknown(instruction) => panic!("Unknown instruction {instruction} executed!"),
         }
+    }
+
+    fn exec_clear_screen(&mut self) {
+        self.screen = Screen::default();
     }
 
     fn exec_return(&mut self) {
@@ -509,6 +519,17 @@ mod test {
         memory::{CHAR_SPRITE_WIDTH, FIRST_CHAR_ADDRESS},
         prelude::*,
     };
+
+    #[test]
+    fn test_clear_screen() {
+        let mut chip8 = Chip8::default();
+
+        // TODO: Draw something
+
+        chip8.exec(ClearScreen);
+
+        assert_eq!(chip8.screen, Screen::default());
+    }
 
     #[test]
     fn test_jump() {
@@ -1289,6 +1310,7 @@ mod test {
     #[test]
     fn test_instruction_from() -> Result<(), ()> {
         let cases = [
+            (0x00E0, ClearScreen),
             (0x00EE, Return),
             (0x1000, Jump(0x000.try_into()?)),
             (0x1234, Jump(0x234.try_into()?)),
