@@ -97,6 +97,15 @@ impl Display for Input {
     }
 }
 
+impl IntoIterator for Input {
+    type Item = (Key, bool);
+    type IntoIter = InputIterator;
+
+    fn into_iter(self) -> Self::IntoIter {
+        InputIterator(self, 0x0)
+    }
+}
+
 #[derive(Default)]
 pub struct InputBuilder([bool; 16]);
 
@@ -109,5 +118,24 @@ impl InputBuilder {
 
     pub fn build(self) -> Input {
         Input(self.0)
+    }
+}
+
+pub struct InputIterator(Input, usize);
+
+impl Iterator for InputIterator {
+    type Item = (Key, bool);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let next_index = 1 + self.1 as usize;
+
+        if next_index <= 0xF {
+            Some((
+                Key::try_from(1 + next_index as u8).unwrap(),
+                self.0 .0[next_index + 1],
+            ))
+        } else {
+            None
+        }
     }
 }

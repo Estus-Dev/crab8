@@ -113,6 +113,10 @@ pub enum Instruction {
     /// Value: FX07 where X is the register
     ReadDelay(Register),
 
+    /// Wait until a key is pressed and store the key in the given register
+    /// Value: FX0A where X is the register
+    ReadInput(Register),
+
     /// Set the delay timer to the value of the specified register
     /// Value: FX15 where X is the register
     SetDelay(Register),
@@ -198,6 +202,7 @@ impl From<u16> for Instruction {
 
             0xF => match value {
                 0x07 => Self::ReadDelay(x),
+                0x0A => Self::ReadInput(x),
                 0x15 => Self::SetDelay(x),
                 0x18 => Self::SetSound(x),
                 0x1E => Self::AddAddress(x),
@@ -244,6 +249,7 @@ impl Chip8 {
             IfNotPressed(register) => self.exec_if_not_pressed(register),
             IfPressed(register) => self.exec_if_pressed(register),
             ReadDelay(register) => self.exec_read_delay(register),
+            ReadInput(register) => self.exec_read_input(register),
             SetDelay(register) => self.exec_set_delay(register),
             SetSound(register) => self.exec_set_sound(register),
             AddAddress(register) => self.exec_add_address(register),
@@ -470,6 +476,10 @@ impl Chip8 {
         let result = self.delay.get();
 
         self.registers.set(register, result);
+    }
+
+    fn exec_read_input(&mut self, register: Register) {
+        self.blocking_input = Some(register);
     }
 
     fn exec_set_delay(&mut self, register: Register) {
