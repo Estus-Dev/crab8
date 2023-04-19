@@ -142,8 +142,6 @@ impl Default for Memory {
             .step_by(CHAR_SPRITE_WIDTH as usize)
             .enumerate()
         {
-            println!("{FIRST_CHAR_ADDRESS}, {FIRST_SAFE_ADDRESS}");
-            println!("Char {char}");
             let char = Character::try_from(char as u8).expect("A nibble is a valid char");
             for (offset, &byte) in char.sprite().iter().enumerate() {
                 default.0[address as usize + offset] = byte;
