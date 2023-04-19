@@ -457,9 +457,7 @@ impl Chip8 {
             (current_value / 1) % 10,
         ];
 
-        for (offset, &digit) in bcd.iter().enumerate() {
-            self.memory.set(address.wrapping_add(offset as u16), digit);
-        }
+        self.memory.set_range(address, &bcd);
     }
 }
 

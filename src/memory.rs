@@ -98,6 +98,12 @@ impl Memory {
     pub fn set(&mut self, address: Address, value: u8) {
         self.0[address.0 as usize] = value;
     }
+
+    pub fn set_range(&mut self, address: Address, values: &[u8]) {
+        for (offset, &value) in values.iter().enumerate() {
+            self.set(address.wrapping_add(offset as u16), value);
+        }
+    }
 }
 
 impl Debug for Memory {
