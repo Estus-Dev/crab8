@@ -96,6 +96,11 @@ pub enum Instruction {
     /// Value: CXNN where X is the register and NN is the bitmask to apply
     Rand(Register, u8),
 
+    /// Draw the sprite with N rows at the current address register to the screen.
+    /// Coordinates to draw are the values of the two registers X and Y
+    /// Value: DXYN where X/Y are the registers with the coordinates and N is the number of rows.
+    Draw(Register, Register, u8),
+
     /// Skip the next instruction if the key stored in the specified register is pressed.
     /// Value: EX9E where X is the register
     IfNotPressed(Register),
@@ -187,6 +192,7 @@ impl From<u16> for Instruction {
             0xA => Self::StoreAddress(address),
             0xB => Self::JumpOffset(address),
             0xC => Self::Rand(x, value),
+            0xD => Self::Draw(x, y, sub_operator),
             0xE if value == 0x9E => Self::IfNotPressed(x),
             0xE if value == 0xA1 => Self::IfPressed(x),
 
@@ -234,6 +240,7 @@ impl Chip8 {
             StoreAddress(address) => self.exec_store_address(address),
             JumpOffset(address) => self.exec_jump_offset(address),
             Rand(register, bitmask) => self.exec_rand(register, bitmask),
+            Draw(x, y, row_count) => self.exec_draw(x, y, row_count),
             IfNotPressed(register) => self.exec_if_not_pressed(register),
             IfPressed(register) => self.exec_if_pressed(register),
             ReadDelay(register) => self.exec_read_delay(register),
@@ -414,6 +421,19 @@ impl Chip8 {
         let result = random::<u8>() & bitmask;
 
         self.registers.set(register, result);
+    }
+
+    fn exec_draw(&mut self, x: Register, y: Register, row_count: u8) {
+        let start = self.address_register;
+        let end = start.wrapping_add(row_count as u16);
+        let x = self.registers.get(x);
+        let y = self.registers.get(y);
+        let sprite = self.memory.get_range(start, end);
+
+        let (screen, collision_flag) = self.screen.draw(x, y, sprite);
+
+        self.screen = screen;
+        self.registers.set(VF, collision_flag as u8);
     }
 
     fn exec_if_not_pressed(&mut self, register: Register) {
@@ -1145,6 +1165,11 @@ mod test {
     }
 
     #[test]
+    fn test_draw() {
+        // TODO:
+    }
+
+    #[test]
     fn test_delay_timer() {
         let mut chip8 = Chip8::default();
 
@@ -1364,6 +1389,8 @@ mod test {
             (0xBD62, JumpOffset(0xD62.try_into()?)),
             (0xC700, Rand(V7, 0x00)),
             (0xC12F, Rand(V1, 0x2F)),
+            (0xD52B, Draw(V5, V2, 0xB)),
+            (0xD1E9, Draw(V1, VE, 0x9)),
             (0xE09E, IfNotPressed(V0)),
             (0xE69E, IfNotPressed(V6)),
             (0xEA9E, IfNotPressed(VA)),

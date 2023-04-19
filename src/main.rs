@@ -1,3 +1,4 @@
+use chip_8::memory::{self, CHAR_SPRITE_WIDTH};
 use chip_8::prelude::*;
 
 fn main() -> Result<(), ()> {
@@ -14,6 +15,25 @@ fn main() -> Result<(), ()> {
     chip8.stack.push(0x123.try_into()?)?;
     chip8.stack.push(0x234.try_into()?)?;
     chip8.stack.push(0x345.try_into()?)?;
+
+    for (column, character) in (0x0..=0xF).enumerate() {
+        let address = Character::try_from(character).unwrap().address();
+        let x_offset = 5 * column as u8;
+        let y_offset = 6 * (x_offset / 65);
+        let x_offset = x_offset % 65;
+
+        chip8.exec(StoreAddress(address));
+        chip8.exec(Store(V0, x_offset));
+        chip8.exec(Store(V1, y_offset));
+        chip8.exec(Draw(V0, V1, CHAR_SPRITE_WIDTH as u8));
+    }
+
+    chip8.exec(Store(V0, 29));
+    chip8.exec(Store(V1, 14));
+    chip8.exec(StoreAddress(CharC.address()));
+    chip8.exec(Draw(V0, V1, 0x05));
+    chip8.exec(StoreAddress(Char8.address()));
+    chip8.exec(Draw(V0, V1, 0x05));
 
     chip8.input = Input::build()
         .set_pressed(Key5, true)
