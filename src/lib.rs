@@ -49,7 +49,7 @@ pub struct Chip8 {
 
     pub input: Input,
 
-    pub display: Screen,
+    pub screen: Screen,
 }
 
 impl Chip8 {
@@ -70,7 +70,7 @@ impl Default for Chip8 {
             stack: Default::default(),
             memory: Default::default(),
             input: Default::default(),
-            display: Default::default(),
+            screen: Default::default(),
         }
     }
 }
@@ -89,7 +89,7 @@ impl Display for Chip8 {
         writeln!(f)?;
         writeln!(f, "{}", self.memory)?;
         writeln!(f);
-        writeln!(f, "{}", self.display)?;
+        writeln!(f, "{}", self.screen)?;
 
         Ok(())
     }
