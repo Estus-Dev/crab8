@@ -12,4 +12,5 @@ rand = { workspace = true }
 members = ["crates/bevy_chip8"]
 
 [workspace.dependencies]
+bevy = "^0.10"
 rand = "^0.8"
