@@ -1,15 +1,8 @@
 [package]
-name = "chip-8"
+name = "bevy_chip8"
 version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-rand = { workspace = true }
-
-[workspace]
-members = ["crates/bevy_chip8"]
-
-[workspace.dependencies]
-rand = "^0.8"
