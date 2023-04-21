@@ -370,6 +370,7 @@ name = "bevy_chip8"
 version = "0.1.0"
 dependencies = [
  "bevy",
+ "chip-8",
 ]
 
 [[package]]
@@ -1104,6 +1105,7 @@ checksum = "fd16c4719339c4530435d38e511904438d07cce7950afa3718a84ac36c10e89e"
 name = "chip-8"
 version = "0.1.0"
 dependencies = [
+ "bevy",
  "rand",
 ]
 

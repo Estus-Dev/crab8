@@ -6,7 +6,11 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+bevy = { workspace = true, optional = true }
 rand = { workspace = true }
+
+[features]
+bevy = ["dep:bevy"]
 
 [workspace]
 members = ["crates/bevy_chip8"]

@@ -20,10 +20,13 @@ pub mod prelude {
 }
 
 use crate::prelude::*;
+#[cfg(feature = "bevy")]
+use bevy::ecs::system::Resource;
 use std::{fmt, fmt::Display};
 
 /// Chip8 represents the current state of the entire machine.
 /// https://github.com/mattmikolay/chip-8/wiki/CHIP%E2%80%908-Technical-Reference
+#[cfg_attr(feature = "bevy", derive(Resource))]
 #[derive(Debug)]
 pub struct Chip8 {
     /// The CHIP-8 has a 12-bit address register named I for pointing to memory.
