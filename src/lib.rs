@@ -22,6 +22,7 @@ pub mod prelude {
 use crate::prelude::*;
 #[cfg(feature = "bevy")]
 use bevy::ecs::system::Resource;
+use reqwest::{blocking::get, Result};
 use std::{fmt, fmt::Display, fs::File, io::Read};
 
 /// Chip8 represents the current state of the entire machine.
@@ -99,6 +100,17 @@ impl Chip8 {
 
         self.memory = Memory::default();
         self.memory.set_range(start, &buffer);
+
+        Ok(())
+    }
+
+    pub fn download(&mut self, url: &str) -> Result<()> {
+        let res = get(url)?;
+        let data = res.bytes()?;
+        let start = Address::initial_instruction();
+
+        self.memory = Memory::default();
+        self.memory.set_range(start, &data);
 
         Ok(())
     }

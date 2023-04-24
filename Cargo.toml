@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 bevy = { workspace = true, optional = true }
 rand = { workspace = true }
+reqwest = { workspace = true }
 
 [features]
 bevy = ["dep:bevy"]
@@ -18,3 +19,4 @@ members = ["crates/bevy_chip8"]
 [workspace.dependencies]
 bevy = "^0.10"
 rand = "^0.8"
+reqwest = { version = "^0.11.16", features = ["blocking"] }
