@@ -46,16 +46,9 @@ fn setup_chip8(
         ..default()
     });
 
-    // Set a character in VX
-    chip8.exec(0x600F);
-    // Load the address of the sprite for the character from VX into I
-    chip8.exec(0xF029);
-    // Set X position to draw on the screen
-    chip8.exec(0x6010);
-    // Set Y position to draw on the screen
-    chip8.exec(0x6108);
-    // Draw the sprite at I to X, Y
-    chip8.exec(0xD015);
+    chip8
+        .load("./roms/1-chip8-logo.ch8")
+        .expect("Place 1-chip8-logo.ch8 in roms/");
 
     commands
         .spawn(SpriteBundle {

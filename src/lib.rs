@@ -22,7 +22,7 @@ pub mod prelude {
 use crate::prelude::*;
 #[cfg(feature = "bevy")]
 use bevy::ecs::system::Resource;
-use std::{fmt, fmt::Display};
+use std::{fmt, fmt::Display, fs::File, io::Read};
 
 /// Chip8 represents the current state of the entire machine.
 /// https://github.com/mattmikolay/chip-8/wiki/CHIP%E2%80%908-Technical-Reference
@@ -87,6 +87,20 @@ impl Chip8 {
     pub fn tick(&mut self) {
         self.delay.tick();
         self.sound.tick();
+    }
+
+    pub fn load(&mut self, filename: &str) -> std::io::Result<()> {
+        let mut file = File::open(filename)?;
+        let mut buffer = Vec::new();
+        let start = Address::initial_instruction();
+
+        // TODO: Check to see if it will fit in memory
+        file.read_to_end(&mut buffer)?;
+
+        self.memory = Memory::default();
+        self.memory.set_range(start, &buffer);
+
+        Ok(())
     }
 }
 
