@@ -1,4 +1,3 @@
-use core::panic;
 use rand::random;
 
 use crate::memory::{CHAR_SPRITE_WIDTH, FIRST_CHAR_ADDRESS};
