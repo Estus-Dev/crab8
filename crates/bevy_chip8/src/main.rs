@@ -46,9 +46,13 @@ fn setup_chip8(
         ..default()
     });
 
+    // TODO: This is blocking and should instead be downloaded async and put in a resource. Then
+    // setup can continue when that resource becomes available.
     chip8
-        .load("./roms/3-corax+.ch8")
-        .expect("Place 3-corax+.ch8 in roms/");
+        .download(
+            "https://github.com/Timendus/chip8-test-suite/blob/main/bin/3-corax+.ch8?raw=true",
+        )
+        .expect("A working internet connection is required for now");
 
     commands
         .spawn(SpriteBundle {
