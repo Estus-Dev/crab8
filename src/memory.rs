@@ -112,6 +112,16 @@ impl Memory {
             self.set(address.wrapping_add(offset as u16), value);
         }
     }
+
+    // TODO: Take an Instruction instead
+    pub fn set_instruction(&mut self, address: Address, instruction: u16) {
+        let instruction = [
+            ((instruction & 0xFF00) >> 8) as u8,
+            (instruction & 0x00FF) as u8,
+        ];
+
+        self.set_range(address, &instruction);
+    }
 }
 
 impl Debug for Memory {
@@ -154,8 +164,12 @@ impl Default for Memory {
             default.set_range(address.try_into().unwrap(), char.sprite());
         }
 
+        // At the end of valid address space, jump back to 0x200
+        default.set_instruction(Address::try_from(LAST_SAFE_ADDRESS + 1).unwrap(), 0x1200);
+        // TODO: default.set_instruction(Address::try_from(LAST_SAFE_ADDRESS + 1)?, Jump(0x200));
+
         // Fill ending reserved address space with 0xFF for visualization purposes.
-        for address in (LAST_SAFE_ADDRESS + 1)..=LAST_ADDRESS {
+        for address in (LAST_SAFE_ADDRESS + 3)..=LAST_ADDRESS {
             default.0[address as usize] = 0xFF;
         }
 
