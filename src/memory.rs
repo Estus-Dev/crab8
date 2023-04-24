@@ -45,6 +45,11 @@ impl Address {
         self.wrapping_add(1)
     }
 
+    /// Get the address of the next instruction in memory
+    pub fn next_instruction(&self) -> Address {
+        self.wrapping_add(2)
+    }
+
     pub fn get(&self) -> u16 {
         self.0
     }

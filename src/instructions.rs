@@ -283,7 +283,7 @@ impl Chip8 {
 
         if current_value == value {
             self.program_counter
-                .set(self.program_counter.wrapping_add(1));
+                .set(self.program_counter.next_instruction());
         }
     }
 
@@ -292,7 +292,7 @@ impl Chip8 {
 
         if current_value != value {
             self.program_counter
-                .set(self.program_counter.wrapping_add(1));
+                .set(self.program_counter.next_instruction());
         }
     }
 
@@ -302,7 +302,7 @@ impl Chip8 {
 
         if current_value == value {
             self.program_counter
-                .set(self.program_counter.wrapping_add(1));
+                .set(self.program_counter.next_instruction());
         }
     }
 
@@ -402,7 +402,7 @@ impl Chip8 {
 
         if current_value != value {
             self.program_counter
-                .set(self.program_counter.wrapping_add(1));
+                .set(self.program_counter.next_instruction());
         }
     }
 
@@ -448,7 +448,7 @@ impl Chip8 {
 
         if pressed {
             self.program_counter
-                .set(self.program_counter.wrapping_add(1));
+                .set(self.program_counter.next_instruction());
         }
     }
 
@@ -463,7 +463,7 @@ impl Chip8 {
 
         if !pressed {
             self.program_counter
-                .set(self.program_counter.wrapping_add(1));
+                .set(self.program_counter.next_instruction());
         }
     }
 
@@ -1064,7 +1064,7 @@ mod test {
 
                 for key in (0x0..=0x0F).map(|key| Key::try_from(key).unwrap()) {
                     let starting_pc = chip8.program_counter.get();
-                    let incremented_pc = chip8.program_counter.wrapping_add(1).get();
+                    let incremented_pc = chip8.program_counter.next_instruction().get();
 
                     chip8.registers.set(register, key as u8);
                     chip8.exec(IfNotPressed(register));
@@ -1091,7 +1091,7 @@ mod test {
 
                 for key in (0x0..=0x0F).map(|key| Key::try_from(key).unwrap()) {
                     let starting_pc = chip8.program_counter.get();
-                    let incremented_pc = chip8.program_counter.wrapping_add(1).get();
+                    let incremented_pc = chip8.program_counter.next_instruction().get();
 
                     chip8.registers.set(register, key as u8);
                     chip8.exec(IfNotPressed(register));
@@ -1121,7 +1121,7 @@ mod test {
 
                 for key in (0x0..=0x0F).map(|key| Key::try_from(key).unwrap()) {
                     let starting_pc = chip8.program_counter.get();
-                    let incremented_pc = chip8.program_counter.wrapping_add(1).get();
+                    let incremented_pc = chip8.program_counter.next_instruction().get();
 
                     chip8.registers.set(register, key as u8);
                     chip8.exec(IfPressed(register));
@@ -1148,7 +1148,7 @@ mod test {
 
                 for key in (0x0..=0x0F).map(|key| Key::try_from(key).unwrap()) {
                     let starting_pc = chip8.program_counter.get();
-                    let incremented_pc = chip8.program_counter.wrapping_add(1).get();
+                    let incremented_pc = chip8.program_counter.next_instruction().get();
 
                     chip8.registers.set(register, key as u8);
                     chip8.exec(IfPressed(register));

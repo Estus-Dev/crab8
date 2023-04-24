@@ -72,7 +72,7 @@ impl Chip8 {
 
         self.exec(instruction);
 
-        self.program_counter = self.program_counter.wrapping_add(2);
+        self.program_counter = self.program_counter.next_instruction();
     }
 
     fn resume_read_input(&mut self, register: Register, input: Input) {
