@@ -22,6 +22,7 @@ pub mod prelude {
 use crate::prelude::*;
 #[cfg(feature = "bevy")]
 use bevy::ecs::system::Resource;
+#[cfg(feature = "download")]
 use reqwest::{blocking::get, Result};
 use std::{fmt, fmt::Display, fs::File, io::Read};
 
@@ -104,6 +105,7 @@ impl Chip8 {
         Ok(())
     }
 
+    #[cfg(feature = "download")]
     pub fn download(&mut self, url: &str) -> Result<()> {
         let res = get(url)?;
         let data = res.bytes()?;
