@@ -10,6 +10,7 @@ fn main() {
             primary_window: Some(Window {
                 title: "CHIP-8".to_string(),
                 resolution: (1024.0, 512.0).into(),
+                resizable: false,
                 ..default()
             }),
             ..default()
