@@ -91,7 +91,7 @@ impl Chip8 {
         self.sound.tick();
     }
 
-    pub fn load(&mut self, filename: &str) -> std::io::Result<()> {
+    pub fn load_file(&mut self, filename: &str) -> std::io::Result<()> {
         let mut file = File::open(filename)?;
         let mut buffer = Vec::new();
         let start = Address::initial_instruction();
