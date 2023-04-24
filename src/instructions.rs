@@ -149,7 +149,7 @@ pub enum Instruction {
     Read(Register),
 
     /// Rather than fail parsing we'll return an invalid instruction
-    Invalid(u16),
+    NoOp(u16),
 }
 
 impl From<u16> for Instruction {
@@ -185,7 +185,7 @@ impl From<u16> for Instruction {
                 0x6 => Self::ShiftRight(x, y),
                 0x7 => Self::SubtractFromRegister(x, y),
                 0xE => Self::ShiftLeft(x, y),
-                _ => Self::Invalid(instruction),
+                _ => Self::NoOp(instruction),
             },
 
             0x9 if sub_operator == 0x0 => Self::IfRegisters(x, y),
@@ -206,10 +206,10 @@ impl From<u16> for Instruction {
                 0x33 => Self::WriteDecimal(x),
                 0x55 => Self::Write(x),
                 0x65 => Self::Read(x),
-                _ => Self::Invalid(instruction),
+                _ => Self::NoOp(instruction),
             },
 
-            _ => Self::Invalid(instruction),
+            _ => Self::NoOp(instruction),
         }
     }
 }
@@ -253,7 +253,7 @@ impl Chip8 {
             WriteDecimal(register) => self.exec_write_decimal(register),
             Write(register) => self.exec_write(register),
             Read(register) => self.exec_read(register),
-            Invalid(instruction) => self.exec_invalid(instruction),
+            NoOp(instruction) => self.exec_no_op(instruction),
         }
     }
 
@@ -538,10 +538,7 @@ impl Chip8 {
         self.address_register = self.address_register.wrapping_add(1 + register as u16);
     }
 
-    fn exec_invalid(&mut self, instruction: u16) {
-        let pc = self.program_counter.get();
-        println!("Invalid instruction {instruction:#06X} executed at {pc:#05X}!");
-    }
+    fn exec_no_op(&mut self, _instruction: u16) {}
 }
 
 #[cfg(test)]
@@ -1364,7 +1361,7 @@ mod test {
             (0x4712, If(V7, 0x12)),
             (0x5AD0, IfNotRegisters(VA, VD)),
             (0x5040, IfNotRegisters(V0, V4)),
-            (0x5049, Invalid(0x5049)),
+            (0x5049, NoOp(0x5049)),
             (0x64AC, Store(V4, 0xAC)),
             (0x6000, Store(V0, 0x00)),
             (0x6123, Store(V1, 0x23)),
@@ -1395,7 +1392,7 @@ mod test {
             (0x8CAE, ShiftLeft(VC, VA)),
             (0x9AD0, IfRegisters(VA, VD)),
             (0x9040, IfRegisters(V0, V4)),
-            (0x9049, Invalid(0x9049)),
+            (0x9049, NoOp(0x9049)),
             (0xA000, StoreAddress(0x000.try_into()?)),
             (0xA123, StoreAddress(0x123.try_into()?)),
             (0xAF24, StoreAddress(0xF24.try_into()?)),
@@ -1412,23 +1409,23 @@ mod test {
             (0xE2A1, IfPressed(V2)),
             (0xE9A1, IfPressed(V9)),
             (0xEBA1, IfPressed(VB)),
-            (0xE09F, Invalid(0xE09F)),
-            (0xE1A2, Invalid(0xE1A2)),
-            (0xE200, Invalid(0xE200)),
-            (0xE3FF, Invalid(0xE3FF)),
+            (0xE09F, NoOp(0xE09F)),
+            (0xE1A2, NoOp(0xE1A2)),
+            (0xE200, NoOp(0xE200)),
+            (0xE3FF, NoOp(0xE3FF)),
             (0xF507, ReadDelay(V5)),
             (0xF207, ReadDelay(V2)),
-            (0xF000, Invalid(0xF000)),
-            (0xF114, Invalid(0xF114)),
+            (0xF000, NoOp(0xF000)),
+            (0xF114, NoOp(0xF114)),
             (0xF115, SetDelay(V1)),
             (0xF015, SetDelay(V0)),
-            (0xFA16, Invalid(0xFA16)),
-            (0xFC17, Invalid(0xFC17)),
+            (0xFA16, NoOp(0xFA16)),
+            (0xFC17, NoOp(0xFC17)),
             (0xFB18, SetSound(VB)),
             (0xF618, SetSound(V6)),
             (0xF01E, AddAddress(V0)),
             (0xF41E, AddAddress(V4)),
-            (0xF41F, Invalid(0xF41F)),
+            (0xF41F, NoOp(0xF41F)),
             (0xF129, LoadSprite(V1)),
             (0xF729, LoadSprite(V7)),
             (0xFE33, WriteDecimal(VE)),
