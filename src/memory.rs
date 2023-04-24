@@ -154,7 +154,7 @@ impl Default for Memory {
             default.set_range(address.try_into().unwrap(), char.sprite());
         }
 
-        // Fill starting reserved address space with 0xFF for visualization purposes.
+        // Fill ending reserved address space with 0xFF for visualization purposes.
         for address in (LAST_SAFE_ADDRESS + 1)..=LAST_ADDRESS {
             default.0[address as usize] = 0xFF;
         }
