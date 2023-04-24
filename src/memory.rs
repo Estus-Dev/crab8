@@ -40,6 +40,11 @@ impl Address {
         Address((self.0 + value) & 0x0FFF)
     }
 
+    /// Get the address of the next byte in memory
+    pub fn next(&self) -> Address {
+        self.wrapping_add(1)
+    }
+
     pub fn get(&self) -> u16 {
         self.0
     }
@@ -84,7 +89,7 @@ impl Memory {
     }
 
     pub fn get_instruction(&self, address: Address) -> Instruction {
-        let next_address = address.wrapping_add(1).0 as usize;
+        let next_address = address.next().0 as usize;
         let address = address.0 as usize;
         let instruction = ((self.0[address] as u16) << 8) + self.0[next_address] as u16;
 
