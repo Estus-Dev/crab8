@@ -38,6 +38,10 @@ impl Screen {
 
         (screen, collision_flag)
     }
+
+    pub fn get_row(&self, y: usize) -> &[bool] {
+        &self.0[y]
+    }
 }
 
 impl Debug for Screen {
