@@ -253,7 +253,7 @@ impl Chip8 {
             WriteDecimal(register) => self.exec_write_decimal(register),
             Write(register) => self.exec_write(register),
             Read(register) => self.exec_read(register),
-            Invalid(instruction) => panic!("Invalid instruction {instruction} executed!"),
+            Invalid(instruction) => self.exec_invalid(instruction),
         }
     }
 
@@ -536,6 +536,11 @@ impl Chip8 {
 
         self.registers.set_range(values);
         self.address_register = self.address_register.wrapping_add(1 + register as u16);
+    }
+
+    fn exec_invalid(&mut self, instruction: u16) {
+        let pc = self.program_counter.get();
+        println!("Invalid instruction {instruction:#06X} executed at {pc:#05X}!");
     }
 }
 
