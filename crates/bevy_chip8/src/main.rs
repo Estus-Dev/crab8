@@ -80,7 +80,7 @@ fn update_chip8(
 
     chip8.tick();
 
-    for (entity, _, _) in &query {
+    for (entity, previous_frame, _) in &query {
         commands
             .entity(entity)
             .remove::<SpriteBundle>()
@@ -88,5 +88,7 @@ fn update_chip8(
                 texture: images.add(render_framebuffer(&chip8.screen)),
                 ..default()
             });
+
+        images.remove(previous_frame);
     }
 }
