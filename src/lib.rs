@@ -91,16 +91,19 @@ impl Chip8 {
         self.sound.tick();
     }
 
+    pub fn load(&mut self, rom: &[u8]) {
+        self.memory = Memory::default();
+        self.memory.set_range(Address::initial_instruction(), rom);
+    }
+
     pub fn load_file(&mut self, filename: &str) -> std::io::Result<()> {
         let mut file = File::open(filename)?;
         let mut buffer = Vec::new();
-        let start = Address::initial_instruction();
 
         // TODO: Check to see if it will fit in memory
         file.read_to_end(&mut buffer)?;
 
-        self.memory = Memory::default();
-        self.memory.set_range(start, &buffer);
+        self.load(&buffer);
 
         Ok(())
     }
