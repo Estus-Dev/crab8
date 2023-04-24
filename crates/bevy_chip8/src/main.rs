@@ -1,8 +1,19 @@
 mod screen;
 
 use bevy::prelude::*;
-use chip_8::Chip8;
+use chip_8::{input::Input, Chip8};
 use screen::render_framebuffer;
+
+/// CHIP-8 updates timers and display at 60hz
+const TIMESTEP: f32 = 1.0 / 60.0;
+
+/// There's not much of a standard for tick rate.
+/// This will need to be configurable via UI to make most software work.
+const INSTRUCTIONS_PER_TICK: usize = 10;
+
+#[derive(Component)]
+/// A marker component for the CHIP-8 screen render
+struct Screen;
 
 fn main() {
     App::new()
@@ -16,7 +27,9 @@ fn main() {
             ..default()
         }))
         .insert_resource(Chip8::default())
+        .insert_resource(FixedTime::new_from_secs(TIMESTEP))
         .add_startup_system(setup_chip8)
+        .add_system(update_chip8.in_schedule(CoreSchedule::FixedUpdate))
         .run();
 }
 
@@ -44,8 +57,36 @@ fn setup_chip8(
     // Draw the sprite at I to X, Y
     chip8.exec(0xD015);
 
-    commands.spawn(SpriteBundle {
-        texture: images.add(render_framebuffer(&chip8.screen)),
-        ..default()
-    });
+    commands
+        .spawn(SpriteBundle {
+            texture: images.add(render_framebuffer(&chip8.screen)),
+            ..default()
+        })
+        .insert(Screen)
+        .insert(Name::new("Screen"));
+}
+
+fn update_chip8(
+    mut commands: Commands,
+    query: Query<(Entity, &Handle<Image>, &Screen)>,
+    mut images: ResMut<Assets<Image>>,
+    mut chip8: ResMut<Chip8>,
+) {
+    let input = Input::default();
+
+    for _ in 0..INSTRUCTIONS_PER_TICK {
+        chip8.execute(input);
+    }
+
+    chip8.tick();
+
+    for (entity, _, _) in &query {
+        commands
+            .entity(entity)
+            .remove::<SpriteBundle>()
+            .insert(SpriteBundle {
+                texture: images.add(render_framebuffer(&chip8.screen)),
+                ..default()
+            });
+    }
 }
