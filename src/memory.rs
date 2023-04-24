@@ -84,10 +84,11 @@ impl Memory {
     }
 
     pub fn get_instruction(&self, address: Address) -> Instruction {
+        let next_address = address.wrapping_add(1).0 as usize;
         let address = address.0 as usize;
-        let instruction = &self.0[address..=address.wrapping_add(1)];
+        let instruction = ((self.0[address] as u16) << 8) + self.0[next_address] as u16;
 
-        Instruction::from(((instruction[0] as u16) << 8) + instruction[1] as u16)
+        Instruction::from(instruction)
     }
 
     pub fn get_range(&self, start: Address, end: Address) -> &[u8] {
