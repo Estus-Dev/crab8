@@ -1,7 +1,7 @@
 mod screen;
 
 use bevy::prelude::*;
-use chip_8::{input::Input, Chip8};
+use chip_8::{input::Key, Chip8};
 use screen::render_framebuffer;
 
 /// CHIP-8 updates timers and display at 60hz
@@ -69,10 +69,11 @@ fn setup_chip8(
 fn update_chip8(
     mut commands: Commands,
     query: Query<(Entity, &Handle<Image>, &Screen)>,
+    keyboard: Res<Input<KeyCode>>,
     mut images: ResMut<Assets<Image>>,
     mut chip8: ResMut<Chip8>,
 ) {
-    let input = Input::default();
+    let input = get_input(keyboard);
 
     for _ in 0..INSTRUCTIONS_PER_TICK {
         chip8.execute(input);
@@ -88,4 +89,40 @@ fn update_chip8(
 
         images.remove(previous_frame);
     }
+}
+
+fn get_keybind(key: Key) -> KeyCode {
+    use Key::*;
+
+    match key {
+        Key0 => KeyCode::X,
+        Key1 => KeyCode::Key1,
+        Key2 => KeyCode::Key2,
+        Key3 => KeyCode::Key3,
+        Key4 => KeyCode::Q,
+        Key5 => KeyCode::W,
+        Key6 => KeyCode::E,
+        Key7 => KeyCode::A,
+        Key8 => KeyCode::S,
+        Key9 => KeyCode::D,
+        KeyA => KeyCode::Z,
+        KeyB => KeyCode::C,
+        KeyC => KeyCode::Key4,
+        KeyD => KeyCode::R,
+        KeyE => KeyCode::F,
+        KeyF => KeyCode::V,
+    }
+}
+
+fn get_input(keyboard: Res<Input<KeyCode>>) -> chip_8::input::Input {
+    let mut builder = chip_8::input::Input::build();
+
+    for key in 0x0..=0xF {
+        let key = Key::try_from(key).expect("A nibble is a valid key");
+        let keybind = get_keybind(key);
+
+        builder = builder.set_pressed(key, keyboard.pressed(keybind));
+    }
+
+    builder.build()
 }
