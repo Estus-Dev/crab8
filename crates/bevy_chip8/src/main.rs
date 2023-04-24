@@ -47,8 +47,8 @@ fn setup_chip8(
     });
 
     chip8
-        .load("./roms/1-chip8-logo.ch8")
-        .expect("Place 1-chip8-logo.ch8 in roms/");
+        .load("./roms/3-corax+.ch8")
+        .expect("Place 3-corax+.ch8 in roms/");
 
     commands
         .spawn(SpriteBundle {
