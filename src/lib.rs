@@ -68,10 +68,7 @@ impl Chip8 {
             return;
         }
 
-        let instruction = self
-            .memory
-            .get_range(self.program_counter, self.program_counter.wrapping_add(1));
-        let instruction = ((instruction[0] as u16) << 8) + instruction[1] as u16;
+        let instruction = self.memory.get_instruction(self.program_counter);
 
         self.exec(instruction);
 
