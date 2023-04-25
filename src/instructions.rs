@@ -618,6 +618,7 @@ mod test {
                 .expect("A nibble is a valid register");
 
             let previous_pc = crab8.program_counter.get();
+            let incremented_pc = crab8.program_counter.next_instruction().get();
 
             crab8.exec(Store(register, value));
             crab8.exec(instruction);
@@ -625,7 +626,7 @@ mod test {
             let pc = crab8.program_counter.get();
 
             if skipped {
-                assert_eq!(pc, previous_pc + 1);
+                assert_eq!(pc, incremented_pc);
             } else {
                 assert_eq!(pc, previous_pc);
             }
@@ -648,6 +649,7 @@ mod test {
                 .expect("A nibble is a valid register");
 
             let previous_pc = crab8.program_counter.get();
+            let incremented_pc = crab8.program_counter.next_instruction().get();
 
             crab8.exec(Store(register, value));
             crab8.exec(instruction);
@@ -655,7 +657,7 @@ mod test {
             let pc = crab8.program_counter.get();
 
             if skipped {
-                assert_eq!(pc, previous_pc + 1);
+                assert_eq!(pc, incremented_pc);
             } else {
                 assert_eq!(pc, previous_pc);
             }
@@ -681,6 +683,7 @@ mod test {
                 .expect("A nibble is a valid register");
 
             let previous_pc = crab8.program_counter.get();
+            let incremented_pc = crab8.program_counter.next_instruction().get();
 
             crab8.exec(Store(x, x_value));
             crab8.exec(Store(y, y_value));
@@ -689,7 +692,7 @@ mod test {
             let pc = crab8.program_counter.get();
 
             if skipped {
-                assert_eq!(pc, previous_pc + 1);
+                assert_eq!(pc, incremented_pc);
             } else {
                 assert_eq!(pc, previous_pc);
             }
@@ -999,6 +1002,7 @@ mod test {
                 .expect("A nibble is a valid register");
 
             let previous_pc = crab8.program_counter.get();
+            let incremented_pc = crab8.program_counter.next_instruction().get();
 
             crab8.exec(Store(x, x_value));
             crab8.exec(Store(y, y_value));
@@ -1007,7 +1011,7 @@ mod test {
             let pc = crab8.program_counter.get();
 
             if skipped {
-                assert_eq!(pc, previous_pc + 1);
+                assert_eq!(pc, incremented_pc);
             } else {
                 assert_eq!(pc, previous_pc);
             }
