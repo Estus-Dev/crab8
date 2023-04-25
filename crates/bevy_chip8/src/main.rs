@@ -21,7 +21,7 @@ struct Screen;
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> reqwest::Result<()> {
     let rom = reqwest::get(
-        "https://github.com/Timendus/chip8-test-suite/blob/main/bin/3-corax+.ch8?raw=true",
+        "https://raw.githubusercontent.com/Timendus/chip8-test-suite/master/bin/3-corax+.ch8",
     )
     .await?
     .bytes()
