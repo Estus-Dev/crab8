@@ -1,3 +1,8 @@
-# CHIP-8
+# CRAB-8
 
-A CHIP-8 implementation in Rust.  Not yet usable.  It still needs to be made real-time and interactive, play sounds, etc...
+A CHIP-8 emulator written in Rust with a [Bevy Engine][] frontend.
+
+![Example Image][]
+
+[Bevy Engine]: https://bevyengine.org/
+[Example Image]: ./docs/images/example.png
