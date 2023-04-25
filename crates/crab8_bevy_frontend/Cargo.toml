@@ -1,5 +1,5 @@
 [package]
-name = "bevy_chip8"
+name = "crab8_bevy_frontend"
 version = "0.1.0"
 edition = "2021"
 

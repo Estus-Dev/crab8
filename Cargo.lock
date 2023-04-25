@@ -372,16 +372,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "bevy_chip8"
-version = "0.1.0"
-dependencies = [
- "bevy",
- "crab8",
- "reqwest",
- "tokio",
-]
-
-[[package]]
 name = "bevy_core"
 version = "0.10.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1276,6 +1266,16 @@ dependencies = [
  "bevy",
  "rand",
  "reqwest",
+]
+
+[[package]]
+name = "crab8_bevy_frontend"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+ "crab8",
+ "reqwest",
+ "tokio",
 ]
 
 [[package]]
