@@ -11,11 +11,22 @@ const TIMESTEP: f32 = 1.0 / 60.0;
 /// This will need to be configurable via UI to make most software work.
 const INSTRUCTIONS_PER_TICK: usize = 10;
 
+#[derive(Resource)]
+struct Rom(Vec<u8>);
+
 #[derive(Component)]
 /// A marker component for the CHIP-8 screen render
 struct Screen;
 
-fn main() {
+#[tokio::main]
+async fn main() -> reqwest::Result<()> {
+    let rom = reqwest::get(
+        "https://github.com/Timendus/chip8-test-suite/blob/main/bin/3-corax+.ch8?raw=true",
+    )
+    .await?
+    .bytes()
+    .await?;
+
     App::new()
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             primary_window: Some(Window {
@@ -28,13 +39,17 @@ fn main() {
         }))
         .insert_resource(Chip8::default())
         .insert_resource(FixedTime::new_from_secs(TIMESTEP))
+        .insert_resource(Rom(rom.into()))
         .add_startup_system(setup_chip8)
         .add_system(update_chip8.in_schedule(CoreSchedule::FixedUpdate))
         .run();
+
+    Ok(())
 }
 
 fn setup_chip8(
     mut commands: Commands,
+    rom: Res<Rom>,
     mut images: ResMut<Assets<Image>>,
     mut chip8: ResMut<Chip8>,
 ) {
@@ -46,14 +61,6 @@ fn setup_chip8(
         ..default()
     });
 
-    // TODO: This is blocking and should instead be downloaded async and put in a resource. Then
-    // setup can continue when that resource becomes available.
-    chip8
-        .download(
-            "https://github.com/Timendus/chip8-test-suite/blob/main/bin/3-corax+.ch8?raw=true",
-        )
-        .expect("A working internet connection is required for now");
-
     commands
         .spawn(SpriteBundle {
             texture: images.add(render_framebuffer(&chip8.screen)),
@@ -61,6 +68,8 @@ fn setup_chip8(
         })
         .insert(Screen)
         .insert(Name::new("Screen"));
+
+    chip8.load(&rom.0);
 }
 
 fn update_chip8(

@@ -8,3 +8,5 @@ edition = "2021"
 [dependencies]
 bevy = { workspace = true }
 chip-8 = { path = "../..", features = ["bevy"] }
+reqwest = { workspace = true }
+tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
