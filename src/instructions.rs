@@ -214,7 +214,7 @@ impl From<u16> for Instruction {
     }
 }
 
-impl Chip8 {
+impl Crab8 {
     pub fn exec(&mut self, instruction: impl Into<Instruction>) {
         use Instruction::*;
 
@@ -551,26 +551,26 @@ mod test {
 
     #[test]
     fn test_clear_screen() {
-        let mut chip8 = Chip8::default();
+        let mut crab8 = Crab8::default();
 
         // TODO: Draw something
 
-        chip8.exec(ClearScreen);
+        crab8.exec(ClearScreen);
 
-        assert_eq!(chip8.screen, Screen::default());
+        assert_eq!(crab8.screen, Screen::default());
     }
 
     #[test]
     fn test_jump() {
         let cases = [0x1000, 0x1234, 0x1FFF, 0x1CED, 0x12BA];
 
-        let mut chip8 = Chip8::default();
+        let mut crab8 = Crab8::default();
 
-        assert_eq!(chip8.program_counter.get(), 0x200);
+        assert_eq!(crab8.program_counter.get(), 0x200);
 
         for instruction in cases {
-            chip8.exec(instruction);
-            assert_eq!(chip8.program_counter.get(), instruction & 0x0FFF);
+            crab8.exec(instruction);
+            assert_eq!(crab8.program_counter.get(), instruction & 0x0FFF);
         }
     }
 
@@ -578,26 +578,26 @@ mod test {
     fn test_call() -> Result<(), ()> {
         let cases = [0x2000, 0x2234, 0x2FFF, 0x2CED, 0x22BA];
 
-        let mut chip8 = Chip8::default();
+        let mut crab8 = Crab8::default();
 
         for instruction in cases {
-            chip8.exec(instruction);
-            assert_eq!(chip8.program_counter.get(), instruction & 0x0FFF);
+            crab8.exec(instruction);
+            assert_eq!(crab8.program_counter.get(), instruction & 0x0FFF);
         }
 
         for (i, address) in cases.iter().map(|a| a & 0x0FFF).rev().skip(1).enumerate() {
-            chip8.exec(Return);
+            crab8.exec(Return);
 
-            assert_eq!(chip8.program_counter.get(), address, "{i}");
+            assert_eq!(crab8.program_counter.get(), address, "{i}");
         }
 
-        chip8.exec(Return);
+        crab8.exec(Return);
 
-        assert_eq!(chip8.program_counter, Address::initial_instruction());
+        assert_eq!(crab8.program_counter, Address::initial_instruction());
 
-        chip8.exec(Return);
+        crab8.exec(Return);
 
-        assert_eq!(chip8.program_counter, Address::default());
+        assert_eq!(crab8.program_counter, Address::default());
 
         Ok(())
     }
@@ -611,18 +611,18 @@ mod test {
             (0x3642, 0x46, false),
         ];
 
-        let mut chip8 = Chip8::default();
+        let mut crab8 = Crab8::default();
 
         for (instruction, value, skipped) in cases {
             let register = Register::try_from((instruction & 0x0F00) >> 8) //
                 .expect("A nibble is a valid register");
 
-            let previous_pc = chip8.program_counter.get();
+            let previous_pc = crab8.program_counter.get();
 
-            chip8.exec(Store(register, value));
-            chip8.exec(instruction);
+            crab8.exec(Store(register, value));
+            crab8.exec(instruction);
 
-            let pc = chip8.program_counter.get();
+            let pc = crab8.program_counter.get();
 
             if skipped {
                 assert_eq!(pc, previous_pc + 1);
@@ -641,18 +641,18 @@ mod test {
             (0x4642, 0x46, true),
         ];
 
-        let mut chip8 = Chip8::default();
+        let mut crab8 = Crab8::default();
 
         for (instruction, value, skipped) in cases {
             let register = Register::try_from((instruction & 0x0F00) >> 8) //
                 .expect("A nibble is a valid register");
 
-            let previous_pc = chip8.program_counter.get();
+            let previous_pc = crab8.program_counter.get();
 
-            chip8.exec(Store(register, value));
-            chip8.exec(instruction);
+            crab8.exec(Store(register, value));
+            crab8.exec(instruction);
 
-            let pc = chip8.program_counter.get();
+            let pc = crab8.program_counter.get();
 
             if skipped {
                 assert_eq!(pc, previous_pc + 1);
@@ -672,7 +672,7 @@ mod test {
             (0x5640, 0x46, 0x45, false),
         ];
 
-        let mut chip8 = Chip8::default();
+        let mut crab8 = Crab8::default();
 
         for (instruction, x_value, y_value, skipped) in cases {
             let x = Register::try_from((instruction & 0x0F00) >> 8) //
@@ -680,13 +680,13 @@ mod test {
             let y = Register::try_from((instruction & 0x00F0) >> 4) //
                 .expect("A nibble is a valid register");
 
-            let previous_pc = chip8.program_counter.get();
+            let previous_pc = crab8.program_counter.get();
 
-            chip8.exec(Store(x, x_value));
-            chip8.exec(Store(y, y_value));
-            chip8.exec(instruction);
+            crab8.exec(Store(x, x_value));
+            crab8.exec(Store(y, y_value));
+            crab8.exec(instruction);
 
-            let pc = chip8.program_counter.get();
+            let pc = crab8.program_counter.get();
 
             if skipped {
                 assert_eq!(pc, previous_pc + 1);
@@ -698,286 +698,286 @@ mod test {
 
     #[test]
     fn test_store() {
-        let mut chip8 = Chip8::default();
+        let mut crab8 = Crab8::default();
 
-        assert_eq!(chip8.registers, 0x00000000000000000000000000000000.into());
+        assert_eq!(crab8.registers, 0x00000000000000000000000000000000.into());
 
-        chip8.exec(Store(V0, 0xFF));
+        crab8.exec(Store(V0, 0xFF));
 
-        assert_eq!(chip8.registers, 0xFF000000000000000000000000000000.into());
+        assert_eq!(crab8.registers, 0xFF000000000000000000000000000000.into());
 
-        chip8.exec(Store(V5, 0x24));
+        crab8.exec(Store(V5, 0x24));
 
-        assert_eq!(chip8.registers, 0xFF000000002400000000000000000000.into());
+        assert_eq!(crab8.registers, 0xFF000000002400000000000000000000.into());
 
-        chip8.exec(Store(V5, 0x00));
+        crab8.exec(Store(V5, 0x00));
 
-        assert_eq!(chip8.registers, 0xFF000000000000000000000000000000.into());
+        assert_eq!(crab8.registers, 0xFF000000000000000000000000000000.into());
     }
 
     #[test]
     fn test_add() {
-        let mut chip8 = Chip8::default();
+        let mut crab8 = Crab8::default();
 
-        assert_eq!(chip8.registers, 0x00000000000000000000000000000000.into());
+        assert_eq!(crab8.registers, 0x00000000000000000000000000000000.into());
 
-        chip8.exec(Store(V0, 0x12));
+        crab8.exec(Store(V0, 0x12));
 
-        assert_eq!(chip8.registers, 0x12000000000000000000000000000000.into());
+        assert_eq!(crab8.registers, 0x12000000000000000000000000000000.into());
 
-        chip8.exec(Add(V0, 0x34));
+        crab8.exec(Add(V0, 0x34));
 
-        assert_eq!(chip8.registers, 0x46000000000000000000000000000000.into());
+        assert_eq!(crab8.registers, 0x46000000000000000000000000000000.into());
 
-        chip8.exec(Add(V5, 0x47));
+        crab8.exec(Add(V5, 0x47));
 
-        assert_eq!(chip8.registers, 0x46000000004700000000000000000000.into());
+        assert_eq!(crab8.registers, 0x46000000004700000000000000000000.into());
 
-        chip8.exec(Store(V2, 0xAA));
+        crab8.exec(Store(V2, 0xAA));
 
-        assert_eq!(chip8.registers, 0x4600AA00004700000000000000000000.into());
+        assert_eq!(crab8.registers, 0x4600AA00004700000000000000000000.into());
 
-        chip8.exec(Add(V2, 0x66));
+        crab8.exec(Add(V2, 0x66));
 
-        assert_eq!(chip8.registers, 0x46001000004700000000000000000000.into());
+        assert_eq!(crab8.registers, 0x46001000004700000000000000000000.into());
     }
 
     #[test]
     fn test_copy() {
-        let mut chip8 = Chip8::default();
+        let mut crab8 = Crab8::default();
 
-        assert_eq!(chip8.registers, 0x00000000000000000000000000000000.into());
+        assert_eq!(crab8.registers, 0x00000000000000000000000000000000.into());
 
-        chip8.exec(Store(V0, 0x12));
+        crab8.exec(Store(V0, 0x12));
 
-        assert_eq!(chip8.registers, 0x12000000000000000000000000000000.into());
+        assert_eq!(crab8.registers, 0x12000000000000000000000000000000.into());
 
-        chip8.exec(Copy(V1, V0));
+        crab8.exec(Copy(V1, V0));
 
-        assert_eq!(chip8.registers, 0x12120000000000000000000000000000.into());
+        assert_eq!(crab8.registers, 0x12120000000000000000000000000000.into());
 
-        chip8.exec(Store(V1, 0x63));
+        crab8.exec(Store(V1, 0x63));
 
-        assert_eq!(chip8.registers, 0x12630000000000000000000000000000.into());
+        assert_eq!(crab8.registers, 0x12630000000000000000000000000000.into());
 
-        chip8.exec(Copy(V8, V1));
+        crab8.exec(Copy(V8, V1));
 
-        assert_eq!(chip8.registers, 0x12630000000000006300000000000000.into());
+        assert_eq!(crab8.registers, 0x12630000000000006300000000000000.into());
     }
 
     #[test]
     fn test_or() {
-        let mut chip8 = Chip8::default();
+        let mut crab8 = Crab8::default();
 
-        assert_eq!(chip8.registers, 0x00000000000000000000000000000000.into());
+        assert_eq!(crab8.registers, 0x00000000000000000000000000000000.into());
 
-        chip8.exec(Store(V0, 0b00100100));
+        crab8.exec(Store(V0, 0b00100100));
 
-        assert_eq!(chip8.registers.get(V0), 0b00100100);
+        assert_eq!(crab8.registers.get(V0), 0b00100100);
 
-        chip8.exec(Store(V1, 0b00111000));
-        chip8.exec(Or(V0, V1));
+        crab8.exec(Store(V1, 0b00111000));
+        crab8.exec(Or(V0, V1));
 
-        assert_eq!(chip8.registers.get(V0), 0b00111100);
-        assert_eq!(chip8.registers.get(V1), 0b00111000);
+        assert_eq!(crab8.registers.get(V0), 0b00111100);
+        assert_eq!(crab8.registers.get(V1), 0b00111000);
 
-        chip8.exec(Store(V6, 0b00000000));
-        chip8.exec(Or(V6, V1));
+        crab8.exec(Store(V6, 0b00000000));
+        crab8.exec(Or(V6, V1));
 
-        assert_eq!(chip8.registers.get(V6), 0b00111000);
-        assert_eq!(chip8.registers.get(V1), 0b00111000);
+        assert_eq!(crab8.registers.get(V6), 0b00111000);
+        assert_eq!(crab8.registers.get(V1), 0b00111000);
     }
 
     #[test]
     fn test_and() {
-        let mut chip8 = Chip8::default();
+        let mut crab8 = Crab8::default();
 
-        assert_eq!(chip8.registers, 0x00000000000000000000000000000000.into());
+        assert_eq!(crab8.registers, 0x00000000000000000000000000000000.into());
 
-        chip8.exec(Store(V0, 0b00100100));
-        chip8.exec(Store(V1, 0b00111000));
+        crab8.exec(Store(V0, 0b00100100));
+        crab8.exec(Store(V1, 0b00111000));
 
-        assert_eq!(chip8.registers.get(V0), 0b00100100);
-        assert_eq!(chip8.registers.get(V1), 0b00111000);
+        assert_eq!(crab8.registers.get(V0), 0b00100100);
+        assert_eq!(crab8.registers.get(V1), 0b00111000);
 
-        chip8.exec(And(V0, V1));
+        crab8.exec(And(V0, V1));
 
-        assert_eq!(chip8.registers.get(V0), 0b00100000);
-        assert_eq!(chip8.registers.get(V1), 0b00111000);
+        assert_eq!(crab8.registers.get(V0), 0b00100000);
+        assert_eq!(crab8.registers.get(V1), 0b00111000);
 
-        chip8.exec(Store(V6, 0b00000000));
+        crab8.exec(Store(V6, 0b00000000));
 
-        chip8.exec(Or(V6, V1));
+        crab8.exec(Or(V6, V1));
 
-        assert_eq!(chip8.registers.get(V6), 0b00111000);
-        assert_eq!(chip8.registers.get(V1), 0b00111000);
+        assert_eq!(crab8.registers.get(V6), 0b00111000);
+        assert_eq!(crab8.registers.get(V1), 0b00111000);
     }
 
     #[test]
     fn test_xor() {
-        let mut chip8 = Chip8::default();
+        let mut crab8 = Crab8::default();
 
-        assert_eq!(chip8.registers, 0x00000000000000000000000000000000.into());
+        assert_eq!(crab8.registers, 0x00000000000000000000000000000000.into());
 
-        chip8.exec(Store(V0, 0b00100100));
-        chip8.exec(Store(V1, 0b00111000));
+        crab8.exec(Store(V0, 0b00100100));
+        crab8.exec(Store(V1, 0b00111000));
 
-        assert_eq!(chip8.registers.get(V0), 0b00100100);
-        assert_eq!(chip8.registers.get(V1), 0b00111000);
+        assert_eq!(crab8.registers.get(V0), 0b00100100);
+        assert_eq!(crab8.registers.get(V1), 0b00111000);
 
-        chip8.exec(Xor(V0, V1));
+        crab8.exec(Xor(V0, V1));
 
-        assert_eq!(chip8.registers.get(V0), 0b00011100);
-        assert_eq!(chip8.registers.get(V1), 0b00111000);
+        assert_eq!(crab8.registers.get(V0), 0b00011100);
+        assert_eq!(crab8.registers.get(V1), 0b00111000);
 
-        chip8.exec(Store(V6, 0b00000000));
+        crab8.exec(Store(V6, 0b00000000));
 
-        chip8.exec(Xor(V6, V1));
+        crab8.exec(Xor(V6, V1));
 
-        assert_eq!(chip8.registers.get(V6), 0b00111000);
-        assert_eq!(chip8.registers.get(V1), 0b00111000);
+        assert_eq!(crab8.registers.get(V6), 0b00111000);
+        assert_eq!(crab8.registers.get(V1), 0b00111000);
     }
 
     #[test]
     fn test_add_register_with_carry() {
-        let mut chip8 = Chip8::default();
+        let mut crab8 = Crab8::default();
 
-        assert_eq!(chip8.registers, 0x00000000000000000000000000000000.into());
+        assert_eq!(crab8.registers, 0x00000000000000000000000000000000.into());
 
-        chip8.exec(Store(V0, 0x12));
-        chip8.exec(Store(V3, 0x89));
+        crab8.exec(Store(V0, 0x12));
+        crab8.exec(Store(V3, 0x89));
 
-        assert_eq!(chip8.registers, 0x12000089000000000000000000000000.into());
+        assert_eq!(crab8.registers, 0x12000089000000000000000000000000.into());
 
-        chip8.exec(AddRegister(V3, V0));
+        crab8.exec(AddRegister(V3, V0));
 
-        assert_eq!(chip8.registers, 0x1200009B000000000000000000000000.into());
+        assert_eq!(crab8.registers, 0x1200009B000000000000000000000000.into());
 
-        chip8.exec(AddRegister(V0, V3));
+        crab8.exec(AddRegister(V0, V3));
 
-        assert_eq!(chip8.registers, 0xAD00009B000000000000000000000000.into());
+        assert_eq!(crab8.registers, 0xAD00009B000000000000000000000000.into());
 
-        chip8.exec(AddRegister(V0, V3));
+        crab8.exec(AddRegister(V0, V3));
 
-        assert_eq!(chip8.registers, 0x4800009B000000000000000000000001.into());
+        assert_eq!(crab8.registers, 0x4800009B000000000000000000000001.into());
     }
 
     #[test]
     fn test_subtract_register_with_carry() {
-        let mut chip8 = Chip8::default();
+        let mut crab8 = Crab8::default();
 
-        assert_eq!(chip8.registers, 0x00000000000000000000000000000000.into());
+        assert_eq!(crab8.registers, 0x00000000000000000000000000000000.into());
 
-        chip8.exec(Store(V0, 0x12));
-        chip8.exec(Store(V3, 0x89));
+        crab8.exec(Store(V0, 0x12));
+        crab8.exec(Store(V3, 0x89));
 
-        assert_eq!(chip8.registers, 0x12000089000000000000000000000000.into());
+        assert_eq!(crab8.registers, 0x12000089000000000000000000000000.into());
 
-        chip8.exec(SubtractRegister(V3, V0));
+        crab8.exec(SubtractRegister(V3, V0));
 
-        assert_eq!(chip8.registers, 0x12000077000000000000000000000000.into());
+        assert_eq!(crab8.registers, 0x12000077000000000000000000000000.into());
 
-        chip8.exec(SubtractRegister(V0, V3));
+        crab8.exec(SubtractRegister(V0, V3));
 
-        assert_eq!(chip8.registers, 0x9B000077000000000000000000000001.into());
+        assert_eq!(crab8.registers, 0x9B000077000000000000000000000001.into());
 
-        chip8.exec(SubtractRegister(V0, V3));
+        crab8.exec(SubtractRegister(V0, V3));
 
-        assert_eq!(chip8.registers, 0x24000077000000000000000000000000.into());
+        assert_eq!(crab8.registers, 0x24000077000000000000000000000000.into());
     }
 
     #[test]
     fn test_shift_right() {
-        let mut chip8 = Chip8::default();
+        let mut crab8 = Crab8::default();
 
-        assert_eq!(chip8.registers, 0x00000000000000000000000000000000.into());
+        assert_eq!(crab8.registers, 0x00000000000000000000000000000000.into());
 
-        chip8.exec(Store(V0, 0b00100100));
+        crab8.exec(Store(V0, 0b00100100));
 
-        assert_eq!(chip8.registers.get(V0), 0b00100100);
+        assert_eq!(crab8.registers.get(V0), 0b00100100);
 
-        chip8.exec(ShiftRight(V1, V0));
+        crab8.exec(ShiftRight(V1, V0));
 
-        assert_eq!(chip8.registers.get(V0), 0b00100100);
-        assert_eq!(chip8.registers.get(V1), 0b00010010);
-        assert_eq!(chip8.registers.get(VF), 0x00);
+        assert_eq!(crab8.registers.get(V0), 0b00100100);
+        assert_eq!(crab8.registers.get(V1), 0b00010010);
+        assert_eq!(crab8.registers.get(VF), 0x00);
 
-        chip8.exec(ShiftRight(V2, V1));
+        crab8.exec(ShiftRight(V2, V1));
 
-        assert_eq!(chip8.registers.get(V1), 0b00010010);
-        assert_eq!(chip8.registers.get(V2), 0b00001001);
-        assert_eq!(chip8.registers.get(VF), 0x00);
+        assert_eq!(crab8.registers.get(V1), 0b00010010);
+        assert_eq!(crab8.registers.get(V2), 0b00001001);
+        assert_eq!(crab8.registers.get(VF), 0x00);
 
-        chip8.exec(ShiftRight(V3, V2));
+        crab8.exec(ShiftRight(V3, V2));
 
-        assert_eq!(chip8.registers.get(V2), 0b00001001);
-        assert_eq!(chip8.registers.get(V3), 0b00000100);
-        assert_eq!(chip8.registers.get(VF), 0x01);
+        assert_eq!(crab8.registers.get(V2), 0b00001001);
+        assert_eq!(crab8.registers.get(V3), 0b00000100);
+        assert_eq!(crab8.registers.get(VF), 0x01);
 
-        chip8.exec(ShiftRight(V4, V3));
+        crab8.exec(ShiftRight(V4, V3));
 
-        assert_eq!(chip8.registers.get(V3), 0b00000100);
-        assert_eq!(chip8.registers.get(V4), 0b00000010);
-        assert_eq!(chip8.registers.get(VF), 0x00);
+        assert_eq!(crab8.registers.get(V3), 0b00000100);
+        assert_eq!(crab8.registers.get(V4), 0b00000010);
+        assert_eq!(crab8.registers.get(VF), 0x00);
     }
 
     #[test]
     fn test_sub_from_register_with_carry() {
-        let mut chip8 = Chip8::default();
+        let mut crab8 = Crab8::default();
 
-        assert_eq!(chip8.registers, 0x00000000000000000000000000000000.into());
+        assert_eq!(crab8.registers, 0x00000000000000000000000000000000.into());
 
-        chip8.exec(Store(V0, 0x89));
-        chip8.exec(Store(V3, 0x12));
+        crab8.exec(Store(V0, 0x89));
+        crab8.exec(Store(V3, 0x12));
 
-        assert_eq!(chip8.registers, 0x89000012000000000000000000000000.into());
+        assert_eq!(crab8.registers, 0x89000012000000000000000000000000.into());
 
-        chip8.exec(SubtractFromRegister(V3, V0));
+        crab8.exec(SubtractFromRegister(V3, V0));
 
-        assert_eq!(chip8.registers, 0x89000077000000000000000000000000.into());
+        assert_eq!(crab8.registers, 0x89000077000000000000000000000000.into());
 
-        chip8.exec(SubtractFromRegister(V0, V3));
+        crab8.exec(SubtractFromRegister(V0, V3));
 
-        assert_eq!(chip8.registers, 0xEE000077000000000000000000000001.into());
+        assert_eq!(crab8.registers, 0xEE000077000000000000000000000001.into());
 
-        chip8.exec(SubtractFromRegister(V2, V0));
+        crab8.exec(SubtractFromRegister(V2, V0));
 
-        assert_eq!(chip8.registers, 0xEE00EE77000000000000000000000000.into());
+        assert_eq!(crab8.registers, 0xEE00EE77000000000000000000000000.into());
     }
 
     #[test]
     fn test_shift_left() {
-        let mut chip8 = Chip8::default();
+        let mut crab8 = Crab8::default();
 
-        assert_eq!(chip8.registers, 0x00000000000000000000000000000000.into());
+        assert_eq!(crab8.registers, 0x00000000000000000000000000000000.into());
 
-        chip8.exec(Store(V0, 0b00100100));
+        crab8.exec(Store(V0, 0b00100100));
 
-        assert_eq!(chip8.registers.get(V0), 0b00100100);
+        assert_eq!(crab8.registers.get(V0), 0b00100100);
 
-        chip8.exec(ShiftLeft(V1, V0));
+        crab8.exec(ShiftLeft(V1, V0));
 
-        assert_eq!(chip8.registers.get(V0), 0b00100100);
-        assert_eq!(chip8.registers.get(V1), 0b01001000);
-        assert_eq!(chip8.registers.get(VF), 0x00);
+        assert_eq!(crab8.registers.get(V0), 0b00100100);
+        assert_eq!(crab8.registers.get(V1), 0b01001000);
+        assert_eq!(crab8.registers.get(VF), 0x00);
 
-        chip8.exec(ShiftLeft(V2, V1));
+        crab8.exec(ShiftLeft(V2, V1));
 
-        assert_eq!(chip8.registers.get(V1), 0b01001000);
-        assert_eq!(chip8.registers.get(V2), 0b10010000);
-        assert_eq!(chip8.registers.get(VF), 0x00);
+        assert_eq!(crab8.registers.get(V1), 0b01001000);
+        assert_eq!(crab8.registers.get(V2), 0b10010000);
+        assert_eq!(crab8.registers.get(VF), 0x00);
 
-        chip8.exec(ShiftLeft(V3, V2));
+        crab8.exec(ShiftLeft(V3, V2));
 
-        assert_eq!(chip8.registers.get(V2), 0b10010000);
-        assert_eq!(chip8.registers.get(V3), 0b00100000);
-        assert_eq!(chip8.registers.get(VF), 0x01);
+        assert_eq!(crab8.registers.get(V2), 0b10010000);
+        assert_eq!(crab8.registers.get(V3), 0b00100000);
+        assert_eq!(crab8.registers.get(VF), 0x01);
 
-        chip8.exec(ShiftLeft(V4, V3));
+        crab8.exec(ShiftLeft(V4, V3));
 
-        assert_eq!(chip8.registers.get(V3), 0b00100000);
-        assert_eq!(chip8.registers.get(V4), 0b01000000);
-        assert_eq!(chip8.registers.get(VF), 0x00);
+        assert_eq!(crab8.registers.get(V3), 0b00100000);
+        assert_eq!(crab8.registers.get(V4), 0b01000000);
+        assert_eq!(crab8.registers.get(VF), 0x00);
     }
 
     #[test]
@@ -990,7 +990,7 @@ mod test {
             (0x9640, 0x46, 0x45, true),
         ];
 
-        let mut chip8 = Chip8::default();
+        let mut crab8 = Crab8::default();
 
         for (instruction, x_value, y_value, skipped) in cases {
             let x = Register::try_from((instruction & 0x0F00) >> 8) //
@@ -998,13 +998,13 @@ mod test {
             let y = Register::try_from((instruction & 0x00F0) >> 4) //
                 .expect("A nibble is a valid register");
 
-            let previous_pc = chip8.program_counter.get();
+            let previous_pc = crab8.program_counter.get();
 
-            chip8.exec(Store(x, x_value));
-            chip8.exec(Store(y, y_value));
-            chip8.exec(instruction);
+            crab8.exec(Store(x, x_value));
+            crab8.exec(Store(y, y_value));
+            crab8.exec(instruction);
 
-            let pc = chip8.program_counter.get();
+            let pc = crab8.program_counter.get();
 
             if skipped {
                 assert_eq!(pc, previous_pc + 1);
@@ -1016,21 +1016,21 @@ mod test {
 
     #[test]
     fn test_store_address() -> Result<(), ()> {
-        let mut chip8 = Chip8::default();
+        let mut crab8 = Crab8::default();
 
-        assert_eq!(chip8.address_register, 0x000.try_into()?);
+        assert_eq!(crab8.address_register, 0x000.try_into()?);
 
-        chip8.exec(StoreAddress(0xFFF.try_into()?));
+        crab8.exec(StoreAddress(0xFFF.try_into()?));
 
-        assert_eq!(chip8.address_register, 0xFFF.try_into()?);
+        assert_eq!(crab8.address_register, 0xFFF.try_into()?);
 
-        chip8.exec(StoreAddress(0x032.try_into()?));
+        crab8.exec(StoreAddress(0x032.try_into()?));
 
-        assert_eq!(chip8.address_register, 0x032.try_into()?);
+        assert_eq!(crab8.address_register, 0x032.try_into()?);
 
-        chip8.exec(StoreAddress(0x14E.try_into()?));
+        crab8.exec(StoreAddress(0x14E.try_into()?));
 
-        assert_eq!(chip8.address_register, 0x14E.try_into()?);
+        assert_eq!(crab8.address_register, 0x14E.try_into()?);
 
         Ok(())
     }
@@ -1043,33 +1043,33 @@ mod test {
             (0xB123, 0x45, 0x168),
         ];
 
-        let mut chip8 = Chip8::default();
+        let mut crab8 = Crab8::default();
 
         for (instruction, offset, expected) in cases {
-            chip8.registers.set(V0, offset);
-            chip8.exec(instruction);
+            crab8.registers.set(V0, offset);
+            crab8.exec(instruction);
 
-            assert_eq!(chip8.program_counter.get(), expected);
+            assert_eq!(crab8.program_counter.get(), expected);
         }
     }
 
     #[test]
     // TODO: Most of these tests should use some form of property-based testing
     fn test_is_not_pressed() -> Result<(), ()> {
-        let mut chip8 = Chip8::default();
+        let mut crab8 = Crab8::default();
 
         for register in (0x0..=0x0F).map(|r| Register::try_from(r as usize).unwrap()) {
             for pressed_key in (0x0..=0x0F).map(|key| Key::try_from(key).unwrap()) {
-                chip8.input = Input::build().set_pressed(pressed_key, true).build();
+                crab8.input = Input::build().set_pressed(pressed_key, true).build();
 
                 for key in (0x0..=0x0F).map(|key| Key::try_from(key).unwrap()) {
-                    let starting_pc = chip8.program_counter.get();
-                    let incremented_pc = chip8.program_counter.next_instruction().get();
+                    let starting_pc = crab8.program_counter.get();
+                    let incremented_pc = crab8.program_counter.next_instruction().get();
 
-                    chip8.registers.set(register, key as u8);
-                    chip8.exec(IfNotPressed(register));
+                    crab8.registers.set(register, key as u8);
+                    crab8.exec(IfNotPressed(register));
 
-                    let pc = chip8.program_counter.get();
+                    let pc = crab8.program_counter.get();
 
                     if key != pressed_key {
                         assert_eq!(pc, starting_pc);
@@ -1084,19 +1084,19 @@ mod test {
 
         for register in (0x0..=0x0F).map(|r| Register::try_from(r as usize).unwrap()) {
             for pressed_key in (0x0..=0x0F).map(|key| Key::try_from(key).unwrap()) {
-                chip8.input = Input::build()
+                crab8.input = Input::build()
                     .set_pressed(pressed_key, true)
                     .set_pressed(second_pressed_key, true)
                     .build();
 
                 for key in (0x0..=0x0F).map(|key| Key::try_from(key).unwrap()) {
-                    let starting_pc = chip8.program_counter.get();
-                    let incremented_pc = chip8.program_counter.next_instruction().get();
+                    let starting_pc = crab8.program_counter.get();
+                    let incremented_pc = crab8.program_counter.next_instruction().get();
 
-                    chip8.registers.set(register, key as u8);
-                    chip8.exec(IfNotPressed(register));
+                    crab8.registers.set(register, key as u8);
+                    crab8.exec(IfNotPressed(register));
 
-                    let pc = chip8.program_counter.get();
+                    let pc = crab8.program_counter.get();
 
                     if key != pressed_key && key != second_pressed_key {
                         assert_eq!(pc, starting_pc);
@@ -1113,20 +1113,20 @@ mod test {
     #[test]
     // TODO: Most of these tests should use some form of property-based testing
     fn test_is_pressed() -> Result<(), ()> {
-        let mut chip8 = Chip8::default();
+        let mut crab8 = Crab8::default();
 
         for register in (0x0..=0x0F).map(|r| Register::try_from(r as usize).unwrap()) {
             for pressed_key in (0x0..=0x0F).map(|key| Key::try_from(key).unwrap()) {
-                chip8.input = Input::build().set_pressed(pressed_key, true).build();
+                crab8.input = Input::build().set_pressed(pressed_key, true).build();
 
                 for key in (0x0..=0x0F).map(|key| Key::try_from(key).unwrap()) {
-                    let starting_pc = chip8.program_counter.get();
-                    let incremented_pc = chip8.program_counter.next_instruction().get();
+                    let starting_pc = crab8.program_counter.get();
+                    let incremented_pc = crab8.program_counter.next_instruction().get();
 
-                    chip8.registers.set(register, key as u8);
-                    chip8.exec(IfPressed(register));
+                    crab8.registers.set(register, key as u8);
+                    crab8.exec(IfPressed(register));
 
-                    let pc = chip8.program_counter.get();
+                    let pc = crab8.program_counter.get();
 
                     if key == pressed_key {
                         assert_eq!(pc, starting_pc);
@@ -1141,19 +1141,19 @@ mod test {
 
         for register in (0x0..=0x0F).map(|r| Register::try_from(r as usize).unwrap()) {
             for pressed_key in (0x0..=0x0F).map(|key| Key::try_from(key).unwrap()) {
-                chip8.input = Input::build()
+                crab8.input = Input::build()
                     .set_pressed(pressed_key, true)
                     .set_pressed(second_pressed_key, true)
                     .build();
 
                 for key in (0x0..=0x0F).map(|key| Key::try_from(key).unwrap()) {
-                    let starting_pc = chip8.program_counter.get();
-                    let incremented_pc = chip8.program_counter.next_instruction().get();
+                    let starting_pc = crab8.program_counter.get();
+                    let incremented_pc = crab8.program_counter.next_instruction().get();
 
-                    chip8.registers.set(register, key as u8);
-                    chip8.exec(IfPressed(register));
+                    crab8.registers.set(register, key as u8);
+                    crab8.exec(IfPressed(register));
 
-                    let pc = chip8.program_counter.get();
+                    let pc = crab8.program_counter.get();
 
                     if key == pressed_key || key == second_pressed_key {
                         assert_eq!(pc, starting_pc);
@@ -1180,166 +1180,166 @@ mod test {
 
     #[test]
     fn test_delay_timer() {
-        let mut chip8 = Chip8::default();
+        let mut crab8 = Crab8::default();
 
-        assert_eq!(chip8.delay.get(), 0x00);
+        assert_eq!(crab8.delay.get(), 0x00);
 
-        chip8.exec(Store(V5, 0x14));
-        chip8.exec(SetDelay(V5));
+        crab8.exec(Store(V5, 0x14));
+        crab8.exec(SetDelay(V5));
 
-        assert_eq!(chip8.delay.get(), 0x14);
+        assert_eq!(crab8.delay.get(), 0x14);
 
-        chip8.exec(ReadDelay(V8));
+        crab8.exec(ReadDelay(V8));
 
-        assert_eq!(chip8.registers.get(V8), 0x14);
+        assert_eq!(crab8.registers.get(V8), 0x14);
 
-        chip8.tick();
+        crab8.tick();
 
-        assert_eq!(chip8.delay.get(), 0x13);
+        assert_eq!(crab8.delay.get(), 0x13);
 
-        chip8.exec(ReadDelay(V8));
+        crab8.exec(ReadDelay(V8));
 
-        assert_eq!(chip8.registers.get(V8), 0x13);
+        assert_eq!(crab8.registers.get(V8), 0x13);
 
-        chip8.exec(Store(V0, 0xFF));
-        chip8.exec(SetDelay(V0));
-        chip8.exec(ReadDelay(VF));
+        crab8.exec(Store(V0, 0xFF));
+        crab8.exec(SetDelay(V0));
+        crab8.exec(ReadDelay(VF));
 
-        assert_eq!(chip8.registers.get(VF), 0xFF);
+        assert_eq!(crab8.registers.get(VF), 0xFF);
     }
 
     #[test]
     fn test_sound_timer() {
-        let mut chip8 = Chip8::default();
+        let mut crab8 = Crab8::default();
 
-        assert_eq!(chip8.sound.get(), 0x00);
+        assert_eq!(crab8.sound.get(), 0x00);
 
-        chip8.exec(Store(V5, 0x14));
-        chip8.exec(SetSound(V5));
+        crab8.exec(Store(V5, 0x14));
+        crab8.exec(SetSound(V5));
 
-        assert_eq!(chip8.sound.get(), 0x14);
+        assert_eq!(crab8.sound.get(), 0x14);
 
-        chip8.tick();
+        crab8.tick();
 
-        assert_eq!(chip8.sound.get(), 0x13);
+        assert_eq!(crab8.sound.get(), 0x13);
 
-        chip8.exec(Store(V0, 0xFF));
-        chip8.exec(SetSound(V0));
+        crab8.exec(Store(V0, 0xFF));
+        crab8.exec(SetSound(V0));
     }
 
     #[test]
     fn test_add_address() -> Result<(), ()> {
-        let mut chip8 = Chip8::default();
+        let mut crab8 = Crab8::default();
 
-        assert_eq!(chip8.address_register.get(), 0x000);
+        assert_eq!(crab8.address_register.get(), 0x000);
 
-        chip8.exec(AddAddress(V0));
+        crab8.exec(AddAddress(V0));
 
-        assert_eq!(chip8.address_register.get(), 0x000);
+        assert_eq!(crab8.address_register.get(), 0x000);
 
-        chip8.exec(Store(V0, 0x15));
-        chip8.exec(AddAddress(V0));
+        crab8.exec(Store(V0, 0x15));
+        crab8.exec(AddAddress(V0));
 
-        assert_eq!(chip8.address_register.get(), 0x015);
+        assert_eq!(crab8.address_register.get(), 0x015);
 
-        chip8.exec(StoreAddress(0x123.try_into()?));
+        crab8.exec(StoreAddress(0x123.try_into()?));
 
-        assert_eq!(chip8.address_register.get(), 0x123);
+        assert_eq!(crab8.address_register.get(), 0x123);
 
-        chip8.exec(Store(V6, 0x64));
-        chip8.exec(AddAddress(V6));
+        crab8.exec(Store(V6, 0x64));
+        crab8.exec(AddAddress(V6));
 
-        assert_eq!(chip8.address_register.get(), 0x187);
+        assert_eq!(crab8.address_register.get(), 0x187);
 
         Ok(())
     }
 
     #[test]
     fn test_load_sprite() {
-        let mut chip8 = Chip8::default();
+        let mut crab8 = Crab8::default();
         let mut offset = 0x00;
 
-        assert_eq!(chip8.address_register.get(), 0x000);
+        assert_eq!(crab8.address_register.get(), 0x000);
 
-        chip8.exec(Store(V5, 0x00));
-        chip8.exec(LoadSprite(V5));
+        crab8.exec(Store(V5, 0x00));
+        crab8.exec(LoadSprite(V5));
 
-        assert_eq!(chip8.address_register.get(), FIRST_CHAR_ADDRESS + offset);
+        assert_eq!(crab8.address_register.get(), FIRST_CHAR_ADDRESS + offset);
 
-        chip8.exec(Store(V3, 0x04));
-        chip8.exec(LoadSprite(V3));
+        crab8.exec(Store(V3, 0x04));
+        crab8.exec(LoadSprite(V3));
 
         offset = 0x04 * CHAR_SPRITE_WIDTH;
-        assert_eq!(chip8.address_register.get(), FIRST_CHAR_ADDRESS + offset);
+        assert_eq!(crab8.address_register.get(), FIRST_CHAR_ADDRESS + offset);
 
-        chip8.exec(Store(VB, 0x0F));
-        chip8.exec(LoadSprite(VB));
+        crab8.exec(Store(VB, 0x0F));
+        crab8.exec(LoadSprite(VB));
 
         offset = 0x0F * CHAR_SPRITE_WIDTH;
-        assert_eq!(chip8.address_register.get(), FIRST_CHAR_ADDRESS + offset);
+        assert_eq!(crab8.address_register.get(), FIRST_CHAR_ADDRESS + offset);
     }
 
     // This test uses bytes written in decimal for ease of use.
     #[test]
     fn test_write_decimal() -> Result<(), ()> {
-        let mut chip8 = Chip8::default();
-        let start = chip8.address_register;
+        let mut crab8 = Crab8::default();
+        let start = crab8.address_register;
         let end = start.wrapping_add(3);
 
-        chip8.exec(Store(V8, 42));
-        chip8.exec(WriteDecimal(V8));
+        crab8.exec(Store(V8, 42));
+        crab8.exec(WriteDecimal(V8));
 
-        assert_eq!(chip8.memory.get_range(start, end), &[0, 4, 2]);
+        assert_eq!(crab8.memory.get_range(start, end), &[0, 4, 2]);
 
-        chip8.exec(StoreAddress(0x52C.try_into()?));
+        crab8.exec(StoreAddress(0x52C.try_into()?));
 
-        let start = chip8.address_register;
+        let start = crab8.address_register;
         let end = start.wrapping_add(3);
 
-        chip8.exec(Store(V3, 120));
-        chip8.exec(WriteDecimal(V3));
+        crab8.exec(Store(V3, 120));
+        crab8.exec(WriteDecimal(V3));
 
-        assert_eq!(chip8.memory.get_range(start, end), &[1, 2, 0]);
+        assert_eq!(crab8.memory.get_range(start, end), &[1, 2, 0]);
 
         Ok(())
     }
 
     #[test]
     fn test_read_write() -> Result<(), ()> {
-        let mut chip8 = Chip8::default();
+        let mut crab8 = Crab8::default();
         let mut address = Address::try_from(FIRST_CHAR_ADDRESS)?;
 
-        chip8.address_register.set(address);
-        chip8.exec(Read(V4));
-        assert_eq!(chip8.registers.get_range(V4), Char0.sprite());
-        assert_eq!(chip8.address_register, address.wrapping_add(4 + 1));
+        crab8.address_register.set(address);
+        crab8.exec(Read(V4));
+        assert_eq!(crab8.registers.get_range(V4), Char0.sprite());
+        assert_eq!(crab8.address_register, address.wrapping_add(4 + 1));
 
         address = Address::try_from(0x210)?;
-        chip8.address_register.set(address);
+        crab8.address_register.set(address);
 
         let result: [u8; 6] = [0x54, 0x74, 0x12, 0x62, 0xBE, 0xC0];
 
         for (offset, &byte) in result.iter().enumerate() {
             let register = Register::try_from(offset as u16)?;
-            chip8.exec(Store(register, byte));
+            crab8.exec(Store(register, byte));
         }
 
-        chip8.exec(Write(V5));
-        assert_eq!(chip8.address_register, address.wrapping_add(5 + 1));
+        crab8.exec(Write(V5));
+        assert_eq!(crab8.address_register, address.wrapping_add(5 + 1));
 
         let start = address;
         let end = start.wrapping_add(result.len() as u16);
-        assert_eq!(chip8.memory.get_range(start, end), result);
+        assert_eq!(crab8.memory.get_range(start, end), result);
 
         for register in 0x0..=0xF {
             let register = Register::try_from(register as u16)?;
-            chip8.exec(Store(register, 0xBC));
+            crab8.exec(Store(register, 0xBC));
         }
 
-        chip8.exec(StoreAddress(address));
-        chip8.exec(Read(V5));
+        crab8.exec(StoreAddress(address));
+        crab8.exec(Read(V5));
 
-        assert_eq!(chip8.registers.get_range(V5), result);
+        assert_eq!(crab8.registers.get_range(V5), result);
 
         Ok(())
     }

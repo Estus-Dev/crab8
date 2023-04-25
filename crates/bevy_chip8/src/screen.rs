@@ -5,7 +5,7 @@ use bevy::{
         texture::ImageSampler,
     },
 };
-use chip_8::screen::Screen;
+use crab8::screen::Screen;
 
 pub fn render_framebuffer(screen: &Screen) -> Image {
     const SCREEN_WIDTH: usize = 128;

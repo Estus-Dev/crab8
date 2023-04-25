@@ -1,7 +1,7 @@
 mod screen;
 
 use bevy::prelude::*;
-use chip_8::{input::Key, Chip8};
+use crab8::{input::Key, Crab8};
 use screen::render_framebuffer;
 
 /// CHIP-8 updates timers and display at 60hz
@@ -30,28 +30,28 @@ async fn main() -> reqwest::Result<()> {
     App::new()
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             primary_window: Some(Window {
-                title: "CHIP-8".to_string(),
+                title: "CRAB-8".to_string(),
                 resolution: (1024.0, 512.0).into(),
                 resizable: false,
                 ..default()
             }),
             ..default()
         }))
-        .insert_resource(Chip8::default())
+        .insert_resource(Crab8::default())
         .insert_resource(FixedTime::new_from_secs(TIMESTEP))
         .insert_resource(Rom(rom.into()))
-        .add_startup_system(setup_chip8)
-        .add_system(update_chip8.in_schedule(CoreSchedule::FixedUpdate))
+        .add_startup_system(setup_crab8)
+        .add_system(update_crab8.in_schedule(CoreSchedule::FixedUpdate))
         .run();
 
     Ok(())
 }
 
-fn setup_chip8(
+fn setup_crab8(
     mut commands: Commands,
     rom: Res<Rom>,
     mut images: ResMut<Assets<Image>>,
-    mut chip8: ResMut<Chip8>,
+    mut crab8: ResMut<Crab8>,
 ) {
     commands.spawn(Camera2dBundle {
         projection: OrthographicProjection {
@@ -63,35 +63,35 @@ fn setup_chip8(
 
     commands
         .spawn(SpriteBundle {
-            texture: images.add(render_framebuffer(&chip8.screen)),
+            texture: images.add(render_framebuffer(&crab8.screen)),
             ..default()
         })
         .insert(Screen)
         .insert(Name::new("Screen"));
 
-    chip8.load(&rom.0);
+    crab8.load(&rom.0);
 }
 
-fn update_chip8(
+fn update_crab8(
     mut commands: Commands,
     query: Query<(Entity, &Handle<Image>, &Screen)>,
     keyboard: Res<Input<KeyCode>>,
     mut images: ResMut<Assets<Image>>,
-    mut chip8: ResMut<Chip8>,
+    mut crab8: ResMut<Crab8>,
 ) {
     let input = get_input(keyboard);
 
     for _ in 0..INSTRUCTIONS_PER_TICK {
-        chip8.execute(input);
+        crab8.execute(input);
     }
 
-    chip8.tick();
+    crab8.tick();
 
     for (entity, previous_frame, _) in &query {
         commands
             .entity(entity)
             .remove::<Handle<Image>>()
-            .insert(images.add(render_framebuffer(&chip8.screen)));
+            .insert(images.add(render_framebuffer(&crab8.screen)));
 
         images.remove(previous_frame);
     }
@@ -120,8 +120,8 @@ fn get_keybind(key: Key) -> KeyCode {
     }
 }
 
-fn get_input(keyboard: Res<Input<KeyCode>>) -> chip_8::input::Input {
-    let mut builder = chip_8::input::Input::build();
+fn get_input(keyboard: Res<Input<KeyCode>>) -> crab8::input::Input {
+    let mut builder = crab8::input::Input::build();
 
     for key in 0x0..=0xF {
         let key = Key::try_from(key).expect("A nibble is a valid key");
