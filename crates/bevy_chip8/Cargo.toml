@@ -9,4 +9,4 @@ edition = "2021"
 bevy = { workspace = true }
 chip-8 = { path = "../..", features = ["bevy"] }
 reqwest = { workspace = true }
-tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
+tokio = { workspace = true, features = ["macros", "rt"] }

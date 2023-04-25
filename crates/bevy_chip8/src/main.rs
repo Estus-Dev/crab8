@@ -18,7 +18,7 @@ struct Rom(Vec<u8>);
 /// A marker component for the CHIP-8 screen render
 struct Screen;
 
-#[tokio::main]
+#[tokio::main(flavor = "current_thread")]
 async fn main() -> reqwest::Result<()> {
     let rom = reqwest::get(
         "https://github.com/Timendus/chip8-test-suite/blob/main/bin/3-corax+.ch8?raw=true",
