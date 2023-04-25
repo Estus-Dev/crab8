@@ -1,5 +1,7 @@
 # CRAB-8
 
+![Logo][]
+
 A CHIP-8 emulator written in Rust with a [Bevy Engine][] frontend.
 
 ![Example Image][]
@@ -14,3 +16,4 @@ In these early stages, please don't provide unsolicited help or contributions, b
 
 [Bevy Engine]: https://bevyengine.org/
 [Example Image]: ./docs/images/example.png
+[Logo]: ./docs/images/logo-2x.png
