@@ -1,7 +1,9 @@
 mod screen;
 
 use bevy::prelude::*;
+use bevy_mod_reqwest::{ReqwestBytesResult, ReqwestPlugin, ReqwestRequest};
 use crab8::{input::Key, Crab8};
+use reqwest::{Method, Request};
 use screen::render_framebuffer;
 
 /// CHIP-8 updates timers and display at 60hz
@@ -12,21 +14,17 @@ const TIMESTEP: f32 = 1.0 / 60.0;
 const INSTRUCTIONS_PER_TICK: usize = 10;
 
 #[derive(Resource)]
+// Temporary resource to flag whether there is a ROM loaded.  This should be a Bevy state.
+struct Running(bool);
+
+#[derive(Resource)]
 struct Rom(Vec<u8>);
 
 #[derive(Component)]
 /// A marker component for the CHIP-8 screen render
 struct Screen;
 
-#[tokio::main(flavor = "current_thread")]
-async fn main() -> reqwest::Result<()> {
-    let rom = reqwest::get(
-        "https://raw.githubusercontent.com/Timendus/chip8-test-suite/master/bin/3-corax+.ch8",
-    )
-    .await?
-    .bytes()
-    .await?;
-
+fn main() {
     App::new()
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             primary_window: Some(Window {
@@ -37,22 +35,25 @@ async fn main() -> reqwest::Result<()> {
             }),
             ..default()
         }))
+        .add_plugin(ReqwestPlugin)
         .insert_resource(Crab8::default())
         .insert_resource(FixedTime::new_from_secs(TIMESTEP))
-        .insert_resource(Rom(rom.into()))
+        .insert_resource(Running(false))
+        .add_system(load_rom)
         .add_startup_system(setup_crab8)
         .add_system(update_crab8.in_schedule(CoreSchedule::FixedUpdate))
         .run();
-
-    Ok(())
 }
 
-fn setup_crab8(
-    mut commands: Commands,
-    rom: Res<Rom>,
-    mut images: ResMut<Assets<Image>>,
-    mut crab8: ResMut<Crab8>,
-) {
+fn setup_crab8(mut commands: Commands, mut images: ResMut<Assets<Image>>, crab8: ResMut<Crab8>) {
+    if let Ok(url) =
+        "https://raw.githubusercontent.com/Timendus/chip8-test-suite/master/bin/3-corax+.ch8"
+            .try_into()
+    {
+        let request = Request::new(Method::GET, url);
+        commands.spawn(ReqwestRequest(Some(request)));
+    }
+
     commands.spawn(Camera2dBundle {
         projection: OrthographicProjection {
             scale: 0.125,
@@ -68,17 +69,38 @@ fn setup_crab8(
         })
         .insert(Screen)
         .insert(Name::new("Screen"));
+}
 
-    crab8.load(&rom.0);
+// TODO: This should transition bevy states
+fn load_rom(
+    mut commands: Commands,
+    query: Query<(Entity, &ReqwestBytesResult)>,
+    mut crab8: ResMut<Crab8>,
+    mut running: ResMut<Running>,
+) {
+    for (entity, response) in query.iter() {
+        let rom = response
+            .as_ref()
+            .expect("The network could never fail, right?");
+        crab8.load(rom);
+        running.0 = true;
+
+        commands.entity(entity).despawn_recursive();
+    }
 }
 
 fn update_crab8(
     mut commands: Commands,
     query: Query<(Entity, &Handle<Image>, &Screen)>,
     keyboard: Res<Input<KeyCode>>,
+    running: Res<Running>,
     mut images: ResMut<Assets<Image>>,
     mut crab8: ResMut<Crab8>,
 ) {
+    if !running.0 {
+        return;
+    }
+
     let input = get_input(keyboard);
 
     for _ in 0..INSTRUCTIONS_PER_TICK {

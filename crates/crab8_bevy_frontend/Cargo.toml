@@ -7,6 +7,6 @@ edition = "2021"
 
 [dependencies]
 bevy = { workspace = true }
+bevy_mod_reqwest = { workspace = true }
 crab8 = { path = "../..", features = ["bevy"] }
 reqwest = { workspace = true }
-tokio = { workspace = true, features = ["macros", "rt"] }
