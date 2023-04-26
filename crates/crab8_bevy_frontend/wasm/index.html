@@ -8,7 +8,19 @@
     <script type="module">
         import init from './built/crab8_bevy_frontend.js';
 
-        init();
+        init().catch(e => {
+            // https://users.rust-lang.org/t/getting-rid-of-this-error-error-using-exceptions-for-control-flow-dont-mind-me-this-isnt-actually-an-error/92209/2
+            // I'm trying to use this as an example of good development practices.
+            // So winit throwing this error is pretty irritating.
+            if(error.message.startsWith("Using exceptions for control flow,")) {
+                return;
+            }
+
+            // But then does it make me look any better to catch and rethrow here?
+            // Probably not.  But at least if you see this code you see the reasoning.
+            throw e;
+        });
+
     </script>
 </head>
 <body>
