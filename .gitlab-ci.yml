@@ -1,0 +1,75 @@
+image: "estusdev/rust-ci:rust-wasm-1.69"
+
+default:
+  before_script:
+    - rustc --version
+    - cargo --version
+
+stages:
+  - build
+  - test
+  - deploy
+
+build-crab8_bevy_frontend:
+  stage: build
+  script:
+    # Install libraries for Bevy
+    - apt update && apt install libasound2-dev libudev-dev -y
+    - cargo build -p crab8_bevy_frontend --release
+  artifacts:
+    paths:
+      - ./target/release/
+    exclude:
+      - ./target/release/.fingerprint/**/*
+      - ./target/release/build/**/*
+      - ./target/release/deps/**/*
+      - ./target/release/examples/**/*
+      - ./target/release/incremental/**/*
+      - ./target/release/.cargo-lock
+  cache: &linux_cache
+    paths:
+      - ./target/
+    key:
+      files:
+        - ./Cargo.lock
+
+build-crab8_bevy_frontend_wasm:
+  stage: build
+  script:
+    - ./crates/crab8_bevy_frontend/scripts/build-wasm.sh
+  artifacts:
+    paths:
+      - ./target/wasm32-unknown-unknown/release/
+      - ./crates/crab8_bevy_frontend/wasm/built/
+    exclude:
+      - ./target/wasm32-unknown-unknown/release/.fingerprint/**/*
+      - ./target/wasm32-unknown-unknown/release/build/**/*
+      - ./target/wasm32-unknown-unknown/release/deps/**/*
+      - ./target/wasm32-unknown-unknown/release/examples/**/*
+      - ./target/wasm32-unknown-unknown/release/incremental/**/*
+      - ./target/wasm32-unknown-unknown/release/.cargo-lock
+  cache: &wasm_cache
+    paths:
+      - ./target/
+    key:
+      files:
+        - ./Cargo.lock
+
+test-crab8:
+  stage: test
+  cache: []
+  script:
+    - cargo test
+
+deploy-crab8_bevy_frontend_wasm:
+  only:
+    - main
+  image:
+    name: ghcr.io/williamjacksn/netlify-cli
+    entrypoint: [""]
+  stage: deploy
+  cache: []
+  before_script:
+    - netlify --version
+  script:
+    - netlify deploy --prod --dir ./crates/crab8_bevy_frontend/wasm
