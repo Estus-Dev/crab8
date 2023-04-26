@@ -1,10 +1,10 @@
 mod screen;
+mod ui;
 
 use bevy::prelude::*;
 use bevy_mod_reqwest::{ReqwestBytesResult, ReqwestPlugin, ReqwestRequest};
 use crab8::{input::Key, Crab8};
 use reqwest::{Method, Request};
-use screen::render_framebuffer;
 
 /// CHIP-8 updates timers and display at 60hz
 const TIMESTEP: f32 = 1.0 / 60.0;
@@ -22,7 +22,7 @@ struct Rom(Vec<u8>);
 
 #[derive(Component)]
 /// A marker component for the CHIP-8 screen render
-struct Screen;
+pub struct Screen;
 
 fn main() {
     App::new()
@@ -36,6 +36,7 @@ fn main() {
             ..default()
         }))
         .add_plugin(ReqwestPlugin)
+        .add_plugin(ui::Plugin)
         .insert_resource(Crab8::default())
         .insert_resource(FixedTime::new_from_secs(TIMESTEP))
         .insert_resource(Running(false))
@@ -45,7 +46,7 @@ fn main() {
         .run();
 }
 
-fn setup_crab8(mut commands: Commands, mut images: ResMut<Assets<Image>>, crab8: ResMut<Crab8>) {
+fn setup_crab8(mut commands: Commands) {
     if let Ok(url) =
         "https://raw.githubusercontent.com/Timendus/chip8-test-suite/master/bin/3-corax+.ch8"
             .try_into()
@@ -61,14 +62,6 @@ fn setup_crab8(mut commands: Commands, mut images: ResMut<Assets<Image>>, crab8:
         },
         ..default()
     });
-
-    commands
-        .spawn(SpriteBundle {
-            texture: images.add(render_framebuffer(&crab8.screen)),
-            ..default()
-        })
-        .insert(Screen)
-        .insert(Name::new("Screen"));
 }
 
 // TODO: This should transition bevy states
@@ -89,14 +82,7 @@ fn load_rom(
     }
 }
 
-fn update_crab8(
-    mut commands: Commands,
-    query: Query<(Entity, &Handle<Image>, &Screen)>,
-    keyboard: Res<Input<KeyCode>>,
-    running: Res<Running>,
-    mut images: ResMut<Assets<Image>>,
-    mut crab8: ResMut<Crab8>,
-) {
+fn update_crab8(keyboard: Res<Input<KeyCode>>, running: Res<Running>, mut crab8: ResMut<Crab8>) {
     if !running.0 {
         return;
     }
@@ -108,15 +94,6 @@ fn update_crab8(
     }
 
     crab8.tick();
-
-    for (entity, previous_frame, _) in &query {
-        commands
-            .entity(entity)
-            .remove::<Handle<Image>>()
-            .insert(images.add(render_framebuffer(&crab8.screen)));
-
-        images.remove(previous_frame);
-    }
 }
 
 fn get_keybind(key: Key) -> KeyCode {
