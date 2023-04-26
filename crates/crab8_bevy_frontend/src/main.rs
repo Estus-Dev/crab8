@@ -30,7 +30,6 @@ fn main() {
             primary_window: Some(Window {
                 title: "CRAB-8".to_string(),
                 resolution: (1024.0, 512.0).into(),
-                resizable: false,
                 ..default()
             }),
             ..default()
@@ -48,7 +47,7 @@ fn main() {
 
 fn setup_crab8(mut commands: Commands) {
     if let Ok(url) =
-        "https://raw.githubusercontent.com/Timendus/chip8-test-suite/master/bin/3-corax+.ch8"
+        "https://raw.githubusercontent.com/Timendus/chip8-test-suite/master/bin/1-chip8-logo.ch8"
             .try_into()
     {
         let request = Request::new(Method::GET, url);

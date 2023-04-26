@@ -17,9 +17,11 @@ fn setup_ui(mut commands: Commands, crab8: Res<Crab8>, mut images: ResMut<Assets
     commands
         .spawn(NodeBundle {
             style: Style {
-                size: Size::width(Val::Percent(100.0)),
-                justify_content: JustifyContent::SpaceBetween,
+                size: Size::new(Val::Percent(100.0), Val::Percent(100.0)),
+                max_size: Size::new(Val::Percent(100.0), Val::Percent(100.0)),
+                justify_content: JustifyContent::Start,
                 align_items: AlignItems::Start,
+                align_self: AlignSelf::Start,
                 ..default()
             },
             ..default()
@@ -37,6 +39,7 @@ fn ui_screen(crab8: Res<Crab8>, images: &mut ResMut<Assets<Image>>) -> ImageBund
         image: UiImage::new(images.add(screen::render_framebuffer(&crab8.screen))),
         style: Style {
             flex_grow: 1.0,
+            max_size: Size::new(Val::Percent(100.0), Val::Percent(100.0)),
             aspect_ratio: Some(128.0 / 64.0),
             ..default()
         },
