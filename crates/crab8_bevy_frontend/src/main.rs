@@ -30,6 +30,7 @@ fn main() {
             primary_window: Some(Window {
                 title: "CRAB-8".to_string(),
                 resolution: (1024.0, 512.0).into(),
+                fit_canvas_to_parent: true,
                 ..default()
             }),
             ..default()
