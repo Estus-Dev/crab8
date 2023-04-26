@@ -26,12 +26,10 @@ build-crab8_bevy_frontend:
       - ./target/release/examples/**/*
       - ./target/release/incremental/**/*
       - ./target/release/.cargo-lock
-  cache: &linux_cache
+  cache:
     paths:
       - ./target/
-    key:
-      files:
-        - ./Cargo.lock
+    key: ${CI_COMMIT_REF_SLUG}-linux
 
 build-crab8_bevy_frontend_wasm:
   stage: build
@@ -48,12 +46,10 @@ build-crab8_bevy_frontend_wasm:
       - ./target/wasm32-unknown-unknown/release/examples/**/*
       - ./target/wasm32-unknown-unknown/release/incremental/**/*
       - ./target/wasm32-unknown-unknown/release/.cargo-lock
-  cache: &wasm_cache
+  cache:
     paths:
       - ./target/
-    key:
-      files:
-        - ./Cargo.lock
+    key: ${CI_COMMIT_REF_SLUG}-wasm
 
 test-crab8:
   stage: test
