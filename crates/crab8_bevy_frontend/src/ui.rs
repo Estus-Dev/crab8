@@ -26,25 +26,23 @@ fn setup_ui(mut commands: Commands, crab8: Res<Crab8>, mut images: ResMut<Assets
             },
             ..default()
         })
-        .with_children(|parent| {
-            parent
-                .spawn(ui_screen(crab8, &mut images))
-                .insert(Screen)
-                .insert(Name::new("Screen"));
-        });
+        .with_children(|parent| ui_screen(parent, crab8, &mut images));
 }
 
-fn ui_screen(crab8: Res<Crab8>, images: &mut ResMut<Assets<Image>>) -> ImageBundle {
-    ImageBundle {
-        image: UiImage::new(images.add(screen::render_framebuffer(&crab8.screen))),
-        style: Style {
-            flex_grow: 1.0,
-            max_size: Size::new(Val::Percent(100.0), Val::Percent(100.0)),
-            aspect_ratio: Some(128.0 / 64.0),
+fn ui_screen(parent: &mut ChildBuilder, crab8: Res<Crab8>, images: &mut ResMut<Assets<Image>>) {
+    parent
+        .spawn(ImageBundle {
+            image: UiImage::new(images.add(screen::render_framebuffer(&crab8.screen))),
+            style: Style {
+                flex_grow: 1.0,
+                max_size: Size::new(Val::Percent(100.0), Val::Percent(100.0)),
+                aspect_ratio: Some(128.0 / 64.0),
+                ..default()
+            },
             ..default()
-        },
-        ..default()
-    }
+        })
+        .insert(Screen)
+        .insert(Name::new("Screen"));
 }
 
 fn update_ui_screen(
