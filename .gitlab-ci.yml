@@ -29,8 +29,6 @@ build-crab8_bevy_frontend:
   cache:
     paths:
       - ./target/
-    exclude:
-      - ./target/release/deps/crab8*
     key: ${CI_COMMIT_REF_SLUG}-linux
 
 build-crab8_bevy_frontend_wasm:
@@ -51,8 +49,6 @@ build-crab8_bevy_frontend_wasm:
   cache:
     paths:
       - ./target/
-    exclude:
-      - ./target/wasm32-unknown-unknown/release/deps/crab8*
     key: ${CI_COMMIT_REF_SLUG}-wasm
 
 test-crab8:
