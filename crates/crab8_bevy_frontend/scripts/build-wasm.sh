@@ -14,5 +14,6 @@ cd $SCRIPT_DIR/..
 
 cargo build -p $CRATE_NAME --release --target $ARCH
 wasm-bindgen --out-dir $OUT_DIR --target web $TARGET_DIR/$ARCH/$BUILD_MODE/$CRATE_NAME.wasm
+cp -r ./assets/ ./wasm/assets/
 
 cd $PWD

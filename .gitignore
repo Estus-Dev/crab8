@@ -1,3 +1,4 @@
 /target
 /roms
+/crates/crab8_bevy_frontend/wasm/assets/
 /crates/crab8_bevy_frontend/wasm/built/
