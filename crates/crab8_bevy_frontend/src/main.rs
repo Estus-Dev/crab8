@@ -14,15 +14,35 @@ const TIMESTEP: f32 = 1.0 / 60.0;
 const INSTRUCTIONS_PER_TICK: usize = 10;
 
 #[derive(Resource)]
-// Temporary resource to flag whether there is a ROM loaded.  This should be a Bevy state.
-struct Running(bool);
-
-#[derive(Resource)]
 struct Rom(Vec<u8>);
 
 #[derive(Component)]
 /// A marker component for the CHIP-8 screen render
 pub struct Screen;
+
+#[derive(Resource)]
+/// Stores the number of instructions executed since last frame.
+pub struct InstructionsSinceLastFrame(usize);
+
+#[derive(Clone, Copy, Debug, Default, Hash, PartialEq, Eq, States)]
+/// The current state of the emulator.
+pub enum PlaybackState {
+    #[default]
+    /// The default state is unloaded, where there is no ROM to execute.
+    Unloaded,
+    /// When downloading a ROM, the emulator is effectively stopped.
+    Downloading,
+    /// There is a ROM loaded, execution will begin from the start.
+    Stopped,
+    /// The emulator is playing at full speed.
+    Playing,
+    /// The emulator is paused, but emulator state is retained.
+    Paused,
+    /// The emulator is executing a single instruction.
+    StepInstruction,
+    /// The emulator is executing a single frame's worth of instructions.
+    StepFrame,
+}
 
 fn main() {
     App::new()
@@ -39,20 +59,22 @@ fn main() {
         .add_plugin(ui::Plugin)
         .insert_resource(Crab8::default())
         .insert_resource(FixedTime::new_from_secs(TIMESTEP))
-        .insert_resource(Running(false))
-        .add_system(load_rom)
+        .insert_resource(InstructionsSinceLastFrame(0))
+        .add_state::<PlaybackState>()
+        .add_system(load_rom.in_set(OnUpdate(PlaybackState::Downloading)))
         .add_startup_system(setup_crab8)
         .add_system(update_crab8.in_schedule(CoreSchedule::FixedUpdate))
         .run();
 }
 
-fn setup_crab8(mut commands: Commands) {
+fn setup_crab8(mut commands: Commands, mut next_state: ResMut<NextState<PlaybackState>>) {
     if let Ok(url) =
         "https://raw.githubusercontent.com/Timendus/chip8-test-suite/master/bin/1-chip8-logo.ch8"
             .try_into()
     {
         let request = Request::new(Method::GET, url);
         commands.spawn(ReqwestRequest(Some(request)));
+        next_state.set(PlaybackState::Downloading);
     }
 
     commands.spawn(Camera2dBundle {
@@ -64,36 +86,58 @@ fn setup_crab8(mut commands: Commands) {
     });
 }
 
-// TODO: This should transition bevy states
 fn load_rom(
     mut commands: Commands,
     query: Query<(Entity, &ReqwestBytesResult)>,
     mut crab8: ResMut<Crab8>,
-    mut running: ResMut<Running>,
+    mut next_state: ResMut<NextState<PlaybackState>>,
 ) {
-    for (entity, response) in query.iter() {
+    if let Ok((entity, response)) = query.get_single() {
         let rom = response
             .as_ref()
             .expect("The network could never fail, right?");
         crab8.load(rom);
-        running.0 = true;
-
+        next_state.set(PlaybackState::Stopped);
         commands.entity(entity).despawn_recursive();
     }
 }
 
-fn update_crab8(keyboard: Res<Input<KeyCode>>, running: Res<Running>, mut crab8: ResMut<Crab8>) {
-    if !running.0 {
-        return;
-    }
+pub fn update_crab8(
+    keyboard: Res<Input<KeyCode>>,
+    state: Res<State<PlaybackState>>,
+    mut crab8: ResMut<Crab8>,
+    mut cycle_count: ResMut<InstructionsSinceLastFrame>,
+    mut next_state: ResMut<NextState<PlaybackState>>,
+) {
+    use PlaybackState::*;
 
     let input = get_input(keyboard);
 
-    for _ in 0..INSTRUCTIONS_PER_TICK {
-        crab8.execute(input);
-    }
+    match state.0 {
+        StepInstruction if INSTRUCTIONS_PER_TICK - cycle_count.0 == 1 => {
+            crab8.execute(input);
+            crab8.tick();
+            cycle_count.0 = 0;
+        }
+        StepInstruction => {
+            crab8.execute(input);
+            cycle_count.0 += 1;
+        }
+        Playing | StepFrame => {
+            for _ in cycle_count.0..INSTRUCTIONS_PER_TICK {
+                crab8.execute(input);
+            }
 
-    crab8.tick();
+            crab8.tick();
+            cycle_count.0 = 0;
+        }
+        _ => (),
+    };
+
+    match state.0 {
+        StepInstruction | StepFrame => next_state.set(Paused),
+        _ => (),
+    }
 }
 
 fn get_keybind(key: Key) -> KeyCode {

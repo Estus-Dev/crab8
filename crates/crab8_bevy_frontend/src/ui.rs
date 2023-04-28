@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use crab8::Crab8;
 
-use crate::{screen, Screen};
+use crate::{screen, update_crab8, PlaybackState, Screen};
 
 /// Debugger Plugin for CRAB-8's debug UI
 pub struct Plugin;
@@ -9,7 +9,34 @@ pub struct Plugin;
 impl bevy::app::Plugin for Plugin {
     fn build(&self, app: &mut App) {
         app.add_startup_system(setup_ui)
-            .add_system(update_ui_screen);
+            .add_system(update_ui_screen)
+            .add_system(
+                handle_debug_click
+                    .in_schedule(CoreSchedule::FixedUpdate)
+                    .after(update_crab8),
+            );
+    }
+}
+
+#[derive(Component, PartialEq, Eq)]
+pub enum DebugButton {
+    Play,
+    Pause,
+    Stop,
+    StepFrame,
+    StepInstruction,
+}
+
+impl ToString for DebugButton {
+    fn to_string(&self) -> String {
+        match self {
+            Self::Play => "Play",
+            Self::Pause => "Pause",
+            Self::Stop => "Stop",
+            Self::StepFrame => "Step Frame",
+            Self::StepInstruction => "Step Instruction",
+        }
+        .to_string()
     }
 }
 
@@ -72,9 +99,11 @@ fn ui_screen(parent: &mut ChildBuilder, crab8: &Crab8, mut images: ResMut<Assets
 }
 
 fn ui_button_bar(parent: &mut ChildBuilder, mut asset_server: ResMut<AssetServer>) {
+    use DebugButton::*;
+
     parent
         .spawn(NodeBundle {
-            background_color: Color::DARK_GRAY.into(),
+            background_color: Color::BLUE.into(),
             style: Style {
                 justify_content: JustifyContent::Center,
                 align_items: AlignItems::Center,
@@ -84,40 +113,36 @@ fn ui_button_bar(parent: &mut ChildBuilder, mut asset_server: ResMut<AssetServer
             },
             ..default()
         })
-        .with_children(|parent| ui_icon_button(parent, "Play", &mut asset_server))
-        .with_children(|parent| ui_icon_button(parent, "Pause", &mut asset_server))
-        .with_children(|parent| ui_icon_button(parent, "Stop", &mut asset_server))
-        .with_children(|parent| ui_icon_button(parent, "Step Instruction", &mut asset_server))
-        .with_children(|parent| ui_icon_button(parent, "Step Frame", &mut asset_server));
+        .with_children(|parent| ui_icon_button(parent, Play, &mut asset_server))
+        .with_children(|parent| ui_icon_button(parent, Pause, &mut asset_server))
+        .with_children(|parent| ui_icon_button(parent, Stop, &mut asset_server))
+        .with_children(|parent| ui_icon_button(parent, StepInstruction, &mut asset_server))
+        .with_children(|parent| ui_icon_button(parent, StepFrame, &mut asset_server));
 }
 
-fn ui_icon_button(parent: &mut ChildBuilder, name: &str, asset_server: &mut ResMut<AssetServer>) {
+fn ui_icon_button(
+    parent: &mut ChildBuilder,
+    button_type: DebugButton,
+    asset_server: &mut ResMut<AssetServer>,
+) {
+    let name = button_type.to_string();
     let icon: Handle<Image> = asset_server.load(format!("buttons/{}.png", name.to_lowercase()));
 
     parent
         .spawn(ButtonBundle {
             background_color: Color::rgba(0.0, 0.0, 0.0, 0.0).into(),
+            image: UiImage::new(icon),
             style: Style {
                 justify_content: JustifyContent::Center,
                 align_items: AlignItems::Center,
                 margin: UiRect::horizontal(Val::Px(3.0)),
+                size: Size::all(Val::Px(48.0)),
                 ..default()
             },
             ..default()
         })
-        .with_children(|parent| {
-            parent
-                .spawn(ImageBundle {
-                    image: UiImage::new(icon),
-                    background_color: Color::ANTIQUE_WHITE.into(),
-                    style: Style {
-                        size: Size::all(Val::Px(48.0)),
-                        ..default()
-                    },
-                    ..default()
-                })
-                .insert(Name::new(format!("{name} Button")));
-        });
+        .insert(button_type)
+        .insert(Name::new(format!("{name} Button")));
 }
 
 fn update_ui_screen(
@@ -137,5 +162,34 @@ fn update_ui_screen(
             ));
 
         images.remove(previous_texture);
+    }
+}
+
+#[allow(clippy::type_complexity)]
+pub fn handle_debug_click(
+    mut query: Query<
+        (&Interaction, &DebugButton, &mut BackgroundColor),
+        (Changed<Interaction>, With<Button>),
+    >,
+    mut next_state: ResMut<NextState<PlaybackState>>,
+) {
+    use DebugButton::*;
+    use Interaction::*;
+
+    for (action, button_type, mut color) in &mut query {
+        match *action {
+            None => *color = Color::ANTIQUE_WHITE.into(),
+            Hovered => *color = Color::WHITE.into(),
+            Clicked => {
+                *color = Color::DARK_GRAY.into();
+                next_state.set(match *button_type {
+                    Pause => PlaybackState::Paused,
+                    Play => PlaybackState::Playing,
+                    Stop => PlaybackState::Stopped,
+                    StepFrame => PlaybackState::StepFrame,
+                    StepInstruction => PlaybackState::StepInstruction,
+                });
+            }
+        };
     }
 }
