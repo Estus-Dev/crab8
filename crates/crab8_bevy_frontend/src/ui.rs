@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use crab8::Crab8;
+use crab8::{registers::Register, Crab8};
 
 use crate::{screen, update_crab8, PlaybackState, Screen};
 
@@ -10,6 +10,7 @@ impl bevy::app::Plugin for Plugin {
     fn build(&self, app: &mut App) {
         app.add_startup_system(setup_ui)
             .add_system(update_ui_screen)
+            .add_system(update_ui_registers)
             .add_system(
                 handle_debug_click
                     .in_schedule(CoreSchedule::FixedUpdate)
@@ -65,7 +66,7 @@ fn ui_main_display(
     parent: &mut ChildBuilder,
     crab8: &Crab8,
     images: ResMut<Assets<Image>>,
-    asset_server: ResMut<AssetServer>,
+    mut asset_server: ResMut<AssetServer>,
 ) {
     parent
         .spawn(NodeBundle {
@@ -78,7 +79,23 @@ fn ui_main_display(
             ..default()
         })
         .with_children(|parent| ui_screen(parent, crab8, images))
-        .with_children(|parent| ui_button_bar(parent, asset_server));
+        .with_children(|parent| {
+            parent
+                .spawn(NodeBundle {
+                    background_color: Color::BLUE.into(),
+                    style: Style {
+                        flex_direction: FlexDirection::Row,
+                        justify_content: JustifyContent::SpaceBetween,
+                        flex_wrap: FlexWrap::WrapReverse,
+                        ..default()
+                    },
+                    ..default()
+                })
+                .with_children(|parent| {
+                    ui_button_bar(parent, &mut asset_server);
+                    ui_register_bar(parent, crab8, &asset_server);
+                });
+        });
 }
 
 fn ui_screen(parent: &mut ChildBuilder, crab8: &Crab8, mut images: ResMut<Assets<Image>>) {
@@ -118,7 +135,7 @@ fn update_ui_screen(
     }
 }
 
-fn ui_button_bar(parent: &mut ChildBuilder, mut asset_server: ResMut<AssetServer>) {
+fn ui_button_bar(parent: &mut ChildBuilder, mut asset_server: &mut ResMut<AssetServer>) {
     use DebugButton::*;
 
     parent
@@ -126,7 +143,7 @@ fn ui_button_bar(parent: &mut ChildBuilder, mut asset_server: ResMut<AssetServer
             background_color: Color::BLUE.into(),
             style: Style {
                 justify_content: JustifyContent::Center,
-                align_items: AlignItems::Center,
+                align_items: AlignItems::Start,
                 flex_direction: FlexDirection::Row,
                 size: Size::height(Val::Px(48.0)),
                 ..default()
@@ -191,5 +208,72 @@ pub fn handle_debug_click(
                 });
             }
         };
+    }
+}
+
+fn ui_register_bar(parent: &mut ChildBuilder, crab8: &Crab8, asset_server: &ResMut<AssetServer>) {
+    parent
+        .spawn(NodeBundle {
+            style: Style {
+                flex_direction: FlexDirection::Row,
+                align_items: AlignItems::Center,
+                justify_content: JustifyContent::SpaceBetween,
+                ..default()
+            },
+            ..default()
+        })
+        .with_children(|parent| {
+            for i in 0x0..=0xF {
+                let register = Register::try_from(i as u16).expect("A nibble is a valid register");
+                let name = register.name();
+                let value = format!("{:#04X}", crab8.registers.get(register));
+
+                parent
+                    .spawn(NodeBundle {
+                        style: Style {
+                            flex_direction: FlexDirection::Column,
+                            align_items: AlignItems::Center,
+                            justify_content: JustifyContent::Center,
+                            margin: UiRect::horizontal(Val::Px(3.0)),
+                            ..default()
+                        },
+                        ..default()
+                    })
+                    .with_children(|parent| {
+                        let text_style = TextStyle {
+                            color: Color::GRAY,
+                            font: asset_server.load("fonts/pixeloid-font/PixeloidMono-VGj6x.ttf"),
+                            font_size: 18.0,
+                        };
+                        let header_style = TextStyle {
+                            color: Color::ANTIQUE_WHITE,
+                            ..text_style.clone()
+                        };
+
+                        parent.spawn(TextBundle::from_section(name, header_style));
+                        parent
+                            .spawn(TextBundle::from_section(value, text_style))
+                            .insert(register);
+                    });
+            }
+        });
+}
+
+fn update_ui_registers(
+    mut query: Query<(&mut Text, &Register)>,
+    crab8: Res<Crab8>,
+    asset_server: ResMut<AssetServer>,
+) {
+    let text_style = TextStyle {
+        color: Color::GRAY,
+        font: asset_server.load("fonts/pixeloid-font/PixeloidMono-VGj6x.ttf"),
+        font_size: 18.0,
+    };
+
+    for (mut text, &register) in &mut query {
+        let value = crab8.registers.get(register);
+        let value = format!("{value:#04X}");
+
+        text.sections[0] = TextSection::new(value, text_style.clone());
     }
 }
