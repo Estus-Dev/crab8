@@ -13,7 +13,12 @@ impl bevy::app::Plugin for Plugin {
     }
 }
 
-fn setup_ui(mut commands: Commands, crab8: Res<Crab8>, mut images: ResMut<Assets<Image>>) {
+fn setup_ui(
+    mut commands: Commands,
+    crab8: Res<Crab8>,
+    images: ResMut<Assets<Image>>,
+    asset_server: ResMut<AssetServer>,
+) {
     commands
         .spawn(NodeBundle {
             style: Style {
@@ -26,12 +31,33 @@ fn setup_ui(mut commands: Commands, crab8: Res<Crab8>, mut images: ResMut<Assets
             },
             ..default()
         })
-        .with_children(|parent| ui_screen(parent, crab8, &mut images));
+        .with_children(|parent| ui_main_display(parent, &crab8, images, asset_server));
 }
 
-fn ui_screen(parent: &mut ChildBuilder, crab8: Res<Crab8>, images: &mut ResMut<Assets<Image>>) {
+fn ui_main_display(
+    parent: &mut ChildBuilder,
+    crab8: &Crab8,
+    images: ResMut<Assets<Image>>,
+    asset_server: ResMut<AssetServer>,
+) {
+    parent
+        .spawn(NodeBundle {
+            background_color: Color::RED.into(),
+            style: Style {
+                flex_direction: FlexDirection::Column,
+                flex_grow: 1.0,
+                ..default()
+            },
+            ..default()
+        })
+        .with_children(|parent| ui_screen(parent, crab8, images))
+        .with_children(|parent| ui_button_bar(parent, asset_server));
+}
+
+fn ui_screen(parent: &mut ChildBuilder, crab8: &Crab8, mut images: ResMut<Assets<Image>>) {
     parent
         .spawn(ImageBundle {
+            background_color: Color::ANTIQUE_WHITE.into(),
             image: UiImage::new(images.add(screen::render_framebuffer(&crab8.screen))),
             style: Style {
                 flex_grow: 1.0,
@@ -43,6 +69,52 @@ fn ui_screen(parent: &mut ChildBuilder, crab8: Res<Crab8>, images: &mut ResMut<A
         })
         .insert(Screen)
         .insert(Name::new("Screen"));
+}
+
+fn ui_button_bar(parent: &mut ChildBuilder, mut asset_server: ResMut<AssetServer>) {
+    parent
+        .spawn(NodeBundle {
+            background_color: Color::DARK_GRAY.into(),
+            style: Style {
+                justify_content: JustifyContent::Center,
+                align_items: AlignItems::Center,
+                flex_direction: FlexDirection::Row,
+                size: Size::height(Val::Px(48.0)),
+                ..default()
+            },
+            ..default()
+        })
+        .with_children(|parent| ui_icon_button(parent, "Play", &mut asset_server))
+        .with_children(|parent| ui_icon_button(parent, "Pause", &mut asset_server));
+}
+
+fn ui_icon_button(parent: &mut ChildBuilder, name: &str, asset_server: &mut ResMut<AssetServer>) {
+    let icon: Handle<Image> = asset_server.load(format!("buttons/{}.png", name.to_lowercase()));
+
+    parent
+        .spawn(ButtonBundle {
+            background_color: Color::rgba(0.0, 0.0, 0.0, 0.0).into(),
+            style: Style {
+                justify_content: JustifyContent::Center,
+                align_items: AlignItems::Center,
+                margin: UiRect::horizontal(Val::Px(3.0)),
+                ..default()
+            },
+            ..default()
+        })
+        .with_children(|parent| {
+            parent
+                .spawn(ImageBundle {
+                    image: UiImage::new(icon),
+                    background_color: Color::ANTIQUE_WHITE.into(),
+                    style: Style {
+                        size: Size::all(Val::Px(48.0)),
+                        ..default()
+                    },
+                    ..default()
+                })
+                .insert(Name::new(format!("{name} Button")));
+        });
 }
 
 fn update_ui_screen(
