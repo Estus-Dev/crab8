@@ -98,6 +98,26 @@ fn ui_screen(parent: &mut ChildBuilder, crab8: &Crab8, mut images: ResMut<Assets
         .insert(Name::new("Screen"));
 }
 
+fn update_ui_screen(
+    mut commands: Commands,
+    query: Query<(Entity, &UiImage), With<Screen>>,
+    crab8: Res<Crab8>,
+    mut images: ResMut<Assets<Image>>,
+) {
+    if let Ok((entity, previous_frame)) = query.get_single() {
+        let previous_texture = previous_frame.texture.clone();
+
+        commands
+            .entity(entity)
+            .remove::<UiImage>()
+            .insert(UiImage::new(
+                images.add(screen::render_framebuffer(&crab8.screen)),
+            ));
+
+        images.remove(previous_texture);
+    }
+}
+
 fn ui_button_bar(parent: &mut ChildBuilder, mut asset_server: ResMut<AssetServer>) {
     use DebugButton::*;
 
@@ -143,26 +163,6 @@ fn ui_icon_button(
         })
         .insert(button_type)
         .insert(Name::new(format!("{name} Button")));
-}
-
-fn update_ui_screen(
-    mut commands: Commands,
-    query: Query<(Entity, &UiImage), With<Screen>>,
-    crab8: Res<Crab8>,
-    mut images: ResMut<Assets<Image>>,
-) {
-    if let Ok((entity, previous_frame)) = query.get_single() {
-        let previous_texture = previous_frame.texture.clone();
-
-        commands
-            .entity(entity)
-            .remove::<UiImage>()
-            .insert(UiImage::new(
-                images.add(screen::render_framebuffer(&crab8.screen)),
-            ));
-
-        images.remove(previous_texture);
-    }
 }
 
 #[allow(clippy::type_complexity)]
