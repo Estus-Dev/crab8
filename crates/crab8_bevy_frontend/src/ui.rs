@@ -133,14 +133,14 @@ fn ui_button_bar(parent: &mut ChildBuilder, mut asset_server: ResMut<AssetServer
             },
             ..default()
         })
-        .with_children(|parent| ui_icon_button(parent, Play, &mut asset_server))
-        .with_children(|parent| ui_icon_button(parent, Pause, &mut asset_server))
-        .with_children(|parent| ui_icon_button(parent, Stop, &mut asset_server))
-        .with_children(|parent| ui_icon_button(parent, StepInstruction, &mut asset_server))
-        .with_children(|parent| ui_icon_button(parent, StepFrame, &mut asset_server));
+        .with_children(|parent| ui_debug_button(parent, Play, &mut asset_server))
+        .with_children(|parent| ui_debug_button(parent, Pause, &mut asset_server))
+        .with_children(|parent| ui_debug_button(parent, Stop, &mut asset_server))
+        .with_children(|parent| ui_debug_button(parent, StepInstruction, &mut asset_server))
+        .with_children(|parent| ui_debug_button(parent, StepFrame, &mut asset_server));
 }
 
-fn ui_icon_button(
+fn ui_debug_button(
     parent: &mut ChildBuilder,
     button_type: DebugButton,
     asset_server: &mut ResMut<AssetServer>,
