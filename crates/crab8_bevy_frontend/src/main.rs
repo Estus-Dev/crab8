@@ -64,6 +64,7 @@ fn main() {
         .add_system(load_rom.in_set(OnUpdate(PlaybackState::Downloading)))
         .add_startup_system(setup_crab8)
         .add_system(update_crab8.in_schedule(CoreSchedule::FixedUpdate))
+        .add_system(reset_crab8.in_schedule(OnExit(PlaybackState::Stopped)))
         .run();
 }
 
@@ -89,14 +90,14 @@ fn setup_crab8(mut commands: Commands, mut next_state: ResMut<NextState<Playback
 fn load_rom(
     mut commands: Commands,
     query: Query<(Entity, &ReqwestBytesResult)>,
-    mut crab8: ResMut<Crab8>,
     mut next_state: ResMut<NextState<PlaybackState>>,
 ) {
     if let Ok((entity, response)) = query.get_single() {
         let rom = response
             .as_ref()
             .expect("The network could never fail, right?");
-        crab8.load(rom);
+
+        commands.insert_resource(Rom(rom.to_vec()));
         next_state.set(PlaybackState::Stopped);
         commands.entity(entity).despawn_recursive();
     }
@@ -138,6 +139,14 @@ pub fn update_crab8(
         StepInstruction | StepFrame => next_state.set(Paused),
         _ => (),
     }
+}
+
+fn reset_crab8(mut commands: Commands, rom: Res<Rom>) {
+    let mut crab8 = Crab8::default();
+    crab8.load(&rom.0);
+
+    commands.remove_resource::<Crab8>();
+    commands.insert_resource(crab8);
 }
 
 fn get_keybind(key: Key) -> KeyCode {
