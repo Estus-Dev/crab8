@@ -3,7 +3,7 @@ use std::{fmt, fmt::Debug, fmt::Display, fmt::Formatter};
 
 /// The CHIP-8 stack should support a minimum of 12 frames, but implementations are encouraged to
 /// allow for larger sizes.
-const MAX_STACK_DEPTH: usize = 256;
+const MAX_STACK_DEPTH: usize = 16;
 
 #[derive(Clone, PartialEq, Eq)]
 /// The stack holds all previous PC values while executing one or more subroutines.
