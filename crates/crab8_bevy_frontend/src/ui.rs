@@ -131,7 +131,6 @@ fn ui_screen(parent: &mut ChildBuilder, crab8: &Crab8, mut images: ResMut<Assets
             image: UiImage::new(images.add(screen::render_framebuffer(&crab8.screen))),
             style: Style {
                 flex_grow: 1.0,
-                max_size: Size::new(Val::Percent(100.0), Val::Percent(100.0)),
                 aspect_ratio: Some(128.0 / 64.0),
                 ..default()
             },
