@@ -5,7 +5,7 @@ use std::{fmt, fmt::Debug, fmt::Display, fmt::Formatter};
 /// allow for larger sizes.
 const MAX_STACK_DEPTH: usize = 256;
 
-#[derive(PartialEq, Eq)]
+#[derive(Clone, PartialEq, Eq)]
 /// The stack holds all previous PC values while executing one or more subroutines.
 /// The CHIP-8 requires at least 12 frames, but modern interpreters are encouraged to go higher.
 pub struct Stack {
@@ -86,6 +86,37 @@ impl Default for Stack {
 impl Display for Stack {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         write!(f, "{:?}", self)
+    }
+}
+
+impl IntoIterator for Stack {
+    type Item = Address;
+    type IntoIter = StackIterator;
+
+    fn into_iter(self) -> Self::IntoIter {
+        Self::IntoIter {
+            stack: self,
+            index: 0,
+        }
+    }
+}
+
+pub struct StackIterator {
+    stack: Stack,
+    index: usize,
+}
+
+impl Iterator for StackIterator {
+    type Item = Address;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index < self.stack.length {
+            let current_index = self.index;
+            self.index += 1;
+            Some(self.stack.stack[current_index])
+        } else {
+            None
+        }
     }
 }
 

@@ -11,6 +11,7 @@ impl bevy::app::Plugin for Plugin {
         app.add_startup_system(setup_ui)
             .add_system(update_ui_screen)
             .add_system(update_ui_registers)
+            .add_system(update_ui_stack)
             .add_system(
                 handle_debug_click
                     .in_schedule(CoreSchedule::FixedUpdate)
@@ -18,6 +19,9 @@ impl bevy::app::Plugin for Plugin {
             );
     }
 }
+
+#[derive(Component)]
+pub struct UiStack;
 
 #[derive(Component, PartialEq, Eq)]
 pub enum DebugButton {
@@ -70,30 +74,52 @@ fn ui_main_display(
 ) {
     parent
         .spawn(NodeBundle {
-            background_color: Color::RED.into(),
             style: Style {
-                flex_direction: FlexDirection::Column,
+                flex_direction: FlexDirection::Row,
                 flex_grow: 1.0,
                 ..default()
             },
             ..default()
         })
-        .with_children(|parent| ui_screen(parent, crab8, images))
         .with_children(|parent| {
             parent
                 .spawn(NodeBundle {
-                    background_color: Color::BLUE.into(),
                     style: Style {
                         flex_direction: FlexDirection::Row,
-                        justify_content: JustifyContent::SpaceBetween,
-                        flex_wrap: FlexWrap::WrapReverse,
                         ..default()
                     },
                     ..default()
                 })
                 .with_children(|parent| {
-                    ui_button_bar(parent, &mut asset_server);
-                    ui_register_bar(parent, crab8, &asset_server);
+                    parent
+                        .spawn(NodeBundle {
+                            style: Style {
+                                flex_direction: FlexDirection::Column,
+                                ..default()
+                            },
+                            ..default()
+                        })
+                        .with_children(|parent| ui_screen(parent, crab8, images))
+                        .with_children(|parent| {
+                            parent
+                                .spawn(NodeBundle {
+                                    background_color: Color::BLUE.into(),
+                                    style: Style {
+                                        flex_direction: FlexDirection::Row,
+                                        justify_content: JustifyContent::SpaceBetween,
+                                        flex_wrap: FlexWrap::WrapReverse,
+                                        ..default()
+                                    },
+                                    ..default()
+                                })
+                                .with_children(|parent| {
+                                    ui_button_bar(parent, &mut asset_server);
+                                    ui_register_bar(parent, crab8, &asset_server);
+                                });
+                        });
+                })
+                .with_children(|parent| {
+                    ui_stack(parent, crab8, &asset_server);
                 });
         });
 }
@@ -250,12 +276,12 @@ fn ui_register_bar(parent: &mut ChildBuilder, crab8: &Crab8, asset_server: &ResM
                     })
                     .with_children(|parent| {
                         let text_style = TextStyle {
-                            color: Color::WHITE,
+                            color: Color::GRAY,
                             font: asset_server.load("fonts/pixeloid-font/PixeloidMono-VGj6x.ttf"),
                             font_size: 18.0,
                         };
                         let header_style = TextStyle {
-                            color: Color::GRAY,
+                            color: Color::WHITE,
                             ..text_style.clone()
                         };
 
@@ -284,5 +310,75 @@ fn update_ui_registers(
         let value = format!("{value:#04X}");
 
         text.sections[0] = TextSection::new(value, text_style.clone());
+    }
+}
+
+fn ui_stack(parent: &mut ChildBuilder, crab8: &Crab8, asset_server: &ResMut<AssetServer>) {
+    let font = &asset_server.load("fonts/pixeloid-font/PixeloidMono-VGj6x.ttf");
+
+    parent
+        .spawn(NodeBundle {
+            background_color: Color::BLUE.into(),
+            style: Style {
+                flex_direction: FlexDirection::Column,
+                padding: UiRect::all(Val::Px(3.0)),
+                ..default()
+            },
+            ..default()
+        })
+        .with_children(|parent| {
+            parent.spawn(TextBundle::from_section(
+                "Stack:",
+                TextStyle {
+                    font: font.clone(),
+                    font_size: 18.0,
+                    color: Color::WHITE,
+                },
+            ));
+
+            parent
+                .spawn(TextBundle::from_section(
+                    format!("0: {:#05X?}", crab8.program_counter.get()),
+                    TextStyle {
+                        font: font.clone(),
+                        font_size: 18.0,
+                        color: Color::WHITE,
+                    },
+                ))
+                .insert(UiStack);
+        });
+}
+
+fn update_ui_stack(
+    mut query: Query<&mut Text, With<UiStack>>,
+    crab8: Res<Crab8>,
+    asset_server: ResMut<AssetServer>,
+) {
+    let font = &asset_server.load("fonts/pixeloid-font/PixeloidMono-VGj6x.ttf");
+
+    if let Ok(mut text) = query.get_single_mut() {
+        let mut sections = vec![];
+
+        for (i, frame) in crab8.stack.clone().into_iter().enumerate() {
+            sections.push(TextSection::new(
+                format!("{:#02}: {:#05X?}\n", crab8.stack.len() - i, frame.get()),
+                TextStyle {
+                    font: font.clone(),
+                    font_size: 18.0,
+                    color: Color::GRAY,
+                },
+            ));
+        }
+
+        sections.push(TextSection::new(
+            format!("PC: {:#05X?}", crab8.program_counter.get()),
+            TextStyle {
+                font: font.clone(),
+                font_size: 18.0,
+                color: Color::WHITE,
+            },
+        ));
+
+        text.sections = sections;
     }
 }

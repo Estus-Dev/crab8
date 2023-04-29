@@ -51,7 +51,7 @@ fn main() {
                 .set(WindowPlugin {
                     primary_window: Some(Window {
                         title: "CRAB-8".to_string(),
-                        resolution: (1024.0, 512.0 + 48.0).into(),
+                        resolution: (1089.0, 545.0).into(),
                         fit_canvas_to_parent: true,
                         ..default()
                     }),
