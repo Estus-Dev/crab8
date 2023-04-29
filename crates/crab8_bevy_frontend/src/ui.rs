@@ -101,7 +101,7 @@ fn ui_main_display(
 fn ui_screen(parent: &mut ChildBuilder, crab8: &Crab8, mut images: ResMut<Assets<Image>>) {
     parent
         .spawn(ImageBundle {
-            background_color: Color::ANTIQUE_WHITE.into(),
+            background_color: Color::WHITE.into(),
             image: UiImage::new(images.add(screen::render_framebuffer(&crab8.screen))),
             style: Style {
                 flex_grow: 1.0,
@@ -204,8 +204,8 @@ pub fn handle_debug_click(
 
     for (action, button_type, mut color) in &mut query {
         match *action {
-            None => *color = Color::ANTIQUE_WHITE.into(),
-            Hovered => *color = Color::WHITE.into(),
+            None => *color = Color::WHITE.into(),
+            Hovered => *color = Color::GOLD.into(),
             Clicked => {
                 *color = Color::DARK_GRAY.into();
                 next_state.set(match *button_type {
@@ -255,7 +255,7 @@ fn ui_register_bar(parent: &mut ChildBuilder, crab8: &Crab8, asset_server: &ResM
                             font_size: 18.0,
                         };
                         let header_style = TextStyle {
-                            color: Color::ANTIQUE_WHITE,
+                            color: Color::WHITE,
                             ..text_style.clone()
                         };
 
