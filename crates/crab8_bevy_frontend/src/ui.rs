@@ -250,12 +250,12 @@ fn ui_register_bar(parent: &mut ChildBuilder, crab8: &Crab8, asset_server: &ResM
                     })
                     .with_children(|parent| {
                         let text_style = TextStyle {
-                            color: Color::GRAY,
+                            color: Color::WHITE,
                             font: asset_server.load("fonts/pixeloid-font/PixeloidMono-VGj6x.ttf"),
                             font_size: 18.0,
                         };
                         let header_style = TextStyle {
-                            color: Color::WHITE,
+                            color: Color::GRAY,
                             ..text_style.clone()
                         };
 
