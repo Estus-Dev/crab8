@@ -46,15 +46,19 @@ pub enum PlaybackState {
 
 fn main() {
     App::new()
-        .add_plugins(DefaultPlugins.set(WindowPlugin {
-            primary_window: Some(Window {
-                title: "CRAB-8".to_string(),
-                resolution: (1024.0, 512.0 + 48.0).into(),
-                fit_canvas_to_parent: true,
-                ..default()
-            }),
-            ..default()
-        }))
+        .add_plugins(
+            DefaultPlugins
+                .set(WindowPlugin {
+                    primary_window: Some(Window {
+                        title: "CRAB-8".to_string(),
+                        resolution: (1024.0, 512.0 + 48.0).into(),
+                        fit_canvas_to_parent: true,
+                        ..default()
+                    }),
+                    ..default()
+                })
+                .set(ImagePlugin::default_nearest()),
+        )
         .add_plugin(ReqwestPlugin)
         .add_plugin(ui::Plugin)
         .insert_resource(Crab8::default())
