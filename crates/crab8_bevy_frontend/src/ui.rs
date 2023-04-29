@@ -86,6 +86,7 @@ fn ui_main_display(
                 .spawn(NodeBundle {
                     style: Style {
                         flex_direction: FlexDirection::Row,
+                        flex_grow: 1.0,
                         ..default()
                     },
                     ..default()
@@ -95,6 +96,7 @@ fn ui_main_display(
                         .spawn(NodeBundle {
                             style: Style {
                                 flex_direction: FlexDirection::Column,
+                                flex_grow: 1.0,
                                 ..default()
                             },
                             ..default()
