@@ -118,20 +118,29 @@ fn ui_screen(parent: &mut ChildBuilder, crab8: &Crab8, mut images: ResMut<Assets
 fn update_ui_screen(
     mut commands: Commands,
     query: Query<(Entity, &UiImage), With<Screen>>,
+    asset_server: Res<AssetServer>,
     crab8: Res<Crab8>,
+    state: Res<State<PlaybackState>>,
     mut images: ResMut<Assets<Image>>,
 ) {
+    use PlaybackState::*;
+
+    let texture = match state.0 {
+        Unloaded | Downloading | Stopped => asset_server.load("textures/stopped.png"),
+        _ => images.add(screen::render_framebuffer(&crab8.screen)),
+    };
+
     if let Ok((entity, previous_frame)) = query.get_single() {
         let previous_texture = previous_frame.texture.clone();
 
         commands
             .entity(entity)
             .remove::<UiImage>()
-            .insert(UiImage::new(
-                images.add(screen::render_framebuffer(&crab8.screen)),
-            ));
+            .insert(UiImage::new(texture.clone()));
 
-        images.remove(previous_texture);
+        if previous_texture != texture {
+            images.remove(previous_texture);
+        }
     }
 }
 
