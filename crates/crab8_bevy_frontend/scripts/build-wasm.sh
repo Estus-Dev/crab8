@@ -21,5 +21,6 @@ wasm-bindgen --out-dir $OUT_DIR --target web $TARGET_DIR/$ARCH/$BUILD_MODE/$CRAT
 echo "Copying assets..."
 rm -r ./wasm/assets/
 cp -r ./assets/ ./wasm/assets/
+ls ./wasm/assets/
 
 cd $PWD
