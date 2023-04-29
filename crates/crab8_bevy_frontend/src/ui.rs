@@ -135,7 +135,7 @@ fn update_ui_screen(
     }
 }
 
-fn ui_button_bar(parent: &mut ChildBuilder, mut asset_server: &mut ResMut<AssetServer>) {
+fn ui_button_bar(parent: &mut ChildBuilder, asset_server: &mut ResMut<AssetServer>) {
     use DebugButton::*;
 
     parent
