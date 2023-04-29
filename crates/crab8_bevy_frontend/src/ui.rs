@@ -252,6 +252,7 @@ fn ui_register_bar(parent: &mut ChildBuilder, crab8: &Crab8, asset_server: &ResM
         .spawn(NodeBundle {
             style: Style {
                 flex_direction: FlexDirection::Row,
+                flex_wrap: FlexWrap::Wrap,
                 align_items: AlignItems::Center,
                 justify_content: JustifyContent::SpaceBetween,
                 ..default()
