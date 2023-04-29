@@ -38,6 +38,7 @@ build-crab8_bevy_frontend_wasm:
   artifacts:
     paths:
       - ./target/wasm32-unknown-unknown/release/
+      - ./crates/crab8_bevy_frontend/wasm/assets/
       - ./crates/crab8_bevy_frontend/wasm/built/
     exclude:
       - ./target/wasm32-unknown-unknown/release/.fingerprint/**/*
