@@ -21,7 +21,7 @@ const LAST_SAFE_ADDRESS: u16 = LAST_ADDRESS - 352;
 pub const CHAR_SPRITE_WIDTH: u16 = 5;
 
 /// The end of the starting reserved addresses will be used for sprite data.
-pub const FIRST_CHAR_ADDRESS: u16 = FIRST_SAFE_ADDRESS - (16 * CHAR_SPRITE_WIDTH);
+pub const FIRST_CHAR_ADDRESS: u16 = 0x000;
 
 /// The CHIP-8 has 12-bit addresses, allowing up to 4096 bytes of memory.
 /// https://github.com/mattmikolay/chip-8/wiki/CHIP%E2%80%908-Technical-Reference#storage-in-memory
@@ -159,19 +159,20 @@ impl Debug for Memory {
 impl Default for Memory {
     fn default() -> Self {
         let mut default = Self([0x00; 4096]);
-
-        // Fill starting reserved address space with 0xFF for visualization purposes.
-        for address in FIRST_ADDRESS..FIRST_CHAR_ADDRESS {
-            default.0[address as usize] = 0xFF;
-        }
+        let char_sprite_end = FIRST_CHAR_ADDRESS + (16 * CHAR_SPRITE_WIDTH);
 
         // Fill in sprite data
-        for (char, address) in (FIRST_CHAR_ADDRESS..FIRST_SAFE_ADDRESS)
+        for (char, address) in (FIRST_CHAR_ADDRESS..char_sprite_end)
             .step_by(CHAR_SPRITE_WIDTH as usize)
             .enumerate()
         {
             let char = Character::try_from(char as u8).expect("A nibble is a valid char");
             default.set_range(address.try_into().unwrap(), char.sprite());
+        }
+
+        // Fill starting reserved address space with 0xFF for visualization purposes.
+        for address in char_sprite_end..FIRST_SAFE_ADDRESS {
+            default.0[address as usize] = 0xFF;
         }
 
         // At the end of valid address space, jump back to 0x200
