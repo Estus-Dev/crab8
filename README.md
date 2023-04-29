@@ -7,10 +7,6 @@ A CHIP-8 emulator written in Rust with a [Bevy Engine][] frontend.
 <p align="center">
     <img src="./docs/images/logo-2x.png">
 </p>
-<p align="center">
-    <i>The "temporary" logo</i>
-</p>
-
 
 
 ![Example Image][]
