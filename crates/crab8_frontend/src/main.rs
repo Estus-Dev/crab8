@@ -1,3 +1,5 @@
-fn main() {
-    println!("Hello, world!");
+use winit::error::OsError;
+
+fn main() -> Result<(), OsError> {
+    crab8_frontend::build_window()
 }
