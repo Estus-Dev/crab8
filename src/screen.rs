@@ -42,6 +42,10 @@ impl Screen {
     pub fn get_row(&self, y: usize) -> &[bool] {
         &self.0[y]
     }
+
+    pub fn lit(&self, x: usize, y: usize) -> bool {
+        self.0[y][x]
+    }
 }
 
 impl Debug for Screen {
