@@ -1,11 +1,11 @@
-pub struct TemplateApp {
+pub struct Crab8Egui {
     // Example stuff:
     label: String,
 
     value: f32,
 }
 
-impl Default for TemplateApp {
+impl Default for Crab8Egui {
     fn default() -> Self {
         Self {
             // Example stuff:
@@ -15,7 +15,7 @@ impl Default for TemplateApp {
     }
 }
 
-impl TemplateApp {
+impl Crab8Egui {
     /// Called once before the first frame.
     pub fn new(cc: &eframe::CreationContext<'_>) -> Self {
         // This is also where you can customize the look and feel of egui using
@@ -25,7 +25,7 @@ impl TemplateApp {
     }
 }
 
-impl eframe::App for TemplateApp {
+impl eframe::App for Crab8Egui {
     /// Called each time the UI needs repainting, which may be many times per second.
     /// Put your widgets into a `SidePanel`, `TopPanel`, `CentralPanel`, `Window` or `Area`.
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
