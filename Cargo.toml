@@ -16,7 +16,7 @@ bevy = ["dep:bevy"]
 download = ["dep:reqwest"]
 
 [workspace]
-members = ["crates/crab8_bevy_frontend"]
+members = ["crates/*"]
 
 [workspace.dependencies]
 bevy = "^0.10"
