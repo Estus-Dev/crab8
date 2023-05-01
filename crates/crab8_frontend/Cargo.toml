@@ -1,48 +1,32 @@
 [package]
-name = "eframe_template"
+name = "crab8_frontend"
 version = "0.1.0"
-authors = ["Emil Ernerfeldt <emil.ernerfeldt@gmail.com>"]
 edition = "2021"
-rust-version = "1.65"
 
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-egui = "0.21.0"
-eframe = { version = "0.21.0", default-features = false, features = [
-    "accesskit",     # Make egui comptaible with screen readers. NOTE: adds a lot of dependencies.
-    "default_fonts", # Embed the default egui fonts.
-    "glow",          # Use the glow rendering backend. Alternative: "wgpu".
-    "persistence",   # Enable restoring app state when restarting the app.
+eframe = { workspace = true, default-features = false, features = [
+    "accesskit",
+    "default_fonts",
+    "glow",
 ] }
+egui = { workspace = true }
 
-# You only need serde if you want app persistence:
-serde = { version = "1", features = ["derive"] }
-
-# native:
+# Use tracing subscriber on everything but WASM
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-tracing-subscriber = "0.3"
+tracing-subscriber = { workspace = true }
 
-# web:
+# WASM only dependencies
 [target.'cfg(target_arch = "wasm32")'.dependencies]
-console_error_panic_hook = "0.1.6"
-tracing-wasm = "0.2"
-wasm-bindgen-futures = "0.4"
+console_error_panic_hook = { workspace = true }
+tracing-wasm = { workspace = true }
+wasm-bindgen-futures = { workspace = true }
 
-
+# Optimize releases
 [profile.release]
-opt-level = 2 # fast and small wasm
+opt-level = 3
 
-# Optimize all dependencies even in debug builds:
+# Optimize dependencies in development builds
 [profile.dev.package."*"]
-opt-level = 2
-
-
-[patch.crates-io]
-
-# If you want to use the bleeding edge version of egui and eframe:
-# egui = { git = "https://github.com/emilk/egui", branch = "master" }
-# eframe = { git = "https://github.com/emilk/egui", branch = "master" }
-
-# If you fork https://github.com/emilk/egui you can test with:
-# egui = { path = "../egui/crates/egui" }
-# eframe = { path = "../egui/crates/eframe" }
+opt-level = 3
