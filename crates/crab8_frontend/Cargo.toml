@@ -22,3 +22,11 @@ tracing-subscriber = { workspace = true }
 console_error_panic_hook = { workspace = true }
 tracing-wasm = { workspace = true }
 wasm-bindgen-futures = { workspace = true }
+
+# Optimize releases
+[profile.release]
+opt-level = 3
+
+# Optimize dependencies in development builds
+[profile.dev.package."*"]
+opt-level = 3
