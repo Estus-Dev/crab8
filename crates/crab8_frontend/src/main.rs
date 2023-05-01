@@ -1,5 +1,3 @@
-use winit::error::OsError;
-
-fn main() -> Result<(), OsError> {
+fn main() -> Result<(), pixels::Error> {
     crab8_frontend::build_window()
 }

@@ -1377,6 +1377,7 @@ dependencies = [
 name = "crab8_frontend"
 version = "0.1.0"
 dependencies = [
+ "crab8",
  "egui",
  "egui-wgpu",
  "egui-winit",

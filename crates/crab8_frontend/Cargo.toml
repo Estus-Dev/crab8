@@ -11,6 +11,7 @@ path = "./src/main.rs"
 name = "crab8_frontend"
 
 [dependencies]
+crab8 = { path = "../../" }
 egui = { workspace = true }
 egui-wgpu = { workspace = true }
 egui-winit = { workspace = true }
