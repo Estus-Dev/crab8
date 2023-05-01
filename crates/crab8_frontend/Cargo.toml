@@ -3,6 +3,10 @@ name = "crab8_frontend"
 version = "0.1.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
+egui = { workspace = true }
+egui-wgpu = { workspace = true }
+egui-winit = { workspace = true }
+pixels = { workspace = true }
+winit = { workspace = true }
+winit_input_helper = { workspace = true }
