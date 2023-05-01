@@ -1,7 +1,7 @@
 use std::{fmt, fmt::Debug, fmt::Display};
 
-const WIDTH: usize = 64;
-const HEIGHT: usize = 32;
+pub const WIDTH: usize = 64;
+pub const HEIGHT: usize = 32;
 
 #[derive(Clone, PartialEq, Eq)]
 /// The CHIP-8 screen is a monochrome display with a width of 64px and a height of 32px.
