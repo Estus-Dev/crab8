@@ -29,6 +29,8 @@ pub fn build_window() -> Result<(), pixels::Error> {
 
     let surface_texture = SurfaceTexture::new(CRAB8_WIDTH, CRAB8_HEIGHT, &winit_window);
     let mut pixels = Pixels::new(CRAB8_WIDTH, CRAB8_HEIGHT, surface_texture)?;
+    let window_inner_size = winit_window.inner_size();
+    pixels.resize_surface(window_inner_size.width, window_inner_size.height)?;
 
     let mut input = WinitInputHelper::new();
 
