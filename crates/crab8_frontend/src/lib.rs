@@ -38,11 +38,15 @@ pub fn build_window() -> Result<(), pixels::Error> {
     egui_state.set_pixels_per_point(winit_window.scale_factor() as f32);
 
     event_loop.run(move |event, _, control_flow| {
-        // I plan to expand this if statement clippy
-        #[allow(clippy::collapsible_if)]
         if input.update(&event) {
             if input.close_requested() || input.destroyed() {
                 *control_flow = ControlFlow::Exit;
+            }
+
+            if let Some(size) = input.window_resized() {
+                if pixels.resize_surface(size.width, size.height).is_err() {
+                    *control_flow = ControlFlow::Exit;
+                }
             }
         }
 
