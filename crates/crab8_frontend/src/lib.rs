@@ -13,11 +13,10 @@ use winit_input_helper::WinitInputHelper;
 const WINDOW_WIDTH: f64 = 1024.0;
 const WINDOW_HEIGHT: f64 = 512.0;
 
-const CRAB8_WIDTH: u32 = crab8::screen::WIDTH as u32;
-const CRAB8_HEIGHT: u32 = crab8::screen::HEIGHT as u32;
-
 pub fn build_window() -> Result<(), pixels::Error> {
     let crab8 = crab8::Crab8::default();
+    let (crab8_width, crab8_height) = crab8.screen.size();
+    let (crab8_width, crab8_height) = (crab8_width as u32, crab8_height as u32);
 
     let event_loop = EventLoop::new();
     let window_size = LogicalSize::new(WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -29,8 +28,8 @@ pub fn build_window() -> Result<(), pixels::Error> {
         .build(&event_loop)
         .expect("Failed to build winit window");
 
-    let surface_texture = SurfaceTexture::new(CRAB8_WIDTH, CRAB8_HEIGHT, &winit_window);
-    let mut pixels = Pixels::new(CRAB8_WIDTH, CRAB8_HEIGHT, surface_texture)?;
+    let surface_texture = SurfaceTexture::new(crab8_width, crab8_height, &winit_window);
+    let mut pixels = Pixels::new(crab8_width, crab8_height, surface_texture)?;
     let window_inner_size = winit_window.inner_size();
     pixels.resize_surface(window_inner_size.width, window_inner_size.height)?;
 
@@ -56,9 +55,7 @@ pub fn build_window() -> Result<(), pixels::Error> {
         #[allow(clippy::single_match)]
         match event {
             Event::RedrawRequested(_) => {
-                crab8
-                    .screen
-                    .draw_screen(pixels.frame_mut(), CRAB8_WIDTH as usize);
+                crab8.screen.draw_screen(pixels.frame_mut());
 
                 let render_result = pixels.render_with(|encoder, render_target, context| {
                     context.scaling_renderer.render(encoder, render_target);

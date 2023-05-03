@@ -1,7 +1,7 @@
 use std::{fmt, fmt::Debug, fmt::Display};
 
-pub const WIDTH: usize = 64;
-pub const HEIGHT: usize = 32;
+const WIDTH: usize = 64;
+const HEIGHT: usize = 32;
 
 #[derive(Clone, PartialEq, Eq)]
 /// The CHIP-8 screen is a monochrome display with a width of 64px and a height of 32px.
@@ -45,6 +45,10 @@ impl Screen {
 
     pub fn lit(&self, x: usize, y: usize) -> bool {
         self.0[y][x]
+    }
+
+    pub fn size(&self) -> (usize, usize) {
+        (WIDTH, HEIGHT)
     }
 }
 
