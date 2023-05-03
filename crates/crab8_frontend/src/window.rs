@@ -58,21 +58,16 @@ impl Crab8Window {
             }
         }
 
-        // I also plan to expand this match statement clippy
-        #[allow(clippy::single_match)]
-        match event {
-            Event::RedrawRequested(_) => {
-                let render_result = self.pixels.render_with(|encoder, render_target, context| {
-                    context.scaling_renderer.render(encoder, render_target);
+        if let Event::RedrawRequested(_) = event {
+            let render_result = self.pixels.render_with(|encoder, render_target, context| {
+                context.scaling_renderer.render(encoder, render_target);
 
-                    Ok(())
-                });
+                Ok(())
+            });
 
-                if let Err(_err) = render_result {
-                    *control_flow = ControlFlow::Exit;
-                }
+            if let Err(_err) = render_result {
+                *control_flow = ControlFlow::Exit;
             }
-            _ => (),
         }
     }
 }
