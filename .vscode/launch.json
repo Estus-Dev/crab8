@@ -1,0 +1,157 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug executable 'crab8_bevy_frontend'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=crab8_bevy_frontend",
+                    "--package=crab8_bevy_frontend"
+                ],
+                "filter": {
+                    "name": "crab8_bevy_frontend",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in executable 'crab8_bevy_frontend'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--bin=crab8_bevy_frontend",
+                    "--package=crab8_bevy_frontend"
+                ],
+                "filter": {
+                    "name": "crab8_bevy_frontend",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in library 'crab8'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--lib",
+                    "--package=crab8"
+                ],
+                "filter": {
+                    "name": "crab8",
+                    "kind": "lib"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug executable 'crab8'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=crab8",
+                    "--package=crab8"
+                ],
+                "filter": {
+                    "name": "crab8",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in executable 'crab8'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--bin=crab8",
+                    "--package=crab8"
+                ],
+                "filter": {
+                    "name": "crab8",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in library 'crab8_frontend'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--lib",
+                    "--package=crab8_frontend"
+                ],
+                "filter": {
+                    "name": "crab8_frontend",
+                    "kind": "lib"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug executable 'crab8_frontend'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=crab8_frontend",
+                    "--package=crab8_frontend"
+                ],
+                "filter": {
+                    "name": "crab8_frontend",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in executable 'crab8_frontend'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--bin=crab8_frontend",
+                    "--package=crab8_frontend"
+                ],
+                "filter": {
+                    "name": "crab8_frontend",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        }
+    ]
+}
