@@ -1341,10 +1341,14 @@ dependencies = [
 name = "crab8_frontend"
 version = "0.1.0"
 dependencies = [
+ "console_error_panic_hook",
  "console_log",
  "crab8",
+ "log",
  "pixels",
+ "pollster 0.3.0",
  "wasm-bindgen",
+ "wasm-bindgen-futures",
  "web-sys",
  "winit",
  "winit_input_helper",
@@ -2837,7 +2841,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a8a87d67cc8f4592a5313b37ce395e8965dd8284492a85f19478af941a4df257"
 dependencies = [
  "bytemuck",
- "pollster",
+ "pollster 0.2.5",
  "raw-window-handle",
  "thiserror",
  "ultraviolet",
@@ -2868,6 +2872,12 @@ name = "pollster"
 version = "0.2.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5da3b0203fd7ee5720aa0b5e790b591aa5d3f41c3ed2c34a3a393382198af2f7"
+
+[[package]]
+name = "pollster"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "22686f4785f02a4fcc856d3b3bb19bf6c8160d103f7a99cc258bddd0251dc7f2"
 
 [[package]]
 name = "pp-rs"

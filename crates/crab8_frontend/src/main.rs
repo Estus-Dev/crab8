@@ -1,3 +1,3 @@
 fn main() {
-    crab8_frontend::run();
+    pollster::block_on(crab8_frontend::run());
 }
