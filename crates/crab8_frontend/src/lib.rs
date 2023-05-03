@@ -1,5 +1,7 @@
-use crab8::screen::Screen;
+mod screen;
+
 use pixels::{Pixels, SurfaceTexture};
+use screen::DrawScreen;
 use winit::{
     dpi::LogicalSize,
     event::Event,
@@ -54,7 +56,9 @@ pub fn build_window() -> Result<(), pixels::Error> {
         #[allow(clippy::single_match)]
         match event {
             Event::RedrawRequested(_) => {
-                crab8.screen.draw_screen(pixels.frame_mut());
+                crab8
+                    .screen
+                    .draw_screen(pixels.frame_mut(), CRAB8_WIDTH as usize);
 
                 let render_result = pixels.render_with(|encoder, render_target, context| {
                     context.scaling_renderer.render(encoder, render_target);
@@ -69,26 +73,4 @@ pub fn build_window() -> Result<(), pixels::Error> {
             _ => (),
         }
     });
-}
-
-trait DrawScreen {
-    fn draw_screen(&self, frame: &mut [u8]);
-}
-
-impl DrawScreen for Screen {
-    fn draw_screen(&self, frame: &mut [u8]) {
-        const PIXEL_LIT: [u8; 4] = [255, 255, 255, 255];
-        const PIXEL_OFF: [u8; 4] = [0, 0, 0, 255];
-
-        for (i, pixel) in frame.chunks_exact_mut(4).enumerate() {
-            let y = i / CRAB8_WIDTH as usize;
-            let x = i % CRAB8_WIDTH as usize;
-
-            pixel.copy_from_slice(if self.lit(x, y) {
-                &PIXEL_LIT
-            } else {
-                &PIXEL_OFF
-            });
-        }
-    }
 }
