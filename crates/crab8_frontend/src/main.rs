@@ -1,3 +1,3 @@
-fn main() -> Result<(), pixels::Error> {
-    crab8_frontend::build_window()
+fn main() {
+    crab8_frontend::run();
 }
