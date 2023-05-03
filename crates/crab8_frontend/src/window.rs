@@ -8,8 +8,8 @@ use winit::{
 };
 use winit_input_helper::WinitInputHelper;
 
-const WINDOW_WIDTH: f64 = 1024.0;
-const WINDOW_HEIGHT: f64 = 512.0;
+const WIDTH: f64 = 1024.0;
+const HEIGHT: f64 = 512.0;
 
 pub fn build_window() -> Result<(), pixels::Error> {
     let crab8 = crab8::Crab8::default();
@@ -17,7 +17,7 @@ pub fn build_window() -> Result<(), pixels::Error> {
     let (crab8_width, crab8_height) = (crab8_width as u32, crab8_height as u32);
 
     let event_loop = EventLoop::new();
-    let window_size = LogicalSize::new(WINDOW_WIDTH, WINDOW_HEIGHT);
+    let window_size = LogicalSize::new(WIDTH, HEIGHT);
 
     let winit_window = WindowBuilder::new()
         .with_title("CRAB-8")
