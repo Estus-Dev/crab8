@@ -1,6 +1,9 @@
 mod screen;
 mod window;
 
+#[cfg(wasm_platform)]
+mod wasm;
+
 use window::Crab8Window;
 use winit::{event::Event, event_loop::EventLoop};
 
@@ -17,7 +20,7 @@ pub fn run() {
 
     event_loop.run(move |event, _, control_flow| {
         if let Event::RedrawRequested(_) = event {
-            crab8.screen.draw_screen(window.pixels.frame_mut());
+            // crab8.screen.draw_screen(window.pixels.frame_mut());
         }
 
         window.update(&event, control_flow);

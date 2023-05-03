@@ -12,7 +12,7 @@ const HEIGHT: f64 = 512.0;
 
 pub struct Crab8Window {
     input: WinitInputHelper,
-    pub pixels: Pixels,
+    // pub pixels: Pixels,
 }
 
 impl Crab8Window {
@@ -32,15 +32,13 @@ impl Crab8Window {
 
         let surface = SurfaceTexture::new(crab8_width, crab8_height, &winit);
 
-        let mut egui_state = egui_winit::State::new(event_loop);
-        egui_state.set_pixels_per_point(winit.scale_factor() as f32);
-
-        let mut pixels = Pixels::new(crab8_width, crab8_height, surface)?;
-        let window_inner_size = winit.inner_size();
-        pixels.resize_surface(window_inner_size.width, window_inner_size.height)?;
+        // Broken until I refactor to use Pixels::new_async
+        // let mut pixels = Pixels::new(crab8_width, crab8_height, surface)?;
+        // let window_inner_size = winit.inner_size();
+        // pixels.resize_surface(window_inner_size.width, window_inner_size.height)?;
 
         Ok(Crab8Window {
-            pixels,
+            // pixels,
             input: WinitInputHelper::new(),
         })
     }
@@ -52,22 +50,22 @@ impl Crab8Window {
             }
 
             if let Some(size) = self.input.window_resized() {
-                if self.pixels.resize_surface(size.width, size.height).is_err() {
-                    *control_flow = ControlFlow::Exit;
-                }
+                // if self.pixels.resize_surface(size.width, size.height).is_err() {
+                //     *control_flow = ControlFlow::Exit;
+                // }
             }
         }
 
-        if let Event::RedrawRequested(_) = event {
-            let render_result = self.pixels.render_with(|encoder, render_target, context| {
-                context.scaling_renderer.render(encoder, render_target);
+        // if let Event::RedrawRequested(_) = event {
+        //     let render_result = self.pixels.render_with(|encoder, render_target, context| {
+        //         context.scaling_renderer.render(encoder, render_target);
 
-                Ok(())
-            });
+        //         Ok(())
+        //     });
 
-            if let Err(_err) = render_result {
-                *control_flow = ControlFlow::Exit;
-            }
-        }
+        //     if let Err(_err) = render_result {
+        //         *control_flow = ControlFlow::Exit;
+        //     }
+        // }
     }
 }

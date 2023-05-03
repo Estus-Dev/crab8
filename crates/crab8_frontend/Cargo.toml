@@ -11,10 +11,13 @@ path = "./src/main.rs"
 name = "crab8_frontend"
 
 [dependencies]
+console_log = { workspace = true }
 crab8 = { path = "../../" }
-egui = { workspace = true }
-egui-wgpu = { workspace = true }
-egui-winit = { workspace = true }
+# egui = { workspace = true }
+# egui-wgpu = { workspace = true }
+# egui-winit = { workspace = true }
 pixels = { workspace = true }
 winit = { workspace = true }
 winit_input_helper = { workspace = true }
+wasm-bindgen = { workspace = true }
+web-sys = { workspace = true, features = ["console"] }
