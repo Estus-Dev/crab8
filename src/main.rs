@@ -4,7 +4,7 @@ fn main() {
     Command::new("cargo")
         .arg("run")
         .arg("-p")
-        .arg("crab8_bevy_frontend")
+        .arg("crab8_frontend")
         .stdin(Stdio::inherit())
         .stdout(Stdio::inherit())
         .output()
