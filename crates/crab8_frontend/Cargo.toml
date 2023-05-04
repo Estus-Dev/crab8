@@ -14,9 +14,9 @@ name = "crab8_frontend"
 console_error_panic_hook = { workspace = true }
 console_log = { workspace = true }
 crab8 = { path = "../../" }
-# egui = { workspace = true }
-# egui-wgpu = { workspace = true }
-# egui-winit = { workspace = true }
+egui = { workspace = true }
+egui-wgpu = { workspace = true }
+egui-winit = { workspace = true }
 log = { workspace = true }
 pixels = { workspace = true }
 pollster = { workspace = true }
