@@ -1,3 +1,5 @@
+mod gui;
+mod gui_renderer;
 mod screen;
 mod window;
 

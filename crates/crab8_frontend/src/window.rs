@@ -7,10 +7,14 @@ use winit::{
 };
 use winit_input_helper::WinitInputHelper;
 
+use crate::{gui::Gui, gui_renderer::GuiRenderer};
+
 const WIDTH: f64 = 1024.0;
 const HEIGHT: f64 = 512.0;
 
 pub struct Crab8Window {
+    gui: Gui,
+    gui_renderer: GuiRenderer,
     input: WinitInputHelper,
     pub pixels: Pixels,
     winit: Window,
@@ -41,7 +45,18 @@ impl Crab8Window {
         let window_inner_size = winit.inner_size();
         pixels.resize_surface(window_inner_size.width, window_inner_size.height)?;
 
+        let gui = Gui::new();
+        let gui_renderer = GuiRenderer::new(
+            event_loop,
+            WIDTH as u32,
+            HEIGHT as u32,
+            winit.scale_factor() as f32,
+            &pixels,
+        );
+
         Ok(Crab8Window {
+            gui,
+            gui_renderer,
             pixels,
             winit,
             input: WinitInputHelper::new(),
@@ -58,19 +73,39 @@ impl Crab8Window {
                 if self.pixels.resize_surface(size.width, size.height).is_err() {
                     *control_flow = ControlFlow::Exit;
                 }
+
+                self.gui_renderer.resize(size.width, size.height);
             }
+
+            if let Some(scale_factor) = self.input.scale_factor() {
+                self.gui_renderer.scale_factor(scale_factor);
+            }
+
+            self.winit.request_redraw();
         }
 
-        if let Event::RedrawRequested(_) = event {
-            let render_result = self.pixels.render_with(|encoder, render_target, context| {
-                context.scaling_renderer.render(encoder, render_target);
+        match event {
+            Event::RedrawRequested(_) => {
+                self.gui_renderer.prepare(&mut self.gui, &self.winit);
 
-                Ok(())
-            });
+                let render_result = self.pixels.render_with(|encoder, render_target, context| {
+                    context.scaling_renderer.render(encoder, render_target);
 
-            if let Err(_err) = render_result {
-                *control_flow = ControlFlow::Exit;
+                    self.gui_renderer.render(encoder, render_target, context);
+
+                    Ok(())
+                });
+
+                if let Err(_err) = render_result {
+                    *control_flow = ControlFlow::Exit;
+                }
             }
+
+            Event::WindowEvent { event, .. } => {
+                self.gui_renderer.handle_event(event);
+            }
+
+            _ => (),
         }
     }
 }
