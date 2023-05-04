@@ -3,7 +3,7 @@ use winit::{
     dpi::LogicalSize,
     event::Event,
     event_loop::{ControlFlow, EventLoop},
-    window::WindowBuilder,
+    window::{Window, WindowBuilder},
 };
 use winit_input_helper::WinitInputHelper;
 
@@ -13,6 +13,7 @@ const HEIGHT: f64 = 512.0;
 pub struct Crab8Window {
     input: WinitInputHelper,
     pub pixels: Pixels,
+    winit: Window,
 }
 
 impl Crab8Window {
@@ -42,6 +43,7 @@ impl Crab8Window {
 
         Ok(Crab8Window {
             pixels,
+            winit,
             input: WinitInputHelper::new(),
         })
     }
