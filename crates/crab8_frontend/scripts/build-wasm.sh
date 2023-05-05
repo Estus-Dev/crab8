@@ -4,7 +4,7 @@ set -e
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 PWD=$(pwd)
-CRATE_NAME=crab8_bevy_frontend
+CRATE_NAME=crab8_frontend
 BUILD_MODE=release
 TARGET_DIR=../../target
 OUT_DIR=./wasm/built/
