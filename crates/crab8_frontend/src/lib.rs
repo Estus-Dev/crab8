@@ -6,7 +6,7 @@ mod window;
 #[cfg(target_arch = "wasm32")]
 mod wasm;
 
-use std::time::{Duration, Instant};
+use instant::{Duration, Instant};
 use window::Crab8Window;
 use winit::{event::Event, event_loop::EventLoop};
 
