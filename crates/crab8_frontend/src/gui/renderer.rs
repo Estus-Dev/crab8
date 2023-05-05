@@ -62,7 +62,7 @@ impl GuiRenderer {
     pub fn prepare(&mut self, gui: &mut Gui, window: &winit::window::Window) {
         let raw_input = self.state.take_egui_input(window);
         let output = self.context.run(raw_input, |context| {
-            gui.ui(context);
+            gui.render(context);
         });
 
         self.textures.append(output.textures_delta);
