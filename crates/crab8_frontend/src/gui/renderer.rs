@@ -1,4 +1,5 @@
 use crate::gui::Gui;
+use crab8::Crab8;
 use egui::{ClippedPrimitive, Context, TexturesDelta};
 use egui_wgpu::{
     renderer::ScreenDescriptor,
@@ -59,10 +60,10 @@ impl GuiRenderer {
         _ = self.state.on_event(&self.context, event);
     }
 
-    pub fn prepare(&mut self, gui: &mut Gui, window: &winit::window::Window) {
+    pub fn prepare(&mut self, gui: &mut Gui, window: &winit::window::Window, crab8: &mut Crab8) {
         let raw_input = self.state.take_egui_input(window);
         let output = self.context.run(raw_input, |context| {
-            gui.render(context);
+            gui.render(context, crab8);
         });
 
         self.textures.append(output.textures_delta);

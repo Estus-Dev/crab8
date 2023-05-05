@@ -1,3 +1,4 @@
+use crab8::Crab8;
 use pixels::{Pixels, SurfaceTexture};
 use winit::{
     dpi::LogicalSize,
@@ -63,7 +64,7 @@ impl Crab8Window {
         })
     }
 
-    pub fn update(&mut self, event: &Event<()>, control_flow: &mut ControlFlow) {
+    pub fn update(&mut self, event: &Event<()>, control_flow: &mut ControlFlow, crab8: &mut Crab8) {
         if self.input.update(event) {
             if self.input.close_requested() || self.input.destroyed() {
                 *control_flow = ControlFlow::Exit;
@@ -86,7 +87,7 @@ impl Crab8Window {
 
         match event {
             Event::RedrawRequested(_) => {
-                self.gui_renderer.prepare(&mut self.gui, &self.winit);
+                self.gui_renderer.prepare(&mut self.gui, &self.winit, crab8);
 
                 let render_result = self.pixels.render_with(|encoder, render_target, context| {
                     context.scaling_renderer.render(encoder, render_target);

@@ -58,6 +58,6 @@ pub async fn run() {
             _ => (),
         }
 
-        window.update(&event, control_flow);
+        window.update(&event, control_flow, &mut crab8);
     });
 }

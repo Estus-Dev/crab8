@@ -24,7 +24,7 @@ use crate::prelude::*;
 use bevy::ecs::system::Resource;
 #[cfg(feature = "download")]
 use reqwest::{blocking::get, Result};
-use std::{fmt, fmt::Display, fs::File, io::Read};
+use std::{fmt, fmt::Display, fs::File, io::Read, path::Path};
 
 /// Chip8 represents the current state of the entire machine.
 /// https://github.com/mattmikolay/chip-8/wiki/CHIP%E2%80%908-Technical-Reference
@@ -96,7 +96,7 @@ impl Crab8 {
         self.memory.set_range(Address::initial_instruction(), rom);
     }
 
-    pub fn load_file(&mut self, filename: &str) -> std::io::Result<()> {
+    pub fn load_file<P: AsRef<Path>>(&mut self, filename: P) -> std::io::Result<()> {
         let mut file = File::open(filename)?;
         let mut buffer = Vec::new();
 
