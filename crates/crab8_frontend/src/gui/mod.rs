@@ -1,3 +1,5 @@
+pub mod renderer;
+
 use egui::{menu, Context, TopBottomPanel, Window};
 
 pub struct Gui {

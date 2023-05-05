@@ -7,7 +7,7 @@ use winit::{
 };
 use winit_input_helper::WinitInputHelper;
 
-use crate::{gui::Gui, gui_renderer::GuiRenderer};
+use crate::{gui::renderer::GuiRenderer, gui::Gui};
 
 const WIDTH: f64 = 1024.0;
 const HEIGHT: f64 = 512.0;
