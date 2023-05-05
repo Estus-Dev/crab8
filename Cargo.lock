@@ -1384,6 +1384,7 @@ dependencies = [
  "log",
  "pixels",
  "pollster 0.3.0",
+ "reqwest",
  "wasm-bindgen",
  "wasm-bindgen-futures",
  "web-sys",

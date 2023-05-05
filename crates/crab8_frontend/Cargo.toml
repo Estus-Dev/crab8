@@ -21,6 +21,7 @@ instant = { workspace = true }
 log = { workspace = true }
 pixels = { workspace = true }
 pollster = { workspace = true }
+reqwest = { workspace = true }
 winit = { workspace = true }
 winit_input_helper = { workspace = true }
 wasm-bindgen = { workspace = true }
