@@ -27,6 +27,8 @@ impl Gui {
                                 .load_file(path)
                                 .expect("The user would never try to load an invalid file");
                         }
+
+                        ui.close_menu();
                     }
                 });
 
