@@ -10,12 +10,10 @@ stages:
   - test
   - deploy
 
-build-crab8_bevy_frontend:
+build-crab8_frontend:
   stage: build
   script:
-    # Install libraries for Bevy
-    - apt update && apt install libasound2-dev libudev-dev -y
-    - cargo build -p crab8_bevy_frontend --release
+    - cargo build -p crab8_frontend --release
   artifacts:
     paths:
       - ./target/release/
@@ -31,15 +29,15 @@ build-crab8_bevy_frontend:
       - ./target/
     key: ${CI_COMMIT_REF_SLUG}-linux
 
-build-crab8_bevy_frontend_wasm:
+build-crab8_frontend_wasm:
   stage: build
   script:
-    - ./crates/crab8_bevy_frontend/scripts/build-wasm.sh
+    - ./crates/crab8_frontend/scripts/build-wasm.sh
   artifacts:
     paths:
       - ./target/wasm32-unknown-unknown/release/
-      - ./crates/crab8_bevy_frontend/wasm/assets/
-      - ./crates/crab8_bevy_frontend/wasm/built/
+      - ./crates/crab8_frontend/wasm/assets/
+      - ./crates/crab8_frontend/wasm/built/
     exclude:
       - ./target/wasm32-unknown-unknown/release/.fingerprint/**/*
       - ./target/wasm32-unknown-unknown/release/build/**/*
@@ -58,7 +56,7 @@ test-crab8:
   script:
     - cargo test
 
-deploy-crab8_bevy_frontend_wasm:
+deploy-crab8_frontend_wasm:
   only:
     - main
   image:
@@ -69,4 +67,4 @@ deploy-crab8_bevy_frontend_wasm:
   before_script:
     - netlify --version
   script:
-    - netlify deploy --prod --dir ./crates/crab8_bevy_frontend/wasm
+    - netlify deploy --prod --dir ./crates/crab8_frontend/wasm
