@@ -38,7 +38,7 @@ impl GuiRenderer {
         state.set_pixels_per_point(scale_factor);
 
         let screen_descriptor = ScreenDescriptor {
-            size_in_pixels: [width, height],
+            size_in_pixels: [width * 2, height * 2],
             pixels_per_point: scale_factor,
         };
 
