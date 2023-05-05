@@ -1,3 +1,4 @@
-fn main() {
-    pollster::block_on(crab8_frontend::run());
+#[tokio::main]
+async fn main() {
+    crab8_frontend::run().await;
 }
