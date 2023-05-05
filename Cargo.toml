@@ -21,6 +21,7 @@ members = ["crates/*"]
 [workspace.dependencies]
 bevy = "^0.10"
 bevy_mod_reqwest = "^0.10.4"
+chrono = "^0.4.24"
 console_error_panic_hook = "^0.1.7"
 console_log = "^1.0.0"
 # eframe = "^0.21.3"
