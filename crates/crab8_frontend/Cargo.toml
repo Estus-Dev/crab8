@@ -17,6 +17,7 @@ console_log = { workspace = true }
 crab8 = { path = "../../" }
 egui = { workspace = true }
 egui-wgpu = { workspace = true }
+instant = { workspace = true }
 log = { workspace = true }
 pixels = { workspace = true }
 pollster = { workspace = true }
@@ -29,6 +30,7 @@ web-sys = { workspace = true, features = ["console"] }
 [target.'cfg(target_arch="wasm32")'.dependencies]
 chrono = { features = ["wasmbind"] }
 egui-winit = { workspace = true, features = ["links"] }
+instant = { features = ["wasm-bindgen"] }
 
 [target.'cfg(not(target_arch="wasm32"))'.dependencies]
 egui-winit = { workspace = true, features = ["links", "wayland"] }

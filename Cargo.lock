@@ -1380,6 +1380,7 @@ dependencies = [
  "egui",
  "egui-wgpu",
  "egui-winit",
+ "instant",
  "log",
  "pixels",
  "pollster 0.3.0",

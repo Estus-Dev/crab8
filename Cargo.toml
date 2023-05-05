@@ -29,6 +29,7 @@ egui = "^0.21.0"
 egui-wgpu = "^0.21.0"
 egui-winit = { version = "^0.21.1", default-features = false }
 getrandom = "^0.2.9"
+instant = "^0.1.12"
 log = "^0.4.17"
 pixels = "^0.12.1"
 pollster = "^0.3.0"
