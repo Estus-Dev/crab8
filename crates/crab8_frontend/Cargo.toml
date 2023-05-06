@@ -14,7 +14,7 @@ name = "crab8_frontend"
 chrono = { workspace = true }
 console_error_panic_hook = { workspace = true }
 console_log = { workspace = true }
-crab8 = { path = "../../", features = ["download"] }
+crab8 = { path = "../../" }
 egui = { workspace = true }
 egui-wgpu = { workspace = true }
 instant = { workspace = true }
