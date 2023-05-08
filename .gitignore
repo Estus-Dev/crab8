@@ -4,3 +4,4 @@
 /crates/crab8_bevy_frontend/wasm/built/
 /crates/crab8_frontend/wasm/assets/
 /crates/crab8_frontend/wasm/built/
+*.code-workspace
