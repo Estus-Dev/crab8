@@ -17,7 +17,7 @@ build-crab8_frontend:
     - cargo --version
     # Install atk for rfd crate.
     - apt update
-    - apt install librust-atk-dev
+    - apt install librust-atk-dev -y
   script:
     - cargo build -p crab8_frontend --release
   artifacts:
