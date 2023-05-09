@@ -12,6 +12,9 @@ stages:
 
 build-crab8_frontend:
   stage: build
+  before_script:
+    # Install atk for rfd crate.
+    - apt install librust-atk-dev
   script:
     - cargo build -p crab8_frontend --release
   artifacts:
