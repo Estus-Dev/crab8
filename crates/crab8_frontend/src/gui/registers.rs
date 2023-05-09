@@ -34,20 +34,6 @@ impl RegisterWindow {
                 ui.separator();
 
                 ui.horizontal(|ui| {
-                    ui.label(format!("PC={PC:#05X}"));
-                    ui.label(format!("I={I:#05X}"));
-                });
-
-                ui.spacing();
-
-                ui.horizontal(|ui| {
-                    ui.label(format!("DT={DT:#04X}"));
-                    ui.label(format!("ST={ST:#04X}"));
-                });
-
-                ui.separator();
-
-                ui.horizontal(|ui| {
                     for column in 0u16..2 {
                         let offset = column * 0x8;
 
