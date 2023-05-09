@@ -1,4 +1,5 @@
 mod about;
+mod registers;
 pub mod renderer;
 
 use crab8::Crab8;
@@ -6,9 +7,12 @@ use egui::{menu, Context, TopBottomPanel};
 
 use about::AboutWindow;
 
+use registers::RegisterWindow;
+
 #[derive(Default)]
 pub struct Gui {
     about: AboutWindow,
+    registers: RegisterWindow,
 }
 
 impl Gui {
@@ -32,6 +36,14 @@ impl Gui {
                     }
                 });
 
+                ui.menu_button("Debugger", |ui| {
+                    if ui.button("Registers").clicked() {
+                        self.registers.open = !self.registers.open;
+
+                        ui.close_menu();
+                    }
+                });
+
                 ui.menu_button("Help", |ui| {
                     if ui.button("About").clicked() {
                         self.about.open = true;
@@ -42,5 +54,6 @@ impl Gui {
         });
 
         self.about.render(context);
+        self.registers.render(context, crab8);
     }
 }
