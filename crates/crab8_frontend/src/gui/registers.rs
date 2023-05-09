@@ -1,5 +1,5 @@
 use crab8::{registers::Register, Crab8};
-use egui::{Context, Ui, Window};
+use egui::{Context, Ui, Vec2, Window};
 
 #[derive(Default)]
 pub struct RegisterWindow {
@@ -10,10 +10,9 @@ impl RegisterWindow {
     #[allow(non_snake_case)]
     pub fn render(&mut self, context: &Context, crab8: &Crab8) {
         Window::new("Registers")
+            .fixed_size(Vec2::new(120.0, 150.0))
             .open(&mut self.open)
             .show(context, |ui| {
-                ui.set_width(150.0);
-
                 let PC = crab8.program_counter.get();
                 let I = crab8.address_register.get();
                 let DT = crab8.delay.get();
