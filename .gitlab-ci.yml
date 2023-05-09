@@ -15,9 +15,9 @@ build-crab8_frontend:
   before_script:
     - rustc --version
     - cargo --version
-    # Install atk for rfd crate.
+    # Install atk and gdk for rfd crate.
     - apt update
-    - apt install librust-atk-dev -y
+    - apt install librust-atk-dev librust-gdk-dev -y
   script:
     - cargo build -p crab8_frontend --release
   artifacts:
