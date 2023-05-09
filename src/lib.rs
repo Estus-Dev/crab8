@@ -72,9 +72,9 @@ impl Crab8 {
 
         let instruction = self.memory.get_instruction(self.program_counter);
 
-        self.exec(instruction);
-
         self.program_counter = self.program_counter.next_instruction();
+
+        self.exec(instruction);
     }
 
     fn resume_read_input(&mut self, register: Register, input: Input) {
