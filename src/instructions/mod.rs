@@ -1,8 +1,10 @@
 mod bitwise;
 mod conditional;
+mod input;
 mod jump;
 mod math;
 mod memory;
+mod registers;
 mod screen;
 mod timers;
 
@@ -263,24 +265,10 @@ impl Crab8 {
         }
     }
 
-    fn exec_store(&mut self, register: Register, value: u8) {
-        self.registers.set(register, value);
-    }
-
-    fn exec_copy(&mut self, register: Register, other: Register) {
-        let value = self.registers.get(other);
-
-        self.registers.set(register, value);
-    }
-
     fn exec_rand(&mut self, register: Register, bitmask: u8) {
         let result = random::<u8>() & bitmask;
 
         self.registers.set(register, result);
-    }
-
-    fn exec_read_input(&mut self, register: Register) {
-        self.blocking_input = Some(register);
     }
 
     fn exec_no_op(&mut self, _instruction: u16) {}
@@ -290,48 +278,6 @@ impl Crab8 {
 mod test {
     use super::Instruction::*;
     use crate::prelude::*;
-
-    #[test]
-    fn test_store() {
-        let mut crab8 = Crab8::default();
-
-        assert_eq!(crab8.registers, 0x00000000000000000000000000000000.into());
-
-        crab8.exec(Store(V0, 0xFF));
-
-        assert_eq!(crab8.registers, 0xFF000000000000000000000000000000.into());
-
-        crab8.exec(Store(V5, 0x24));
-
-        assert_eq!(crab8.registers, 0xFF000000002400000000000000000000.into());
-
-        crab8.exec(Store(V5, 0x00));
-
-        assert_eq!(crab8.registers, 0xFF000000000000000000000000000000.into());
-    }
-
-    #[test]
-    fn test_copy() {
-        let mut crab8 = Crab8::default();
-
-        assert_eq!(crab8.registers, 0x00000000000000000000000000000000.into());
-
-        crab8.exec(Store(V0, 0x12));
-
-        assert_eq!(crab8.registers, 0x12000000000000000000000000000000.into());
-
-        crab8.exec(Copy(V1, V0));
-
-        assert_eq!(crab8.registers, 0x12120000000000000000000000000000.into());
-
-        crab8.exec(Store(V1, 0x63));
-
-        assert_eq!(crab8.registers, 0x12630000000000000000000000000000.into());
-
-        crab8.exec(Copy(V8, V1));
-
-        assert_eq!(crab8.registers, 0x12630000000000006300000000000000.into());
-    }
 
     #[test]
     fn test_rand() {
