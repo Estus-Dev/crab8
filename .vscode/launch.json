@@ -7,43 +7,6 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug executable 'crab8_bevy_frontend'",
-            "cargo": {
-                "args": [
-                    "build",
-                    "--bin=crab8_bevy_frontend",
-                    "--package=crab8_bevy_frontend"
-                ],
-                "filter": {
-                    "name": "crab8_bevy_frontend",
-                    "kind": "bin"
-                }
-            },
-            "args": [],
-            "cwd": "${workspaceFolder}"
-        },
-        {
-            "type": "lldb",
-            "request": "launch",
-            "name": "Debug unit tests in executable 'crab8_bevy_frontend'",
-            "cargo": {
-                "args": [
-                    "test",
-                    "--no-run",
-                    "--bin=crab8_bevy_frontend",
-                    "--package=crab8_bevy_frontend"
-                ],
-                "filter": {
-                    "name": "crab8_bevy_frontend",
-                    "kind": "bin"
-                }
-            },
-            "args": [],
-            "cwd": "${workspaceFolder}"
-        },
-        {
-            "type": "lldb",
-            "request": "launch",
             "name": "Debug unit tests in library 'crab8'",
             "cargo": {
                 "args": [

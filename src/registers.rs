@@ -1,5 +1,3 @@
-#[cfg(feature = "bevy")]
-use bevy::ecs::component::Component;
 use std::{fmt, fmt::Debug, fmt::Display};
 
 /// The CHIP-8 has 16 8-bit general-purpose registers, V0-VF.
@@ -91,7 +89,6 @@ impl From<u128> for Registers {
 
 /// General use registers on the CHIP-8 are named V0-VF.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-#[cfg_attr(feature = "bevy", derive(Component))]
 #[allow(non_snake_case)]
 pub enum Register {
     /// V0 is a general use register.
