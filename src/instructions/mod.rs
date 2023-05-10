@@ -4,6 +4,7 @@ mod input;
 mod jump;
 mod math;
 mod memory;
+mod random;
 mod registers;
 mod screen;
 mod timers;
@@ -265,12 +266,6 @@ impl Crab8 {
         }
     }
 
-    fn exec_rand(&mut self, register: Register, bitmask: u8) {
-        let result = random::<u8>() & bitmask;
-
-        self.registers.set(register, result);
-    }
-
     fn exec_no_op(&mut self, _instruction: u16) {}
 }
 
@@ -278,12 +273,6 @@ impl Crab8 {
 mod test {
     use super::Instruction::*;
     use crate::prelude::*;
-
-    #[test]
-    fn test_rand() {
-        // TODO: I don't know how I want to approach testing this.
-        // The bitmask needs to be tested too.
-    }
 
     #[test]
     fn test_instruction_from() {
