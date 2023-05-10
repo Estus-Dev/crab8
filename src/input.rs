@@ -21,6 +21,12 @@ pub enum Key {
     KeyF = 0xF,
 }
 
+impl Key {
+    pub fn new(key: u8) -> Self {
+        key.into()
+    }
+}
+
 impl Debug for Key {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let key = format!("{:#X}", *self as usize).replace("0x", "");
@@ -37,28 +43,26 @@ impl Display for Key {
     }
 }
 
-impl TryFrom<u8> for Key {
-    type Error = ();
-
-    fn try_from(value: u8) -> Result<Self, Self::Error> {
-        match value {
-            0x0 => Ok(Key0),
-            0x1 => Ok(Key1),
-            0x2 => Ok(Key2),
-            0x3 => Ok(Key3),
-            0x4 => Ok(Key4),
-            0x5 => Ok(Key5),
-            0x6 => Ok(Key6),
-            0x7 => Ok(Key7),
-            0x8 => Ok(Key8),
-            0x9 => Ok(Key9),
-            0xA => Ok(KeyA),
-            0xB => Ok(KeyB),
-            0xC => Ok(KeyC),
-            0xD => Ok(KeyD),
-            0xE => Ok(KeyE),
-            0xF => Ok(KeyF),
-            _ => Err(()),
+impl From<u8> for Key {
+    fn from(value: u8) -> Self {
+        match value & 0x0F {
+            0x0 => Key0,
+            0x1 => Key1,
+            0x2 => Key2,
+            0x3 => Key3,
+            0x4 => Key4,
+            0x5 => Key5,
+            0x6 => Key6,
+            0x7 => Key7,
+            0x8 => Key8,
+            0x9 => Key9,
+            0xA => KeyA,
+            0xB => KeyB,
+            0xC => KeyC,
+            0xD => KeyD,
+            0xE => KeyE,
+            0xF => KeyF,
+            _ => unreachable!("Always converts the last nibble to a key"),
         }
     }
 }

@@ -1081,7 +1081,7 @@ mod test {
             }
         }
 
-        let second_pressed_key = Key::try_from(0xC)?;
+        let second_pressed_key = Key::new(0xC);
 
         for register in (0x0..=0x0F).map(|r| Register::try_from(r as usize).unwrap()) {
             for pressed_key in (0x0..=0x0F).map(|key| Key::try_from(key).unwrap()) {
@@ -1138,7 +1138,7 @@ mod test {
             }
         }
 
-        let second_pressed_key = Key::try_from(0xC)?;
+        let second_pressed_key = Key::new(0xC);
 
         for register in (0x0..=0x0F).map(|r| Register::try_from(r as usize).unwrap()) {
             for pressed_key in (0x0..=0x0F).map(|key| Key::try_from(key).unwrap()) {
