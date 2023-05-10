@@ -134,10 +134,7 @@ impl Iterator for InputIterator {
         let next_index = 1 + self.1 as usize;
 
         if next_index <= 0xF {
-            Some((
-                Key::try_from(1 + next_index as u8).unwrap(),
-                self.0 .0[next_index + 1],
-            ))
+            Some((Key::new(1 + next_index as u8), self.0 .0[next_index + 1]))
         } else {
             None
         }

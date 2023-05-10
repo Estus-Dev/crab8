@@ -1060,10 +1060,10 @@ mod test {
         let mut crab8 = Crab8::default();
 
         for register in (0x0..=0x0F).map(|r| Register::try_from(r as usize).unwrap()) {
-            for pressed_key in (0x0..=0x0F).map(|key| Key::try_from(key).unwrap()) {
+            for pressed_key in (0x0..=0x0F).map(Key::new) {
                 crab8.input = Input::build().set_pressed(pressed_key, true).build();
 
-                for key in (0x0..=0x0F).map(|key| Key::try_from(key).unwrap()) {
+                for key in (0x0..=0x0F).map(Key::new) {
                     let starting_pc = crab8.program_counter.get();
                     let incremented_pc = crab8.program_counter.next_instruction().get();
 
@@ -1084,13 +1084,13 @@ mod test {
         let second_pressed_key = Key::new(0xC);
 
         for register in (0x0..=0x0F).map(|r| Register::try_from(r as usize).unwrap()) {
-            for pressed_key in (0x0..=0x0F).map(|key| Key::try_from(key).unwrap()) {
+            for pressed_key in (0x0..=0x0F).map(Key::new) {
                 crab8.input = Input::build()
                     .set_pressed(pressed_key, true)
                     .set_pressed(second_pressed_key, true)
                     .build();
 
-                for key in (0x0..=0x0F).map(|key| Key::try_from(key).unwrap()) {
+                for key in (0x0..=0x0F).map(Key::new) {
                     let starting_pc = crab8.program_counter.get();
                     let incremented_pc = crab8.program_counter.next_instruction().get();
 
@@ -1117,10 +1117,10 @@ mod test {
         let mut crab8 = Crab8::default();
 
         for register in (0x0..=0x0F).map(|r| Register::try_from(r as usize).unwrap()) {
-            for pressed_key in (0x0..=0x0F).map(|key| Key::try_from(key).unwrap()) {
+            for pressed_key in (0x0..=0x0F).map(Key::new) {
                 crab8.input = Input::build().set_pressed(pressed_key, true).build();
 
-                for key in (0x0..=0x0F).map(|key| Key::try_from(key).unwrap()) {
+                for key in (0x0..=0x0F).map(Key::new) {
                     let starting_pc = crab8.program_counter.get();
                     let incremented_pc = crab8.program_counter.next_instruction().get();
 
@@ -1141,13 +1141,13 @@ mod test {
         let second_pressed_key = Key::new(0xC);
 
         for register in (0x0..=0x0F).map(|r| Register::try_from(r as usize).unwrap()) {
-            for pressed_key in (0x0..=0x0F).map(|key| Key::try_from(key).unwrap()) {
+            for pressed_key in (0x0..=0x0F).map(Key::new) {
                 crab8.input = Input::build()
                     .set_pressed(pressed_key, true)
                     .set_pressed(second_pressed_key, true)
                     .build();
 
-                for key in (0x0..=0x0F).map(|key| Key::try_from(key).unwrap()) {
+                for key in (0x0..=0x0F).map(Key::new) {
                     let starting_pc = crab8.program_counter.get();
                     let incremented_pc = crab8.program_counter.next_instruction().get();
 
