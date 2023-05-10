@@ -166,7 +166,7 @@ impl Default for Memory {
             .step_by(CHAR_SPRITE_WIDTH as usize)
             .enumerate()
         {
-            let char = Character::try_from(char as u8).expect("A nibble is a valid char");
+            let char: Character = (char as u8).into();
             default.set_range(address.try_into().unwrap(), char.sprite());
         }
 

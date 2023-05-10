@@ -148,29 +148,28 @@ impl Character {
     }
 }
 
-impl TryFrom<u8> for Character {
-    type Error = ();
+impl From<u8> for Character {
+    /// Convert the last nibble of a byte into a character. Lossy for values > 0xF.
+    fn from(value: u8) -> Self {
+        match value & 0x0F {
+            0x0 => Char0,
+            0x1 => Char1,
+            0x2 => Char2,
+            0x3 => Char3,
+            0x4 => Char4,
+            0x5 => Char5,
+            0x6 => Char6,
+            0x7 => Char7,
+            0x8 => Char8,
+            0x9 => Char9,
+            0xA => CharA,
+            0xB => CharB,
+            0xC => CharC,
+            0xD => CharD,
+            0xE => CharE,
+            0xF => CharF,
 
-    fn try_from(value: u8) -> Result<Self, Self::Error> {
-        match value {
-            0x0 => Ok(Char0),
-            0x1 => Ok(Char1),
-            0x2 => Ok(Char2),
-            0x3 => Ok(Char3),
-            0x4 => Ok(Char4),
-            0x5 => Ok(Char5),
-            0x6 => Ok(Char6),
-            0x7 => Ok(Char7),
-            0x8 => Ok(Char8),
-            0x9 => Ok(Char9),
-            0xA => Ok(CharA),
-            0xB => Ok(CharB),
-            0xC => Ok(CharC),
-            0xD => Ok(CharD),
-            0xE => Ok(CharE),
-            0xF => Ok(CharF),
-
-            _ => Err(()),
+            _ => unreachable!("Always converts the last nibble to a character"),
         }
     }
 }

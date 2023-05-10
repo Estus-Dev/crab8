@@ -501,7 +501,10 @@ impl Crab8 {
         let first_address =
             Address::try_from(FIRST_CHAR_ADDRESS).expect("First char address is a valid address");
         let current_value = self.registers.get(register);
-        let character = Character::try_from(current_value).unwrap_or(Char0);
+
+        // Converting to character here will wrap out of bounds values
+        let character: Character = current_value.into();
+
         let offset = CHAR_SPRITE_WIDTH * character as u16;
         let result = first_address.wrapping_add(offset);
 
