@@ -226,19 +226,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "async-compat"
-version = "0.2.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9b48b4ff0c2026db683dea961cd8ea874737f56cffca86fa84415eaddc51c00d"
-dependencies = [
- "futures-core",
- "futures-io",
- "once_cell",
- "pin-project-lite",
- "tokio",
-]
-
-[[package]]
 name = "async-executor"
 version = "1.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -695,22 +682,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "39106bc2ee21fce9496d2e15e0ba7925dff63e3eae10f7c1fc0094b56ad9f2bb"
 dependencies = [
  "glam",
-]
-
-[[package]]
-name = "bevy_mod_reqwest"
-version = "0.10.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b7f286c23a43c5932ae9dd3e62406d0a52454fdf31f8c40bf4a0ce68affa0edb"
-dependencies = [
- "async-compat",
- "bevy",
- "bytes",
- "crossbeam-channel",
- "futures-lite",
- "reqwest",
- "serde",
- "serde_json",
 ]
 
 [[package]]
@@ -1408,16 +1379,6 @@ dependencies = [
  "bevy",
  "getrandom",
  "rand",
- "reqwest",
-]
-
-[[package]]
-name = "crab8_bevy_frontend"
-version = "0.1.0"
-dependencies = [
- "bevy",
- "bevy_mod_reqwest",
- "crab8",
  "reqwest",
 ]
 
