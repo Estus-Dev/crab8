@@ -17,7 +17,7 @@ const LAST_SAFE_ADDRESS: u16 = LAST_ADDRESS - 352;
 // Character sprites are 5 bytes wide.
 pub const CHAR_SPRITE_WIDTH: u16 = 5;
 
-/// The end of the starting reserved addresses will be used for sprite data.
+/// The beginning of the reserved addresses will be used for sprite data.
 pub const FIRST_CHAR_ADDRESS: u16 = 0x000;
 
 /// The CHIP-8 has 12-bit addresses, allowing up to 4096 bytes of memory.
