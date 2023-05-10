@@ -1,9 +1,6 @@
 use crate::prelude::*;
 use std::{fmt, fmt::Debug, fmt::Display, fmt::Formatter};
 
-/// The first accessible memory address is 0x000.
-const FIRST_ADDRESS: u16 = 0x000;
-
 /// The first safe memory address is 0x200.
 /// Values below this address are reserved for the CHIP-8 interpreter.
 const FIRST_SAFE_ADDRESS: u16 = 0x200;
