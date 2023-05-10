@@ -9,8 +9,6 @@ mod registers;
 mod screen;
 mod timers;
 
-use rand::random;
-
 use crate::prelude::*;
 
 /// Chip-8 instructions are 32-bit values that may contain data
