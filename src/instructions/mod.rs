@@ -2,6 +2,7 @@ mod bitwise;
 mod conditional;
 mod jump;
 mod math;
+mod memory;
 mod screen;
 
 use rand::random;
@@ -271,10 +272,6 @@ impl Crab8 {
         self.registers.set(register, value);
     }
 
-    fn exec_store_address(&mut self, address: Address) {
-        self.address_register.set(address);
-    }
-
     fn exec_rand(&mut self, register: Register, bitmask: u8) {
         let result = random::<u8>() & bitmask;
 
@@ -301,44 +298,6 @@ impl Crab8 {
         let result = self.registers.get(register);
 
         self.sound.set(result);
-    }
-
-    fn exec_add_address(&mut self, register: Register) {
-        let current_value = self.address_register;
-        let value = self.registers.get(register);
-        let result = current_value.wrapping_add(value as u16);
-
-        self.address_register.set(result);
-    }
-
-    #[allow(clippy::identity_op)]
-    fn exec_write_decimal(&mut self, register: Register) {
-        let address = self.address_register;
-        let current_value = self.registers.get(register);
-        let bcd = [
-            (current_value / 100) % 10,
-            (current_value / 10) % 10,
-            (current_value / 1) % 10,
-        ];
-
-        self.memory.set_range(address, &bcd);
-    }
-
-    fn exec_write(&mut self, register: Register) {
-        let address = self.address_register;
-        let values = self.registers.get_range(register);
-
-        self.memory.set_range(address, values);
-        self.address_register = self.address_register.wrapping_add(1 + register as u16);
-    }
-
-    fn exec_read(&mut self, register: Register) {
-        let start = self.address_register;
-        let end = start.wrapping_add(1 + register as u16);
-        let values = self.memory.get_range(start, end);
-
-        self.registers.set_range(values);
-        self.address_register = self.address_register.wrapping_add(1 + register as u16);
     }
 
     fn exec_no_op(&mut self, _instruction: u16) {}
@@ -389,25 +348,6 @@ mod test {
         crab8.exec(Copy(V8, V1));
 
         assert_eq!(crab8.registers, 0x12630000000000006300000000000000.into());
-    }
-
-    #[test]
-    fn test_store_address() {
-        let mut crab8 = Crab8::default();
-
-        assert_eq!(crab8.address_register, 0x000.into());
-
-        crab8.exec(StoreAddress(0xFFF.into()));
-
-        assert_eq!(crab8.address_register, 0xFFF.into());
-
-        crab8.exec(StoreAddress(0x032.into()));
-
-        assert_eq!(crab8.address_register, 0x032.into());
-
-        crab8.exec(StoreAddress(0x14E.into()));
-
-        assert_eq!(crab8.address_register, 0x14E.into());
     }
 
     #[test]
@@ -463,94 +403,6 @@ mod test {
 
         crab8.exec(Store(V0, 0xFF));
         crab8.exec(SetSound(V0));
-    }
-
-    #[test]
-    fn test_add_address() {
-        let mut crab8 = Crab8::default();
-
-        assert_eq!(crab8.address_register.get(), 0x000);
-
-        crab8.exec(AddAddress(V0));
-
-        assert_eq!(crab8.address_register.get(), 0x000);
-
-        crab8.exec(Store(V0, 0x15));
-        crab8.exec(AddAddress(V0));
-
-        assert_eq!(crab8.address_register.get(), 0x015);
-
-        crab8.exec(StoreAddress(0x123.into()));
-
-        assert_eq!(crab8.address_register.get(), 0x123);
-
-        crab8.exec(Store(V6, 0x64));
-        crab8.exec(AddAddress(V6));
-
-        assert_eq!(crab8.address_register.get(), 0x187);
-    }
-
-    // This test uses bytes written in decimal for ease of use.
-    #[test]
-    fn test_write_decimal() {
-        let mut crab8 = Crab8::default();
-        let start = crab8.address_register;
-        let end = start.wrapping_add(3);
-
-        crab8.exec(Store(V8, 42));
-        crab8.exec(WriteDecimal(V8));
-
-        assert_eq!(crab8.memory.get_range(start, end), &[0, 4, 2]);
-
-        crab8.exec(StoreAddress(0x52C.into()));
-
-        let start = crab8.address_register;
-        let end = start.wrapping_add(3);
-
-        crab8.exec(Store(V3, 120));
-        crab8.exec(WriteDecimal(V3));
-
-        assert_eq!(crab8.memory.get_range(start, end), &[1, 2, 0]);
-    }
-
-    #[test]
-    fn test_read_write() -> Result<(), ()> {
-        let mut crab8 = Crab8::default();
-        let mut address = Address::new(FIRST_CHAR_ADDRESS);
-
-        crab8.address_register.set(address);
-        crab8.exec(Read(V4));
-        assert_eq!(crab8.registers.get_range(V4), Char0.sprite());
-        assert_eq!(crab8.address_register, address.wrapping_add(4 + 1));
-
-        address = Address::new(0x210);
-        crab8.address_register.set(address);
-
-        let result: [u8; 6] = [0x54, 0x74, 0x12, 0x62, 0xBE, 0xC0];
-
-        for (offset, &byte) in result.iter().enumerate() {
-            let register = Register::try_from(offset as u16)?;
-            crab8.exec(Store(register, byte));
-        }
-
-        crab8.exec(Write(V5));
-        assert_eq!(crab8.address_register, address.wrapping_add(5 + 1));
-
-        let start = address;
-        let end = start.wrapping_add(result.len() as u16);
-        assert_eq!(crab8.memory.get_range(start, end), result);
-
-        for register in 0x0..=0xF {
-            let register = Register::try_from(register as u16)?;
-            crab8.exec(Store(register, 0xBC));
-        }
-
-        crab8.exec(StoreAddress(address));
-        crab8.exec(Read(V5));
-
-        assert_eq!(crab8.registers.get_range(V5), result);
-
-        Ok(())
     }
 
     #[test]
