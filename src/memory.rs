@@ -26,6 +26,11 @@ pub const FIRST_CHAR_ADDRESS: u16 = 0x000;
 pub struct Address(u16);
 
 impl Address {
+    /// Create a new address. The top nibble will be discarded.
+    pub fn new(address: u16) -> Self {
+        address.into()
+    }
+
     /// CHIP-8 programs are loaded starting at 0x200.
     /// Values below this are reserved for the interpreter.
     pub fn initial_instruction() -> Self {
@@ -68,15 +73,9 @@ impl Display for Address {
     }
 }
 
-impl TryFrom<u16> for Address {
-    type Error = ();
-
-    fn try_from(value: u16) -> Result<Self, Self::Error> {
-        if value <= LAST_ADDRESS {
-            Ok(Self(value))
-        } else {
-            Err(())
-        }
+impl From<u16> for Address {
+    fn from(value: u16) -> Self {
+        Self(value & 0x0FFF)
     }
 }
 
@@ -164,7 +163,7 @@ impl Default for Memory {
             .enumerate()
         {
             let char: Character = (char as u8).into();
-            default.set_range(address.try_into().unwrap(), char.sprite());
+            default.set_range(address.into(), char.sprite());
         }
 
         // Fill starting reserved address space with 0xFF for visualization purposes.
@@ -173,8 +172,8 @@ impl Default for Memory {
         }
 
         // At the end of valid address space, jump back to 0x200
-        default.set_instruction(Address::try_from(LAST_SAFE_ADDRESS + 1).unwrap(), 0x1200);
-        // TODO: default.set_instruction(Address::try_from(LAST_SAFE_ADDRESS + 1)?, Jump(0x200));
+        default.set_instruction(Address::new(LAST_SAFE_ADDRESS + 1), 0x1200);
+        // TODO: default.set_instruction(Address::new(LAST_SAFE_ADDRESS + 1), Jump(0x200));
 
         // Fill ending reserved address space with 0xFF for visualization purposes.
         for address in (LAST_SAFE_ADDRESS + 3)..=LAST_ADDRESS {

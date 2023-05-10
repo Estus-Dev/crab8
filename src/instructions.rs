@@ -161,8 +161,7 @@ impl From<u16> for Instruction {
         let y = Register::try_from((instruction & 0x00F0) >> 4) //
             .expect("A nibble is a valid register");
         let value = (instruction & 0x00FF) as u8;
-        let address = Address::try_from(instruction & 0x0FFF) //
-            .expect("Addresses can be any value from 0x0000 to 0x0FFF");
+        let address = Address::new(instruction);
 
         match operator {
             0x0 if address.get() == 0x0E0 => Self::ClearScreen,
@@ -498,8 +497,7 @@ impl Crab8 {
     }
 
     fn exec_load_sprite(&mut self, register: Register) {
-        let first_address =
-            Address::try_from(FIRST_CHAR_ADDRESS).expect("First char address is a valid address");
+        let first_address = Address::new(FIRST_CHAR_ADDRESS);
         let current_value = self.registers.get(register);
 
         // Converting to character here will wrap out of bounds values
@@ -578,7 +576,7 @@ mod test {
     }
 
     #[test]
-    fn test_call() -> Result<(), ()> {
+    fn test_call() {
         let cases = [0x2000, 0x2234, 0x2FFF, 0x2CED, 0x22BA];
 
         let mut crab8 = Crab8::default();
@@ -601,8 +599,6 @@ mod test {
         crab8.exec(Return);
 
         assert_eq!(crab8.program_counter, Address::default());
-
-        Ok(())
     }
 
     #[test]
@@ -1022,24 +1018,22 @@ mod test {
     }
 
     #[test]
-    fn test_store_address() -> Result<(), ()> {
+    fn test_store_address() {
         let mut crab8 = Crab8::default();
 
-        assert_eq!(crab8.address_register, 0x000.try_into()?);
+        assert_eq!(crab8.address_register, 0x000.into());
 
-        crab8.exec(StoreAddress(0xFFF.try_into()?));
+        crab8.exec(StoreAddress(0xFFF.into()));
 
-        assert_eq!(crab8.address_register, 0xFFF.try_into()?);
+        assert_eq!(crab8.address_register, 0xFFF.into());
 
-        crab8.exec(StoreAddress(0x032.try_into()?));
+        crab8.exec(StoreAddress(0x032.into()));
 
-        assert_eq!(crab8.address_register, 0x032.try_into()?);
+        assert_eq!(crab8.address_register, 0x032.into());
 
-        crab8.exec(StoreAddress(0x14E.try_into()?));
+        crab8.exec(StoreAddress(0x14E.into()));
 
-        assert_eq!(crab8.address_register, 0x14E.try_into()?);
-
-        Ok(())
+        assert_eq!(crab8.address_register, 0x14E.into());
     }
 
     #[test]
@@ -1235,7 +1229,7 @@ mod test {
     }
 
     #[test]
-    fn test_add_address() -> Result<(), ()> {
+    fn test_add_address() {
         let mut crab8 = Crab8::default();
 
         assert_eq!(crab8.address_register.get(), 0x000);
@@ -1249,7 +1243,7 @@ mod test {
 
         assert_eq!(crab8.address_register.get(), 0x015);
 
-        crab8.exec(StoreAddress(0x123.try_into()?));
+        crab8.exec(StoreAddress(0x123.into()));
 
         assert_eq!(crab8.address_register.get(), 0x123);
 
@@ -1257,8 +1251,6 @@ mod test {
         crab8.exec(AddAddress(V6));
 
         assert_eq!(crab8.address_register.get(), 0x187);
-
-        Ok(())
     }
 
     #[test]
@@ -1288,7 +1280,7 @@ mod test {
 
     // This test uses bytes written in decimal for ease of use.
     #[test]
-    fn test_write_decimal() -> Result<(), ()> {
+    fn test_write_decimal() {
         let mut crab8 = Crab8::default();
         let start = crab8.address_register;
         let end = start.wrapping_add(3);
@@ -1298,7 +1290,7 @@ mod test {
 
         assert_eq!(crab8.memory.get_range(start, end), &[0, 4, 2]);
 
-        crab8.exec(StoreAddress(0x52C.try_into()?));
+        crab8.exec(StoreAddress(0x52C.into()));
 
         let start = crab8.address_register;
         let end = start.wrapping_add(3);
@@ -1307,21 +1299,19 @@ mod test {
         crab8.exec(WriteDecimal(V3));
 
         assert_eq!(crab8.memory.get_range(start, end), &[1, 2, 0]);
-
-        Ok(())
     }
 
     #[test]
     fn test_read_write() -> Result<(), ()> {
         let mut crab8 = Crab8::default();
-        let mut address = Address::try_from(FIRST_CHAR_ADDRESS)?;
+        let mut address = Address::new(FIRST_CHAR_ADDRESS);
 
         crab8.address_register.set(address);
         crab8.exec(Read(V4));
         assert_eq!(crab8.registers.get_range(V4), Char0.sprite());
         assert_eq!(crab8.address_register, address.wrapping_add(4 + 1));
 
-        address = Address::try_from(0x210)?;
+        address = Address::new(0x210);
         crab8.address_register.set(address);
 
         let result: [u8; 6] = [0x54, 0x74, 0x12, 0x62, 0xBE, 0xC0];
@@ -1352,16 +1342,16 @@ mod test {
     }
 
     #[test]
-    fn test_instruction_from() -> Result<(), ()> {
+    fn test_instruction_from() {
         let cases = [
             (0x00E0, ClearScreen),
             (0x00EE, Return),
-            (0x1000, Jump(0x000.try_into()?)),
-            (0x1234, Jump(0x234.try_into()?)),
-            (0x1ABC, Jump(0xABC.try_into()?)),
-            (0x2101, Call(0x101.try_into()?)),
-            (0x242E, Call(0x42E.try_into()?)),
-            (0x2C5D, Call(0xC5D.try_into()?)),
+            (0x1000, Jump(0x000.into())),
+            (0x1234, Jump(0x234.into())),
+            (0x1ABC, Jump(0xABC.into())),
+            (0x2101, Call(0x101.into())),
+            (0x242E, Call(0x42E.into())),
+            (0x2C5D, Call(0xC5D.into())),
             (0x3271, IfNot(V2, 0x71)),
             (0x3EDD, IfNot(VE, 0xDD)),
             (0x4567, If(V5, 0x67)),
@@ -1400,12 +1390,12 @@ mod test {
             (0x9AD0, IfRegisters(VA, VD)),
             (0x9040, IfRegisters(V0, V4)),
             (0x9049, NoOp(0x9049)),
-            (0xA000, StoreAddress(0x000.try_into()?)),
-            (0xA123, StoreAddress(0x123.try_into()?)),
-            (0xAF24, StoreAddress(0xF24.try_into()?)),
-            (0xBFFF, JumpOffset(0xFFF.try_into()?)),
-            (0xB631, JumpOffset(0x631.try_into()?)),
-            (0xBD62, JumpOffset(0xD62.try_into()?)),
+            (0xA000, StoreAddress(0x000.into())),
+            (0xA123, StoreAddress(0x123.into())),
+            (0xAF24, StoreAddress(0xF24.into())),
+            (0xBFFF, JumpOffset(0xFFF.into())),
+            (0xB631, JumpOffset(0x631.into())),
+            (0xBD62, JumpOffset(0xD62.into())),
             (0xC700, Rand(V7, 0x00)),
             (0xC12F, Rand(V1, 0x2F)),
             (0xD52B, Draw(V5, V2, 0xB)),
@@ -1446,7 +1436,5 @@ mod test {
         for case in cases {
             assert_eq!(Instruction::from(case.0), case.1);
         }
-
-        Ok(())
     }
 }

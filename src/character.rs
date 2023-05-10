@@ -24,7 +24,7 @@ pub enum Character {
 
 impl Character {
     pub fn address(&self) -> Address {
-        let first = Address::try_from(FIRST_CHAR_ADDRESS).unwrap();
+        let first = Address::new(FIRST_CHAR_ADDRESS);
         let offset = *self as u16 * CHAR_SPRITE_WIDTH;
 
         first.wrapping_add(offset)

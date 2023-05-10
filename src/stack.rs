@@ -131,39 +131,39 @@ mod test {
         assert_eq!(stack.len(), 0);
         assert!(stack.is_empty());
 
-        stack.push(0x123.try_into()?)?;
+        stack.push(0x123.into())?;
 
         assert_eq!(stack.len(), 1);
         assert!(!stack.is_empty());
 
-        stack.push(0x234.try_into()?)?;
+        stack.push(0x234.into())?;
 
         assert_eq!(stack.len(), 2);
         assert!(!stack.is_empty());
 
-        stack.push(0x345.try_into()?)?;
+        stack.push(0x345.into())?;
 
         assert_eq!(stack.len(), 3);
         assert!(!stack.is_empty());
 
-        assert_eq!(stack.pop()?, 0x345.try_into()?);
+        assert_eq!(stack.pop()?, 0x345.into());
         assert_eq!(stack.len(), 2);
         assert!(!stack.is_empty());
 
-        stack.push(0x456.try_into()?)?;
+        stack.push(0x456.into())?;
 
         assert_eq!(stack.len(), 3);
         assert!(!stack.is_empty());
 
-        assert_eq!(stack.pop()?, 0x456.try_into()?);
+        assert_eq!(stack.pop()?, 0x456.into());
         assert_eq!(stack.len(), 2);
         assert!(!stack.is_empty());
 
-        assert_eq!(stack.pop()?, 0x234.try_into()?);
+        assert_eq!(stack.pop()?, 0x234.into());
         assert_eq!(stack.len(), 1);
         assert!(!stack.is_empty());
 
-        assert_eq!(stack.pop()?, 0x123.try_into()?);
+        assert_eq!(stack.pop()?, 0x123.into());
         assert_eq!(stack.len(), 0);
         assert!(stack.is_empty());
 
@@ -177,10 +177,10 @@ mod test {
         let mut stack = Stack::empty();
 
         for i in 0..MAX_STACK_DEPTH {
-            stack.push((i as u16).try_into()?)?;
+            stack.push((i as u16).into())?;
         }
 
-        assert!(stack.push(0x000.try_into()?).is_err());
+        assert!(stack.push(0x000.into()).is_err());
 
         Ok(())
     }
