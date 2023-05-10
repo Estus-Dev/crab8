@@ -289,7 +289,7 @@ impl Crab8 {
 #[cfg(test)]
 mod test {
     use super::Instruction::*;
-    use crate::{memory::FIRST_CHAR_ADDRESS, prelude::*};
+    use crate::prelude::*;
 
     #[test]
     fn test_store() {
