@@ -166,10 +166,8 @@ impl From<u16> for Instruction {
     fn from(instruction: u16) -> Self {
         let operator = ((instruction & 0xF000) >> 12) as u8;
         let sub_operator = (instruction & 0x000F) as u8;
-        let x = Register::try_from((instruction & 0x0F00) >> 8) //
-            .expect("A nibble is a valid register");
-        let y = Register::try_from((instruction & 0x00F0) >> 4) //
-            .expect("A nibble is a valid register");
+        let x = Register::from((instruction & 0x0F00) >> 8);
+        let y = Register::from((instruction & 0x00F0) >> 4);
         let value = (instruction & 0x00FF) as u8;
         let address = Address::new(instruction);
 

@@ -60,8 +60,7 @@ mod test {
         let mut crab8 = Crab8::default();
 
         for (instruction, value, skipped) in cases {
-            let register = Register::try_from((instruction & 0x0F00) >> 8) //
-                .expect("A nibble is a valid register");
+            let register = Register::from((instruction & 0x0F00) >> 8);
 
             let previous_pc = crab8.program_counter.get();
             let incremented_pc = crab8.program_counter.next_instruction().get();
@@ -91,8 +90,7 @@ mod test {
         let mut crab8 = Crab8::default();
 
         for (instruction, value, skipped) in cases {
-            let register = Register::try_from((instruction & 0x0F00) >> 8) //
-                .expect("A nibble is a valid register");
+            let register = Register::from((instruction & 0x0F00) >> 8);
 
             let previous_pc = crab8.program_counter.get();
             let incremented_pc = crab8.program_counter.next_instruction().get();
@@ -123,10 +121,8 @@ mod test {
         let mut crab8 = Crab8::default();
 
         for (instruction, x_value, y_value, skipped) in cases {
-            let x = Register::try_from((instruction & 0x0F00) >> 8) //
-                .expect("A nibble is a valid register");
-            let y = Register::try_from((instruction & 0x00F0) >> 4) //
-                .expect("A nibble is a valid register");
+            let x = Register::from((instruction & 0x0F00) >> 8);
+            let y = Register::from((instruction & 0x00F0) >> 4);
 
             let previous_pc = crab8.program_counter.get();
             let incremented_pc = crab8.program_counter.next_instruction().get();
@@ -158,10 +154,8 @@ mod test {
         let mut crab8 = Crab8::default();
 
         for (instruction, x_value, y_value, skipped) in cases {
-            let x = Register::try_from((instruction & 0x0F00) >> 8) //
-                .expect("A nibble is a valid register");
-            let y = Register::try_from((instruction & 0x00F0) >> 4) //
-                .expect("A nibble is a valid register");
+            let x = Register::from((instruction & 0x0F00) >> 8);
+            let y = Register::from((instruction & 0x00F0) >> 4);
 
             let previous_pc = crab8.program_counter.get();
             let incremented_pc = crab8.program_counter.next_instruction().get();

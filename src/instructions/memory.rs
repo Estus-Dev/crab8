@@ -135,7 +135,7 @@ mod test {
         let result: [u8; 6] = [0x54, 0x74, 0x12, 0x62, 0xBE, 0xC0];
 
         for (offset, &byte) in result.iter().enumerate() {
-            let register = Register::try_from(offset as u16)?;
+            let register = Register::from(offset);
             crab8.exec(Store(register, byte));
         }
 
@@ -147,7 +147,7 @@ mod test {
         assert_eq!(crab8.memory.get_range(start, end), result);
 
         for register in 0x0..=0xF {
-            let register = Register::try_from(register as u16)?;
+            let register = Register::from(register);
             crab8.exec(Store(register, 0xBC));
         }
 

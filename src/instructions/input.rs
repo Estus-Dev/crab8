@@ -4,8 +4,7 @@ impl Crab8 {
     pub fn exec_if_not_pressed(&mut self, register: Register) {
         let key = self.registers.get(register);
         let pressed = if key <= 0xF {
-            self.input
-                .is_key_pressed(key.try_into().expect("A nibble is a valid key"))
+            self.input.is_key_pressed(key.into())
         } else {
             false
         };
@@ -19,8 +18,7 @@ impl Crab8 {
     pub fn exec_if_pressed(&mut self, register: Register) {
         let key = self.registers.get(register);
         let pressed = if key <= 0xF {
-            self.input
-                .is_key_pressed(key.try_into().expect("A nibble is a valid key"))
+            self.input.is_key_pressed(key.into())
         } else {
             false
         };
@@ -51,7 +49,7 @@ mod test {
     fn test_is_not_pressed() -> Result<(), ()> {
         let mut crab8 = Crab8::default();
 
-        for register in (0x0..=0x0F).map(|r| Register::try_from(r as usize).unwrap()) {
+        for register in (0x0..=0x0F).map(Register::from) {
             for pressed_key in (0x0..=0x0F).map(Key::new) {
                 crab8.input = Input::build().set_pressed(pressed_key, true).build();
 
@@ -75,7 +73,7 @@ mod test {
 
         let second_pressed_key = Key::new(0xC);
 
-        for register in (0x0..=0x0F).map(|r| Register::try_from(r as usize).unwrap()) {
+        for register in (0x0..=0x0F).map(Register::from) {
             for pressed_key in (0x0..=0x0F).map(Key::new) {
                 crab8.input = Input::build()
                     .set_pressed(pressed_key, true)
@@ -108,7 +106,7 @@ mod test {
     fn test_is_pressed() -> Result<(), ()> {
         let mut crab8 = Crab8::default();
 
-        for register in (0x0..=0x0F).map(|r| Register::try_from(r as usize).unwrap()) {
+        for register in (0x0..=0x0F).map(Register::from) {
             for pressed_key in (0x0..=0x0F).map(Key::new) {
                 crab8.input = Input::build().set_pressed(pressed_key, true).build();
 
@@ -132,7 +130,7 @@ mod test {
 
         let second_pressed_key = Key::new(0xC);
 
-        for register in (0x0..=0x0F).map(|r| Register::try_from(r as usize).unwrap()) {
+        for register in (0x0..=0x0F).map(Register::from) {
             for pressed_key in (0x0..=0x0F).map(Key::new) {
                 crab8.input = Input::build()
                     .set_pressed(pressed_key, true)

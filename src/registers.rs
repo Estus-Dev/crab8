@@ -35,12 +35,7 @@ impl Debug for Registers {
             .0
             .iter()
             .enumerate()
-            .map(|(register, value)| {
-                (
-                    Register::try_from(register).expect("0x00..=0x0F are all the registers"),
-                    value,
-                )
-            })
+            .map(|(register, value)| (Register::from(register), value))
             .map(|(register, value)| format!("{:?}={:#04X}", register, value))
             .fold(String::new(), |str, register| str + &register + " ");
 
@@ -148,41 +143,48 @@ impl Register {
     }
 }
 
-impl TryFrom<usize> for Register {
-    type Error = ();
-
-    fn try_from(value: usize) -> Result<Self, Self::Error> {
-        Register::try_from(value as u16)
+impl From<usize> for Register {
+    fn from(value: usize) -> Self {
+        Register::from(value as u8)
     }
 }
 
-impl TryFrom<u16> for Register {
-    type Error = ();
-
-    fn try_from(value: u16) -> Result<Self, Self::Error> {
+impl From<u8> for Register {
+    fn from(value: u8) -> Self {
         use Register::*;
 
-        match value {
-            i if i == V0 as u16 => Ok(V0),
-            i if i == V1 as u16 => Ok(V1),
-            i if i == V2 as u16 => Ok(V2),
-            i if i == V3 as u16 => Ok(V3),
-            i if i == V4 as u16 => Ok(V4),
-            i if i == V5 as u16 => Ok(V5),
-            i if i == V6 as u16 => Ok(V6),
-            i if i == V7 as u16 => Ok(V7),
-            i if i == V8 as u16 => Ok(V8),
-            i if i == V9 as u16 => Ok(V9),
-            i if i == VA as u16 => Ok(VA),
-            i if i == VB as u16 => Ok(VB),
-            i if i == VC as u16 => Ok(VC),
-            i if i == VD as u16 => Ok(VD),
-            i if i == VE as u16 => Ok(VE),
-            i if i == VF as u16 => Ok(VF),
+        match value & 0x0F {
+            i if i == V0 as u8 => V0,
+            i if i == V1 as u8 => V1,
+            i if i == V2 as u8 => V2,
+            i if i == V3 as u8 => V3,
+            i if i == V4 as u8 => V4,
+            i if i == V5 as u8 => V5,
+            i if i == V6 as u8 => V6,
+            i if i == V7 as u8 => V7,
+            i if i == V8 as u8 => V8,
+            i if i == V9 as u8 => V9,
+            i if i == VA as u8 => VA,
+            i if i == VB as u8 => VB,
+            i if i == VC as u8 => VC,
+            i if i == VD as u8 => VD,
+            i if i == VE as u8 => VE,
+            i if i == VF as u8 => VF,
 
-            // TODO: Use a proper error
-            _ => Err(()),
+            _ => unreachable!("Always converts the last nibble to a character"),
         }
+    }
+}
+
+impl From<u16> for Register {
+    fn from(value: u16) -> Self {
+        Register::from(value as u8)
+    }
+}
+
+impl From<i32> for Register {
+    fn from(value: i32) -> Self {
+        Register::from(value as u8)
     }
 }
 

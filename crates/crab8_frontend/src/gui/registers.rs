@@ -48,7 +48,7 @@ impl RegisterWindow {
 }
 
 fn register_label(ui: &mut Ui, register: u16, crab8: &Crab8) {
-    let register = Register::try_from(register).expect("A nibble is a valid register");
+    let register = register.into();
     let value = crab8.registers.get(register);
 
     ui.label(format!("{register:?}={value:#04X}"));
