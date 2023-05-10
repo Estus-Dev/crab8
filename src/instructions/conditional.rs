@@ -43,10 +43,7 @@ impl Crab8 {
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::{
-        input::{Input, Key},
-        instructions::Instruction::*,
-    };
+    use crate::instructions::Instruction::*;
 
     #[test]
     fn test_if_not() {

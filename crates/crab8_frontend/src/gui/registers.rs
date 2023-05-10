@@ -1,4 +1,4 @@
-use crab8::{registers::Register, Crab8};
+use crab8::Crab8;
 use egui::{Context, Ui, Vec2, Window};
 
 #[derive(Default)]
