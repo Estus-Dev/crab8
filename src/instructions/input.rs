@@ -30,7 +30,11 @@ impl Crab8 {
     }
 
     pub fn exec_read_input(&mut self, register: Register) {
-        self.blocking_input = Some(register);
+        if let Some((key, _)) = self.input.into_iter().find(|&(_, pressed)| pressed) {
+            self.registers.set(register, key as u8);
+        } else {
+            self.program_counter = self.program_counter.wrapping_sub(2);
+        }
     }
 }
 

@@ -52,35 +52,17 @@ pub struct Crab8 {
     pub input: Input,
 
     pub screen: Screen,
-
-    pub blocking_input: Option<Register>,
 }
 
 impl Crab8 {
     pub fn execute(&mut self, input: Input) {
         self.input = input;
 
-        if let Some(register) = self.blocking_input {
-            if self.input.into_iter().filter(|(_, down)| *down).count() > 0 {
-                self.resume_read_input(register, self.input);
-            }
-            return;
-        }
-
         let instruction = self.memory.get_instruction(self.program_counter);
 
         self.program_counter = self.program_counter.next_instruction();
 
         self.exec(instruction);
-    }
-
-    fn resume_read_input(&mut self, register: Register, input: Input) {
-        for (key, pressed) in input {
-            if pressed {
-                self.registers.set(register, key as u8);
-                return;
-            }
-        }
     }
 
     pub fn tick(&mut self) {
@@ -130,7 +112,6 @@ impl Default for Crab8 {
             memory: Default::default(),
             input: Default::default(),
             screen: Default::default(),
-            blocking_input: None,
         }
     }
 }

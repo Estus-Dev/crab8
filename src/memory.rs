@@ -42,6 +42,11 @@ impl Address {
         Address((self.0 + value) & 0x0FFF)
     }
 
+    /// Subtract a u16 from the given Address and return a new Address.
+    pub fn wrapping_sub(&self, value: u16) -> Address {
+        Address(self.0.wrapping_sub(value) & 0x0FFF)
+    }
+
     /// Get the address of the next byte in memory
     pub fn next(&self) -> Address {
         self.wrapping_add(1)
