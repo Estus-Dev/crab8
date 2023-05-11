@@ -137,10 +137,10 @@ impl Iterator for InputIterator {
     type Item = (Key, bool);
 
     fn next(&mut self) -> Option<Self::Item> {
-        let next_index = 1 + self.1;
+        self.1 += 1;
 
-        if next_index <= 0xF {
-            Some((Key::new(1 + next_index as u8), self.0 .0[next_index + 1]))
+        if self.1 <= 0xF {
+            Some((Key::new(self.1 as u8), self.0 .0[self.1]))
         } else {
             None
         }
