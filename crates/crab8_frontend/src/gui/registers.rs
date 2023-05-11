@@ -15,8 +15,8 @@ impl RegisterWindow {
             .show(context, |ui| {
                 let PC = crab8.program_counter;
                 let I = crab8.address_register;
-                let DT = crab8.delay.get();
-                let ST = crab8.sound.get();
+                let DT = crab8.delay;
+                let ST = crab8.sound;
 
                 ui.horizontal(|ui| {
                     ui.vertical(|ui| {
@@ -25,8 +25,8 @@ impl RegisterWindow {
                     });
 
                     ui.vertical(|ui| {
-                        ui.label(format!("DT={DT:#04X}"));
-                        ui.label(format!("ST={ST:#04X}"));
+                        ui.label(format!("DT={DT}"));
+                        ui.label(format!("ST={ST}"));
                     });
                 });
 

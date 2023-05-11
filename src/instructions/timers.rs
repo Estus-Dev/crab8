@@ -2,7 +2,7 @@ use crate::{registers::Register, Crab8};
 
 impl Crab8 {
     pub fn exec_read_delay(&mut self, register: Register) {
-        let result = self.delay.get();
+        let result = self.delay.into();
 
         self.registers.set(register, result);
     }
@@ -10,13 +10,13 @@ impl Crab8 {
     pub fn exec_set_delay(&mut self, register: Register) {
         let result = self.registers.get(register);
 
-        self.delay.set(result);
+        self.delay = result.into();
     }
 
     pub fn exec_set_sound(&mut self, register: Register) {
         let result = self.registers.get(register);
 
-        self.sound.set(result);
+        self.sound = result.into();
     }
 }
 
@@ -30,12 +30,12 @@ mod test {
     fn test_delay_timer() {
         let mut crab8 = Crab8::default();
 
-        assert_eq!(crab8.delay.get(), 0x00);
+        assert_eq!(crab8.delay, 0x00.into());
 
         crab8.exec(Store(V5, 0x14));
         crab8.exec(SetDelay(V5));
 
-        assert_eq!(crab8.delay.get(), 0x14);
+        assert_eq!(crab8.delay, 0x14.into());
 
         crab8.exec(ReadDelay(V8));
 
@@ -43,7 +43,7 @@ mod test {
 
         crab8.tick();
 
-        assert_eq!(crab8.delay.get(), 0x13);
+        assert_eq!(crab8.delay, 0x13.into());
 
         crab8.exec(ReadDelay(V8));
 
@@ -60,16 +60,16 @@ mod test {
     fn test_sound_timer() {
         let mut crab8 = Crab8::default();
 
-        assert_eq!(crab8.sound.get(), 0x00);
+        assert_eq!(crab8.sound, 0x00.into());
 
         crab8.exec(Store(V5, 0x14));
         crab8.exec(SetSound(V5));
 
-        assert_eq!(crab8.sound.get(), 0x14);
+        assert_eq!(crab8.sound, 0x14.into());
 
         crab8.tick();
 
-        assert_eq!(crab8.sound.get(), 0x13);
+        assert_eq!(crab8.sound, 0x13.into());
 
         crab8.exec(Store(V0, 0xFF));
         crab8.exec(SetSound(V0));
