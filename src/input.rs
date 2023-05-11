@@ -73,16 +73,32 @@ impl From<Key> for u8 {
     }
 }
 
+#[derive(Clone, Copy, Default, PartialEq, Eq)]
+pub enum KeyState {
+    #[default]
+    Unpressed,
+    Pressed,
+    Released,
+}
+
 #[derive(Clone, Copy, Default)]
-pub struct Input([bool; 16]);
+pub struct Input([KeyState; 16]);
 
 impl Input {
     pub fn build() -> InputBuilder {
-        InputBuilder::default()
+        InputBuilder::new()
+    }
+
+    pub fn update(&self) -> InputBuilder {
+        InputBuilder::new_from_previous(self)
     }
 
     pub fn is_key_pressed(&self, key: Key) -> bool {
-        self.0[key as usize]
+        self.0[key as usize] == KeyState::Pressed
+    }
+
+    pub fn was_key_released(&self, key: Key) -> bool {
+        self.0[key as usize] == KeyState::Unpressed
     }
 }
 
@@ -91,7 +107,13 @@ impl Debug for Input {
         let pressed_keys = (0x0..=0xF)
             .enumerate()
             .map(|(i, key)| (i, self.0[key]))
-            .filter_map(|(i, key)| if key { Some(i) } else { None })
+            .filter_map(|(i, key)| {
+                if key == KeyState::Pressed {
+                    Some(i)
+                } else {
+                    None
+                }
+            })
             .map(|key| format!("{key:#3X}").replace("0x", ""))
             .fold("".to_owned(), |pressed_keys, key| pressed_keys + " " + &key)
             .trim()
@@ -108,7 +130,7 @@ impl Display for Input {
 }
 
 impl IntoIterator for Input {
-    type Item = (Key, bool);
+    type Item = (Key, KeyState);
     type IntoIter = InputIterator;
 
     fn into_iter(self) -> Self::IntoIter {
@@ -117,11 +139,24 @@ impl IntoIterator for Input {
 }
 
 #[derive(Default)]
-pub struct InputBuilder([bool; 16]);
+pub struct InputBuilder([KeyState; 16]);
 
 impl InputBuilder {
-    pub fn set_pressed(mut self, key: Key, pressed: bool) -> Self {
-        self.0[key as usize] = pressed;
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn new_from_previous(previous: &Input) -> Self {
+        use KeyState::*;
+
+        Self(previous.0.map(|key| match key {
+            Pressed => Released,
+            Unpressed | Released => Unpressed,
+        }))
+    }
+
+    pub fn set_pressed(mut self, key: Key, state: KeyState) -> Self {
+        self.0[key as usize] = KeyState::Pressed;
 
         self
     }
@@ -134,7 +169,7 @@ impl InputBuilder {
 pub struct InputIterator(Input, usize);
 
 impl Iterator for InputIterator {
-    type Item = (Key, bool);
+    type Item = (Key, KeyState);
 
     fn next(&mut self) -> Option<Self::Item> {
         self.1 += 1;

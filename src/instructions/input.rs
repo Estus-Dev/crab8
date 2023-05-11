@@ -1,4 +1,4 @@
-use crate::{registers::Register, Crab8};
+use crate::{input::KeyState, registers::Register, Crab8};
 
 impl Crab8 {
     pub fn exec_if_not_pressed(&mut self, register: Register) {
@@ -28,7 +28,11 @@ impl Crab8 {
     }
 
     pub fn exec_read_input(&mut self, register: Register) {
-        if let Some((key, _)) = self.input.into_iter().find(|&(_, pressed)| pressed) {
+        if let Some((key, _)) = self
+            .input
+            .into_iter()
+            .find(|&(key, state)| state == KeyState::Released)
+        {
             self.registers.set(register, key as u8);
         } else {
             self.program_counter = self.program_counter.wrapping_sub(2);
@@ -39,9 +43,9 @@ impl Crab8 {
 #[cfg(test)]
 mod test {
     use crate::{
-        input::{Input, Key},
+        input::{Input, InputBuilder, Key},
         instructions::Instruction::*,
-        registers::Register,
+        registers::Register::{self, *},
     };
 
     use super::*;
@@ -53,7 +57,9 @@ mod test {
 
         for register in (0x0..=0x0F).map(Register::from) {
             for pressed_key in (0x0..=0x0F).map(Key::new) {
-                crab8.input = Input::build().set_pressed(pressed_key, true).build();
+                crab8.input = Input::build()
+                    .set_pressed(pressed_key, KeyState::Pressed)
+                    .build();
 
                 for key in (0x0..=0x0F).map(Key::new) {
                     let starting_pc = crab8.program_counter;
@@ -78,8 +84,8 @@ mod test {
         for register in (0x0..=0x0F).map(Register::from) {
             for pressed_key in (0x0..=0x0F).map(Key::new) {
                 crab8.input = Input::build()
-                    .set_pressed(pressed_key, true)
-                    .set_pressed(second_pressed_key, true)
+                    .set_pressed(pressed_key, KeyState::Pressed)
+                    .set_pressed(second_pressed_key, KeyState::Pressed)
                     .build();
 
                 for key in (0x0..=0x0F).map(Key::new) {
@@ -110,7 +116,9 @@ mod test {
 
         for register in (0x0..=0x0F).map(Register::from) {
             for pressed_key in (0x0..=0x0F).map(Key::new) {
-                crab8.input = Input::build().set_pressed(pressed_key, true).build();
+                crab8.input = Input::build()
+                    .set_pressed(pressed_key, KeyState::Pressed)
+                    .build();
 
                 for key in (0x0..=0x0F).map(Key::new) {
                     let starting_pc = crab8.program_counter;
@@ -135,8 +143,8 @@ mod test {
         for register in (0x0..=0x0F).map(Register::from) {
             for pressed_key in (0x0..=0x0F).map(Key::new) {
                 crab8.input = Input::build()
-                    .set_pressed(pressed_key, true)
-                    .set_pressed(second_pressed_key, true)
+                    .set_pressed(pressed_key, KeyState::Pressed)
+                    .set_pressed(second_pressed_key, KeyState::Pressed)
                     .build();
 
                 for key in (0x0..=0x0F).map(Key::new) {
@@ -158,5 +166,53 @@ mod test {
         }
 
         Ok(())
+    }
+
+    #[test]
+    fn test_blocking_input() {
+        let mut crab8 = Crab8::default();
+
+        let expected = crab8.program_counter.wrapping_sub(2);
+        let key = Key::KeyC;
+
+        crab8.registers.set(V0, key.into());
+        crab8.exec(ReadInput(V0));
+
+        assert_eq!(expected, crab8.program_counter);
+
+        crab8.program_counter = crab8.program_counter.wrapping_add(2);
+
+        crab8.exec(ReadInput(V0));
+
+        assert_eq!(expected, crab8.program_counter);
+
+        crab8.input = Input::build().set_pressed(key, KeyState::Pressed).build();
+
+        crab8.program_counter = crab8.program_counter.wrapping_add(2);
+
+        crab8.exec(ReadInput(V0));
+
+        assert_eq!(expected, crab8.program_counter);
+
+        crab8.input = crab8
+            .input
+            .update()
+            .set_pressed(key, KeyState::Pressed)
+            .build();
+
+        crab8.program_counter = crab8.program_counter.wrapping_add(2);
+
+        crab8.exec(ReadInput(V0));
+
+        assert_eq!(expected, crab8.program_counter);
+
+        crab8.input = crab8.input.update().build();
+
+        crab8.program_counter = crab8.program_counter.wrapping_add(2);
+        let expected = crab8.program_counter;
+
+        crab8.exec(ReadInput(V0));
+
+        assert_eq!(expected, crab8.program_counter);
     }
 }

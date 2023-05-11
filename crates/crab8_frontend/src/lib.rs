@@ -52,7 +52,7 @@ pub async fn run() {
                     println!("Long frame detected: {delta_time:?}");
                 }
 
-                crab8.execute(crab8::input::Input::default());
+                crab8.execute(crab8.input.update().build());
             }
 
             _ => (),
