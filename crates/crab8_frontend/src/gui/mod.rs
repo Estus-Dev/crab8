@@ -1,18 +1,20 @@
 mod about;
 mod registers;
 pub mod renderer;
+mod stack;
 
 use crab8::Crab8;
 use egui::{menu, Context, TopBottomPanel};
 
 use about::AboutWindow;
-
 use registers::RegisterWindow;
+use stack::StackWindow;
 
 #[derive(Default)]
 pub struct Gui {
     about: AboutWindow,
     registers: RegisterWindow,
+    stack: StackWindow,
 }
 
 impl Gui {
@@ -42,6 +44,12 @@ impl Gui {
 
                         ui.close_menu();
                     }
+
+                    if ui.button("Stack").clicked() {
+                        self.stack.open = !self.stack.open;
+
+                        ui.close_menu();
+                    }
                 });
 
                 ui.menu_button("Help", |ui| {
@@ -55,5 +63,6 @@ impl Gui {
 
         self.about.render(context);
         self.registers.render(context, crab8);
+        self.stack.render(context, crab8);
     }
 }
