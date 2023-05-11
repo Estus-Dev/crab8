@@ -43,7 +43,7 @@ impl Crab8 {
 #[cfg(test)]
 mod test {
     use crate::{
-        input::{Input, InputBuilder, Key},
+        input::{Input, Key},
         instructions::Instruction::*,
         registers::Register::{self, *},
     };
