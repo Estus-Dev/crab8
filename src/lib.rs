@@ -20,6 +20,7 @@ pub mod prelude {
 }
 
 use crate::prelude::*;
+use input::InputBuilder;
 #[cfg(feature = "download")]
 use reqwest::{blocking::get, Result};
 use std::{fmt, fmt::Display, fs::File, io::Read, path::Path};
@@ -51,12 +52,15 @@ pub struct Crab8 {
 
     pub input: Input,
 
+    pub next_input: InputBuilder,
+
     pub screen: Screen,
 }
 
 impl Crab8 {
-    pub fn execute(&mut self, input: Input) {
-        self.input = input;
+    pub fn execute(&mut self) {
+        self.input = self.next_input.build();
+        self.next_input = self.input.update();
 
         let instruction = self.memory.get_instruction(self.program_counter);
 
@@ -108,6 +112,7 @@ impl Crab8 {
         self.stack = Default::default();
         self.memory = Default::default();
         self.input = Default::default();
+        self.next_input = Default::default();
         self.screen = Default::default();
     }
 }
@@ -123,6 +128,7 @@ impl Default for Crab8 {
             stack: Default::default(),
             memory: Default::default(),
             input: Default::default(),
+            next_input: Default::default(),
             screen: Default::default(),
         }
     }

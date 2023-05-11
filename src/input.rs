@@ -73,7 +73,7 @@ impl From<Key> for u8 {
     }
 }
 
-#[derive(Clone, Copy, Default, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub enum KeyState {
     #[default]
     Unpressed,
@@ -138,7 +138,7 @@ impl IntoIterator for Input {
     }
 }
 
-#[derive(Default)]
+#[derive(Debug, Default)]
 pub struct InputBuilder([KeyState; 16]);
 
 impl InputBuilder {
@@ -150,22 +150,30 @@ impl InputBuilder {
         use KeyState::*;
 
         Self(previous.0.map(|key| match key {
-            Pressed => Released,
-            Unpressed | Released => Unpressed,
+            Released => Unpressed,
+            _ => key,
         }))
     }
 
-    pub fn set_pressed(self, key: Key) -> Self {
+    pub fn set_pressed(&mut self, key: Key) -> &mut Self {
         self.set(key, KeyState::Pressed)
     }
 
-    pub fn set(mut self, key: Key, state: KeyState) -> Self {
+    pub fn set_released(&mut self, key: Key) -> &mut Self {
+        if self.0[key as usize] != KeyState::Pressed {
+            println!("Released {key} when it was not pressed");
+        }
+
+        self.set(key, KeyState::Released)
+    }
+
+    pub fn set(&mut self, key: Key, state: KeyState) -> &mut Self {
         self.0[key as usize] = state;
 
         self
     }
 
-    pub fn build(self) -> Input {
+    pub fn build(&self) -> Input {
         Input(self.0)
     }
 }

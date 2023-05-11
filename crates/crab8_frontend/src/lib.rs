@@ -1,4 +1,5 @@
 mod gui;
+mod input;
 mod screen;
 mod window;
 
@@ -8,7 +9,10 @@ pub mod wasm;
 use instant::{Duration, Instant};
 use reqwest::{Client, Method, Request};
 use window::Crab8Window;
-use winit::{event::Event, event_loop::EventLoop};
+use winit::{
+    event::{Event, KeyboardInput, WindowEvent},
+    event_loop::EventLoop,
+};
 
 use crate::screen::DrawScreen;
 pub async fn run() {
@@ -38,9 +42,27 @@ pub async fn run() {
     };
 
     event_loop.run(move |event, _, control_flow| {
-        match event {
+        match &event {
             Event::RedrawRequested(_) => {
                 crab8.screen.draw_screen(window.pixels.frame_mut());
+            }
+
+            // Clippy insists this is the idiomatic way to handle this event...
+            // All I'm doing here is getting the keycode and current state of this event
+            Event::WindowEvent {
+                event:
+                    WindowEvent::KeyboardInput {
+                        input:
+                            KeyboardInput {
+                                virtual_keycode: Some(keycode),
+                                state,
+                                ..
+                            },
+                        ..
+                    },
+                ..
+            } => {
+                input::handle_input(*keycode, *state, &mut crab8);
             }
 
             Event::MainEventsCleared => {
@@ -52,7 +74,7 @@ pub async fn run() {
                     println!("Long frame detected: {delta_time:?}");
                 }
 
-                crab8.execute(crab8.input.update().build());
+                crab8.execute();
             }
 
             _ => (),
