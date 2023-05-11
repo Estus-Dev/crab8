@@ -34,7 +34,7 @@ impl Crab8 {
         let offset = CHAR_SPRITE_WIDTH * character as u16;
         let result = first_address.wrapping_add(offset);
 
-        self.address_register.set(result);
+        self.address_register = result;
     }
 }
 

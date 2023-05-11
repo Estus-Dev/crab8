@@ -2,7 +2,7 @@ use crate::{memory::Address, registers::Register, Crab8};
 
 impl Crab8 {
     pub fn exec_store_address(&mut self, address: Address) {
-        self.address_register.set(address);
+        self.address_register = address;
     }
 
     pub fn exec_add_address(&mut self, register: Register) {
@@ -10,7 +10,7 @@ impl Crab8 {
         let value = self.registers.get(register);
         let result = current_value.wrapping_add(value as u16);
 
-        self.address_register.set(result);
+        self.address_register = result;
     }
 
     #[allow(clippy::identity_op)]
@@ -124,13 +124,13 @@ mod test {
         let mut crab8 = Crab8::default();
         let mut address = Address::new(FIRST_CHAR_ADDRESS);
 
-        crab8.address_register.set(address);
+        crab8.address_register = address;
         crab8.exec(Read(V4));
         assert_eq!(crab8.registers.get_range(V4), Char0.sprite());
         assert_eq!(crab8.address_register, address.wrapping_add(4 + 1));
 
         address = Address::new(0x210);
-        crab8.address_register.set(address);
+        crab8.address_register = address;
 
         let result: [u8; 6] = [0x54, 0x74, 0x12, 0x62, 0xBE, 0xC0];
 

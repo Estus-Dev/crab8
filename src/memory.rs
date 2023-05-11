@@ -60,10 +60,6 @@ impl Address {
     pub fn get(&self) -> u16 {
         self.0
     }
-
-    pub fn set(&mut self, address: Self) {
-        self.0 = address.get();
-    }
 }
 
 impl Debug for Address {

@@ -4,18 +4,18 @@ impl Crab8 {
     pub fn exec_return(&mut self) {
         let address = self.stack.pop().unwrap_or(Address::default());
 
-        self.program_counter.set(address);
+        self.program_counter = address;
     }
 
     pub fn exec_jump(&mut self, address: Address) {
-        self.program_counter.set(address);
+        self.program_counter = address;
     }
 
     pub fn exec_call(&mut self, address: Address) {
         self.stack
             .push(self.program_counter)
             .expect("Stack Overflow");
-        self.program_counter.set(address);
+        self.program_counter = address;
     }
 
     pub fn exec_jump_offset(&mut self, address: Address) {
@@ -23,7 +23,7 @@ impl Crab8 {
         // UNDEFINED BEHAVIOR: I'm choosing to implement overflow by wrapping.
         let result = address.wrapping_add(offset as u16);
 
-        self.program_counter.set(result);
+        self.program_counter = result;
     }
 }
 

@@ -5,8 +5,7 @@ impl Crab8 {
         let current_value = self.registers.get(register);
 
         if current_value == value {
-            self.program_counter
-                .set(self.program_counter.next_instruction());
+            self.program_counter = self.program_counter.next_instruction();
         }
     }
 
@@ -14,8 +13,7 @@ impl Crab8 {
         let current_value = self.registers.get(register);
 
         if current_value != value {
-            self.program_counter
-                .set(self.program_counter.next_instruction());
+            self.program_counter = self.program_counter.next_instruction();
         }
     }
 
@@ -24,8 +22,7 @@ impl Crab8 {
         let value = self.registers.get(other);
 
         if current_value == value {
-            self.program_counter
-                .set(self.program_counter.next_instruction());
+            self.program_counter = self.program_counter.next_instruction();
         }
     }
 
@@ -34,8 +31,7 @@ impl Crab8 {
         let value = self.registers.get(other);
 
         if current_value != value {
-            self.program_counter
-                .set(self.program_counter.next_instruction());
+            self.program_counter = self.program_counter.next_instruction();
         }
     }
 }

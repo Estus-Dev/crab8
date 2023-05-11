@@ -10,8 +10,7 @@ impl Crab8 {
         };
 
         if pressed {
-            self.program_counter
-                .set(self.program_counter.next_instruction());
+            self.program_counter = self.program_counter.next_instruction();
         }
     }
 
@@ -24,8 +23,7 @@ impl Crab8 {
         };
 
         if !pressed {
-            self.program_counter
-                .set(self.program_counter.next_instruction());
+            self.program_counter = self.program_counter.next_instruction();
         }
     }
 
