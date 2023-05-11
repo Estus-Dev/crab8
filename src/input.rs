@@ -67,6 +67,12 @@ impl From<u8> for Key {
     }
 }
 
+impl From<Key> for u8 {
+    fn from(value: Key) -> Self {
+        value as u8
+    }
+}
+
 #[derive(Clone, Copy, Default)]
 pub struct Input([bool; 16]);
 
