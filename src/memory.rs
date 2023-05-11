@@ -74,7 +74,7 @@ impl Debug for Address {
 
 impl Display for Address {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        write!(f, "{self:?}")
+        write!(f, "{:#05X}", self.0)
     }
 }
 
