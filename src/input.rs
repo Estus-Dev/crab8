@@ -155,8 +155,12 @@ impl InputBuilder {
         }))
     }
 
-    pub fn set_pressed(mut self, key: Key, state: KeyState) -> Self {
-        self.0[key as usize] = KeyState::Pressed;
+    pub fn set_pressed(self, key: Key) -> Self {
+        self.set(key, KeyState::Pressed)
+    }
+
+    pub fn set(mut self, key: Key, state: KeyState) -> Self {
+        self.0[key as usize] = state;
 
         self
     }

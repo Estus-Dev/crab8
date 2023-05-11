@@ -57,9 +57,7 @@ mod test {
 
         for register in (0x0..=0x0F).map(Register::from) {
             for pressed_key in (0x0..=0x0F).map(Key::new) {
-                crab8.input = Input::build()
-                    .set_pressed(pressed_key, KeyState::Pressed)
-                    .build();
+                crab8.input = Input::build().set_pressed(pressed_key).build();
 
                 for key in (0x0..=0x0F).map(Key::new) {
                     let starting_pc = crab8.program_counter;
@@ -84,8 +82,8 @@ mod test {
         for register in (0x0..=0x0F).map(Register::from) {
             for pressed_key in (0x0..=0x0F).map(Key::new) {
                 crab8.input = Input::build()
-                    .set_pressed(pressed_key, KeyState::Pressed)
-                    .set_pressed(second_pressed_key, KeyState::Pressed)
+                    .set_pressed(pressed_key)
+                    .set_pressed(second_pressed_key)
                     .build();
 
                 for key in (0x0..=0x0F).map(Key::new) {
@@ -116,9 +114,7 @@ mod test {
 
         for register in (0x0..=0x0F).map(Register::from) {
             for pressed_key in (0x0..=0x0F).map(Key::new) {
-                crab8.input = Input::build()
-                    .set_pressed(pressed_key, KeyState::Pressed)
-                    .build();
+                crab8.input = Input::build().set_pressed(pressed_key).build();
 
                 for key in (0x0..=0x0F).map(Key::new) {
                     let starting_pc = crab8.program_counter;
@@ -143,8 +139,8 @@ mod test {
         for register in (0x0..=0x0F).map(Register::from) {
             for pressed_key in (0x0..=0x0F).map(Key::new) {
                 crab8.input = Input::build()
-                    .set_pressed(pressed_key, KeyState::Pressed)
-                    .set_pressed(second_pressed_key, KeyState::Pressed)
+                    .set_pressed(pressed_key)
+                    .set_pressed(second_pressed_key)
                     .build();
 
                 for key in (0x0..=0x0F).map(Key::new) {
@@ -186,7 +182,7 @@ mod test {
 
         assert_eq!(expected, crab8.program_counter);
 
-        crab8.input = Input::build().set_pressed(key, KeyState::Pressed).build();
+        crab8.input = Input::build().set_pressed(key).build();
 
         crab8.program_counter = crab8.program_counter.wrapping_add(2);
 
@@ -194,11 +190,7 @@ mod test {
 
         assert_eq!(expected, crab8.program_counter);
 
-        crab8.input = crab8
-            .input
-            .update()
-            .set_pressed(key, KeyState::Pressed)
-            .build();
+        crab8.input = crab8.input.update().set(key, KeyState::Pressed).build();
 
         crab8.program_counter = crab8.program_counter.wrapping_add(2);
 
