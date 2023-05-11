@@ -31,7 +31,7 @@ impl Crab8 {
         if let Some((key, _)) = self
             .input
             .into_iter()
-            .find(|&(key, state)| state == KeyState::Released)
+            .find(|&(_, state)| state == KeyState::Released)
         {
             self.registers.set(register, key as u8);
         } else {
