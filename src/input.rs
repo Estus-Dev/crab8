@@ -85,7 +85,7 @@ pub enum KeyState {
 pub struct Input([KeyState; 16]);
 
 impl Input {
-    pub fn build() -> InputBuilder {
+    pub fn builder() -> InputBuilder {
         InputBuilder::new()
     }
 
