@@ -29,10 +29,12 @@ impl Screen {
                     break 'x;
                 }
 
-                let collided = self.0[screen_y][screen_x] && sprite_pixel > 0;
+                if sprite_pixel > 0 {
+                    let collided = self.0[screen_y][screen_x];
 
-                screen.0[screen_y][screen_x] = sprite_pixel > 0 && !collided;
-                collision_flag = collision_flag || collided;
+                    screen.0[screen_y][screen_x] = !collided;
+                    collision_flag = collision_flag || collided;
+                }
             }
         }
 
