@@ -71,7 +71,7 @@ impl Crab8 {
     }
 
     pub fn load(&mut self, rom: &[u8]) {
-        self.memory = Memory::default();
+        self.reset();
         self.memory.set_range(Address::initial_instruction(), rom);
     }
 
@@ -97,6 +97,18 @@ impl Crab8 {
         self.memory.set_range(start, &data);
 
         Ok(())
+    }
+
+    pub fn reset(&mut self) {
+        self.address_register = Address::default();
+        self.program_counter = Address::initial_instruction();
+        self.registers = Default::default();
+        self.delay = Default::default();
+        self.sound = Default::default();
+        self.stack = Default::default();
+        self.memory = Default::default();
+        self.input = Default::default();
+        self.screen = Default::default();
     }
 }
 
