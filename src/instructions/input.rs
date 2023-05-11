@@ -56,13 +56,13 @@ mod test {
                 crab8.input = Input::build().set_pressed(pressed_key, true).build();
 
                 for key in (0x0..=0x0F).map(Key::new) {
-                    let starting_pc = crab8.program_counter.get();
-                    let incremented_pc = crab8.program_counter.next_instruction().get();
+                    let starting_pc = crab8.program_counter;
+                    let incremented_pc = crab8.program_counter.next_instruction();
 
                     crab8.registers.set(register, key as u8);
                     crab8.exec(IfNotPressed(register));
 
-                    let pc = crab8.program_counter.get();
+                    let pc = crab8.program_counter;
 
                     if key != pressed_key {
                         assert_eq!(pc, starting_pc);
@@ -83,13 +83,13 @@ mod test {
                     .build();
 
                 for key in (0x0..=0x0F).map(Key::new) {
-                    let starting_pc = crab8.program_counter.get();
-                    let incremented_pc = crab8.program_counter.next_instruction().get();
+                    let starting_pc = crab8.program_counter;
+                    let incremented_pc = crab8.program_counter.next_instruction();
 
                     crab8.registers.set(register, key as u8);
                     crab8.exec(IfNotPressed(register));
 
-                    let pc = crab8.program_counter.get();
+                    let pc = crab8.program_counter;
 
                     if key != pressed_key && key != second_pressed_key {
                         assert_eq!(pc, starting_pc);
@@ -113,13 +113,13 @@ mod test {
                 crab8.input = Input::build().set_pressed(pressed_key, true).build();
 
                 for key in (0x0..=0x0F).map(Key::new) {
-                    let starting_pc = crab8.program_counter.get();
-                    let incremented_pc = crab8.program_counter.next_instruction().get();
+                    let starting_pc = crab8.program_counter;
+                    let incremented_pc = crab8.program_counter.next_instruction();
 
                     crab8.registers.set(register, key as u8);
                     crab8.exec(IfPressed(register));
 
-                    let pc = crab8.program_counter.get();
+                    let pc = crab8.program_counter;
 
                     if key == pressed_key {
                         assert_eq!(pc, starting_pc);
@@ -140,13 +140,13 @@ mod test {
                     .build();
 
                 for key in (0x0..=0x0F).map(Key::new) {
-                    let starting_pc = crab8.program_counter.get();
-                    let incremented_pc = crab8.program_counter.next_instruction().get();
+                    let starting_pc = crab8.program_counter;
+                    let incremented_pc = crab8.program_counter.next_instruction();
 
                     crab8.registers.set(register, key as u8);
                     crab8.exec(IfPressed(register));
 
-                    let pc = crab8.program_counter.get();
+                    let pc = crab8.program_counter;
 
                     if key == pressed_key || key == second_pressed_key {
                         assert_eq!(pc, starting_pc);

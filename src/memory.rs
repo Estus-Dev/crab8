@@ -56,10 +56,6 @@ impl Address {
     pub fn next_instruction(&self) -> Address {
         self.wrapping_add(2)
     }
-
-    pub fn get(&self) -> u16 {
-        self.0
-    }
 }
 
 impl Debug for Address {
@@ -77,6 +73,18 @@ impl Display for Address {
 impl From<u16> for Address {
     fn from(value: u16) -> Self {
         Self(value & 0x0FFF)
+    }
+}
+
+impl From<Address> for u16 {
+    fn from(value: Address) -> Self {
+        value.0
+    }
+}
+
+impl From<Address> for usize {
+    fn from(value: Address) -> Self {
+        value.0 as usize
     }
 }
 
@@ -99,8 +107,8 @@ impl Memory {
     }
 
     pub fn get_range(&self, start: Address, end: Address) -> &[u8] {
-        let start = start.get() as usize;
-        let mut end = end.get() as usize;
+        let start = start.into();
+        let mut end = end.into();
 
         if start >= end {
             end = start;

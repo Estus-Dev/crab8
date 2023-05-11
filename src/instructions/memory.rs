@@ -75,25 +75,25 @@ mod test {
     fn test_add_address() {
         let mut crab8 = Crab8::default();
 
-        assert_eq!(crab8.address_register.get(), 0x000);
+        assert_eq!(crab8.address_register, 0x000.into());
 
         crab8.exec(AddAddress(V0));
 
-        assert_eq!(crab8.address_register.get(), 0x000);
+        assert_eq!(crab8.address_register, 0x000.into());
 
         crab8.exec(Store(V0, 0x15));
         crab8.exec(AddAddress(V0));
 
-        assert_eq!(crab8.address_register.get(), 0x015);
+        assert_eq!(crab8.address_register, 0x015.into());
 
         crab8.exec(StoreAddress(0x123.into()));
 
-        assert_eq!(crab8.address_register.get(), 0x123);
+        assert_eq!(crab8.address_register, 0x123.into());
 
         crab8.exec(Store(V6, 0x64));
         crab8.exec(AddAddress(V6));
 
-        assert_eq!(crab8.address_register.get(), 0x187);
+        assert_eq!(crab8.address_register, 0x187.into());
     }
 
     // This test uses bytes written in decimal for ease of use.

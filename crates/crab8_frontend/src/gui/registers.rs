@@ -13,15 +13,15 @@ impl RegisterWindow {
             .fixed_size(Vec2::new(120.0, 150.0))
             .open(&mut self.open)
             .show(context, |ui| {
-                let PC = crab8.program_counter.get();
-                let I = crab8.address_register.get();
+                let PC = crab8.program_counter;
+                let I = crab8.address_register;
                 let DT = crab8.delay.get();
                 let ST = crab8.sound.get();
 
                 ui.horizontal(|ui| {
                     ui.vertical(|ui| {
-                        ui.label(format!("PC={PC:#05X}"));
-                        ui.label(format!("I={I:#05X}"));
+                        ui.label(format!("PC={PC}"));
+                        ui.label(format!("I={I}"));
                     });
 
                     ui.vertical(|ui| {

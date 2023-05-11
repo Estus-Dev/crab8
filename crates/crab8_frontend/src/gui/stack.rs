@@ -14,8 +14,8 @@ impl StackWindow {
             .open(&mut self.open)
             .show(context, |ui| {
                 ui.vertical(|ui| {
-                    let pc = crab8.program_counter.get();
-                    ui.label(format!("PC={pc:#05X}"));
+                    let pc = crab8.program_counter;
+                    ui.label(format!("PC={pc}"));
                     ui.separator();
 
                     for (i, address) in crab8.stack.clone().into_iter().enumerate() {

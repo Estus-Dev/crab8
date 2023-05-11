@@ -55,13 +55,13 @@ mod test {
         for (instruction, value, skipped) in cases {
             let register = Register::from((instruction & 0x0F00) >> 8);
 
-            let previous_pc = crab8.program_counter.get();
-            let incremented_pc = crab8.program_counter.next_instruction().get();
+            let previous_pc = crab8.program_counter;
+            let incremented_pc = crab8.program_counter.next_instruction();
 
             crab8.exec(Store(register, value));
             crab8.exec(instruction);
 
-            let pc = crab8.program_counter.get();
+            let pc = crab8.program_counter;
 
             if skipped {
                 assert_eq!(pc, incremented_pc);
@@ -85,13 +85,13 @@ mod test {
         for (instruction, value, skipped) in cases {
             let register = Register::from((instruction & 0x0F00) >> 8);
 
-            let previous_pc = crab8.program_counter.get();
-            let incremented_pc = crab8.program_counter.next_instruction().get();
+            let previous_pc = crab8.program_counter;
+            let incremented_pc = crab8.program_counter.next_instruction();
 
             crab8.exec(Store(register, value));
             crab8.exec(instruction);
 
-            let pc = crab8.program_counter.get();
+            let pc = crab8.program_counter;
 
             if skipped {
                 assert_eq!(pc, incremented_pc);
@@ -117,14 +117,14 @@ mod test {
             let x = Register::from((instruction & 0x0F00) >> 8);
             let y = Register::from((instruction & 0x00F0) >> 4);
 
-            let previous_pc = crab8.program_counter.get();
-            let incremented_pc = crab8.program_counter.next_instruction().get();
+            let previous_pc = crab8.program_counter;
+            let incremented_pc = crab8.program_counter.next_instruction();
 
             crab8.exec(Store(x, x_value));
             crab8.exec(Store(y, y_value));
             crab8.exec(instruction);
 
-            let pc = crab8.program_counter.get();
+            let pc = crab8.program_counter;
 
             if skipped {
                 assert_eq!(pc, incremented_pc);
@@ -150,14 +150,14 @@ mod test {
             let x = Register::from((instruction & 0x0F00) >> 8);
             let y = Register::from((instruction & 0x00F0) >> 4);
 
-            let previous_pc = crab8.program_counter.get();
-            let incremented_pc = crab8.program_counter.next_instruction().get();
+            let previous_pc = crab8.program_counter;
+            let incremented_pc = crab8.program_counter.next_instruction();
 
             crab8.exec(Store(x, x_value));
             crab8.exec(Store(y, y_value));
             crab8.exec(instruction);
 
-            let pc = crab8.program_counter.get();
+            let pc = crab8.program_counter;
 
             if skipped {
                 assert_eq!(pc, incremented_pc);

@@ -64,23 +64,23 @@ mod test {
         let mut crab8 = Crab8::default();
         let mut offset = 0x00;
 
-        assert_eq!(crab8.address_register.get(), 0x000);
+        assert_eq!(crab8.address_register, 0x000.into());
 
         crab8.exec(Store(V5, 0x00));
         crab8.exec(LoadSprite(V5));
 
-        assert_eq!(crab8.address_register.get(), FIRST_CHAR_ADDRESS + offset);
+        assert_eq!(crab8.address_register, (FIRST_CHAR_ADDRESS + offset).into());
 
         crab8.exec(Store(V3, 0x04));
         crab8.exec(LoadSprite(V3));
 
         offset = 0x04 * CHAR_SPRITE_WIDTH;
-        assert_eq!(crab8.address_register.get(), FIRST_CHAR_ADDRESS + offset);
+        assert_eq!(crab8.address_register, (FIRST_CHAR_ADDRESS + offset).into());
 
         crab8.exec(Store(VB, 0x0F));
         crab8.exec(LoadSprite(VB));
 
         offset = 0x0F * CHAR_SPRITE_WIDTH;
-        assert_eq!(crab8.address_register.get(), FIRST_CHAR_ADDRESS + offset);
+        assert_eq!(crab8.address_register, (FIRST_CHAR_ADDRESS + offset).into());
     }
 }

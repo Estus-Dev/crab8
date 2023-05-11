@@ -38,11 +38,11 @@ mod test {
 
         let mut crab8 = Crab8::default();
 
-        assert_eq!(crab8.program_counter.get(), 0x200);
+        assert_eq!(crab8.program_counter, 0x200.into());
 
         for instruction in cases {
             crab8.exec(instruction);
-            assert_eq!(crab8.program_counter.get(), instruction & 0x0FFF);
+            assert_eq!(crab8.program_counter, (instruction & 0x0FFF).into());
         }
     }
 
@@ -54,13 +54,13 @@ mod test {
 
         for instruction in cases {
             crab8.exec(instruction);
-            assert_eq!(crab8.program_counter.get(), instruction & 0x0FFF);
+            assert_eq!(crab8.program_counter, (instruction & 0x0FFF).into());
         }
 
         for (i, address) in cases.iter().map(|a| a & 0x0FFF).rev().skip(1).enumerate() {
             crab8.exec(Return);
 
-            assert_eq!(crab8.program_counter.get(), address, "{i}");
+            assert_eq!(crab8.program_counter, address.into(), "{i}");
         }
 
         crab8.exec(Return);
@@ -86,7 +86,7 @@ mod test {
             crab8.registers.set(V0, offset);
             crab8.exec(instruction);
 
-            assert_eq!(crab8.program_counter.get(), expected);
+            assert_eq!(crab8.program_counter, expected.into());
         }
     }
 }

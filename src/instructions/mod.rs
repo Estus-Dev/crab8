@@ -170,8 +170,8 @@ impl From<u16> for Instruction {
         let address = Address::new(instruction);
 
         match operator {
-            0x0 if address.get() == 0x0E0 => Self::ClearScreen,
-            0x0 if address.get() == 0x0EE => Self::Return,
+            0x0 if address == 0x0E0.into() => Self::ClearScreen,
+            0x0 if address == 0x0EE.into() => Self::Return,
             0x1 => Self::Jump(address),
             0x2 => Self::Call(address),
             0x3 => Self::IfNot(x, value),
