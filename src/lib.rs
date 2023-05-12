@@ -55,6 +55,8 @@ pub struct Crab8 {
     pub next_input: InputBuilder,
 
     pub screen: Screen,
+
+    pub instructions_per_frame: usize,
 }
 
 impl Crab8 {
@@ -62,11 +64,15 @@ impl Crab8 {
         self.input = self.next_input.build();
         self.next_input = self.input.update();
 
-        let instruction = self.memory.get_instruction(self.program_counter);
+        for _ in 0..self.instructions_per_frame {
+            let instruction = self.memory.get_instruction(self.program_counter);
 
-        self.program_counter = self.program_counter.next_instruction();
+            self.program_counter = self.program_counter.next_instruction();
 
-        self.exec(instruction);
+            self.exec(instruction);
+        }
+
+        self.tick();
     }
 
     pub fn tick(&mut self) {
@@ -130,6 +136,7 @@ impl Default for Crab8 {
             input: Default::default(),
             next_input: Default::default(),
             screen: Default::default(),
+            instructions_per_frame: 10,
         }
     }
 }
