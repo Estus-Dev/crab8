@@ -198,7 +198,7 @@ mod test {
 
         assert_eq!(expected, crab8.program_counter);
 
-        crab8.input = crab8.input.update().build();
+        crab8.input = crab8.input.update().set_released(key).build();
 
         crab8.program_counter = crab8.program_counter.wrapping_add(2);
         let expected = crab8.program_counter;
