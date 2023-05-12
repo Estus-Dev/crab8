@@ -1,4 +1,5 @@
 mod about;
+mod playback;
 mod registers;
 pub mod renderer;
 mod stack;
@@ -7,12 +8,14 @@ use crab8::Crab8;
 use egui::{menu, Context, TopBottomPanel};
 
 use about::AboutWindow;
+use playback::PlaybackWindow;
 use registers::RegisterWindow;
 use stack::StackWindow;
 
 #[derive(Default)]
 pub struct Gui {
     about: AboutWindow,
+    playback: PlaybackWindow,
     registers: RegisterWindow,
     stack: StackWindow,
 }
@@ -39,6 +42,11 @@ impl Gui {
                 });
 
                 ui.menu_button("Debugger", |ui| {
+                    if ui.button("Playback Controls").clicked() {
+                        self.playback.open = !self.playback.open;
+
+                        ui.close_menu();
+                    }
                     if ui.button("Registers").clicked() {
                         self.registers.open = !self.registers.open;
 
@@ -62,6 +70,7 @@ impl Gui {
         });
 
         self.about.render(context);
+        self.playback.render(context, crab8);
         self.registers.render(context, crab8);
         self.stack.render(context, crab8);
     }

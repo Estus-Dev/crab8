@@ -56,28 +56,60 @@ pub struct Crab8 {
 
     pub screen: Screen,
 
+    pub execution_state: ExecutionState,
+
     pub instructions_per_frame: usize,
+
+    instructions_since_frame: usize,
 }
 
 impl Crab8 {
     pub fn execute(&mut self) {
+        use ExecutionState::*;
+
         self.input = self.next_input.build();
         self.next_input = self.input.update();
 
-        for _ in 0..self.instructions_per_frame {
-            let instruction = self.memory.get_instruction(self.program_counter);
+        match self.execution_state {
+            Running | StepFrame => {
+                for _ in self.instructions_since_frame..self.instructions_per_frame {
+                    self.execute_instruction();
+                }
 
-            self.program_counter = self.program_counter.next_instruction();
+                self.tick();
+            }
 
-            self.exec(instruction);
+            StepInstruction => {
+                self.execute_instruction();
+
+                self.instructions_since_frame += 1;
+
+                if self.instructions_since_frame >= self.instructions_per_frame {
+                    self.tick();
+                }
+            }
+
+            _ => (),
         }
 
-        self.tick();
+        if matches!(self.execution_state, StepFrame | StepInstruction) {
+            self.execution_state = Paused;
+        }
+    }
+
+    fn execute_instruction(&mut self) {
+        let instruction = self.memory.get_instruction(self.program_counter);
+
+        self.program_counter = self.program_counter.next_instruction();
+
+        self.exec(instruction);
     }
 
     pub fn tick(&mut self) {
         self.delay.tick();
         self.sound.tick();
+
+        self.instructions_since_frame = 0;
     }
 
     pub fn load(&mut self, rom: &[u8]) {
@@ -120,6 +152,7 @@ impl Crab8 {
         self.input = Default::default();
         self.next_input = Default::default();
         self.screen = Default::default();
+        self.instructions_since_frame = 0;
     }
 }
 
@@ -136,7 +169,9 @@ impl Default for Crab8 {
             input: Default::default(),
             next_input: Default::default(),
             screen: Default::default(),
+            execution_state: Default::default(),
             instructions_per_frame: 10,
+            instructions_since_frame: 0,
         }
     }
 }
@@ -159,4 +194,13 @@ impl Display for Crab8 {
 
         Ok(())
     }
+}
+
+#[derive(Debug, Default, PartialEq, Eq)]
+pub enum ExecutionState {
+    Paused,
+    StepInstruction,
+    StepFrame,
+    #[default]
+    Running,
 }
