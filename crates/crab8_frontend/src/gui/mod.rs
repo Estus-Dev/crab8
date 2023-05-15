@@ -1,4 +1,5 @@
 mod about;
+mod download;
 mod playback;
 mod registers;
 pub mod renderer;
@@ -12,9 +13,12 @@ use playback::PlaybackWindow;
 use registers::RegisterWindow;
 use stack::StackWindow;
 
+use self::download::DownloadWindow;
+
 #[derive(Default)]
 pub struct Gui {
     about: AboutWindow,
+    pub download: DownloadWindow,
     playback: PlaybackWindow,
     registers: RegisterWindow,
     stack: StackWindow,
@@ -36,6 +40,12 @@ impl Gui {
                                 .load_file(path)
                                 .expect("The user would never try to load an invalid file");
                         }
+
+                        ui.close_menu();
+                    }
+
+                    if ui.button("Download").clicked() {
+                        self.download.open = !self.download.open;
 
                         ui.close_menu();
                     }
@@ -70,6 +80,7 @@ impl Gui {
         });
 
         self.about.render(context);
+        self.download.render(context);
         self.playback.render(context, crab8);
         self.registers.render(context, crab8);
         self.stack.render(context, crab8);

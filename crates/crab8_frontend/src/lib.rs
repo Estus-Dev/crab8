@@ -80,6 +80,16 @@ pub async fn run() {
             _ => (),
         }
 
+        match window.gui.download.rom.lock() {
+            Err(err) => println!("Attempted to unlock ROM but it was locked: {err}"),
+            Ok(mut download_rom) => {
+                if let Some(rom) = download_rom.clone() {
+                    crab8.load(&rom);
+                    *download_rom = None;
+                }
+            }
+        };
+
         window.update(&event, control_flow, &mut crab8);
     });
 }

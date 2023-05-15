@@ -14,7 +14,7 @@ const WIDTH: f64 = 1024.0;
 const HEIGHT: f64 = 512.0;
 
 pub struct Crab8Window {
-    gui: Gui,
+    pub gui: Gui,
     gui_renderer: GuiRenderer,
     input: WinitInputHelper,
     pub pixels: Pixels,
