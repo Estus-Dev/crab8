@@ -17,6 +17,7 @@ console_log = { workspace = true }
 crab8 = { path = "../../" }
 egui = { workspace = true }
 egui-wgpu = { workspace = true }
+ehttp = { workspace = true }
 instant = { workspace = true }
 log = { workspace = true }
 pixels = { workspace = true }
