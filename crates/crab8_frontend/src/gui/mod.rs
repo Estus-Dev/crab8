@@ -13,6 +13,7 @@ use egui::{menu, Context, TopBottomPanel, Window};
 use about::AboutWindow;
 use playback::PlaybackWindow;
 use registers::RegisterWindow;
+use rfd::AsyncFileDialog;
 use stack::StackWindow;
 
 use self::download::DownloadWindow;
@@ -37,13 +38,11 @@ impl Gui {
         TopBottomPanel::top("menu_bar").show(context, |ui| {
             menu::bar(ui, |ui| {
                 ui.menu_button("File", |ui| {
-                    #[cfg(not(target_arch = "wasm32"))]
                     if ui.button("Open").clicked() {
-                        if let Some(path) = rfd::FileDialog::new().pick_file() {
-                            crab8
-                                .load_file(path)
-                                .expect("The user would never try to load an invalid file");
-                        }
+                        wasm_bindgen_futures::spawn_local(Self::open_file(
+                            self.rom.clone(),
+                            self.error.clone(),
+                        ));
 
                         ui.close_menu();
                     }
@@ -117,5 +116,32 @@ impl Gui {
                 *error = None;
             }
         }
+    }
+
+    async fn open_file(rom: Arc<Mutex<Option<Vec<u8>>>>, error: Arc<Mutex<Option<String>>>) {
+        match AsyncFileDialog::new().pick_file().await {
+            Some(file) => {
+                let file = file.read().await;
+                match rom.lock() {
+                    Err(l_err) => match error.lock() {
+                        Err(el_err) => println!("Failed to lock error: {l_err} {el_err}"),
+                        Ok(mut error) => {
+                            *error = Some("Failed to load file".into());
+                        }
+                    },
+
+                    Ok(mut rom) => {
+                        *rom = Some(file);
+                    }
+                }
+            }
+
+            None => match error.lock() {
+                Err(l_err) => println!("Failed to lock error: {l_err}"),
+                Ok(mut error) => {
+                    *error = Some("Failed to load file".into());
+                }
+            },
+        };
     }
 }
