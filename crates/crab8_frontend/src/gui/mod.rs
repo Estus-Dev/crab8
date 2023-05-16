@@ -32,8 +32,8 @@ impl Gui {
     fn render(&mut self, context: &Context, crab8: &mut Crab8) {
         TopBottomPanel::top("menu_bar").show(context, |ui| {
             menu::bar(ui, |ui| {
-                #[cfg(not(target_arch = "wasm32"))]
                 ui.menu_button("File", |ui| {
+                    #[cfg(not(target_arch = "wasm32"))]
                     if ui.button("Open").clicked() {
                         if let Some(path) = rfd::FileDialog::new().pick_file() {
                             crab8
