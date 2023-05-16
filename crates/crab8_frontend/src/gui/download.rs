@@ -16,6 +16,8 @@ impl DownloadWindow {
         rom: Arc<Mutex<Option<Vec<u8>>>>,
         error: Arc<Mutex<Option<String>>>,
     ) {
+        let mut closed = false;
+
         Window::new("Download")
             .open(&mut self.open)
             .show(context, |ui| {
@@ -23,6 +25,8 @@ impl DownloadWindow {
                     ui.label("URL:");
                     ui.text_edit_singleline(&mut self.live_url);
                     if ui.button("Download").clicked() {
+                        closed = true;
+
                         fetch(Request::get(&self.live_url), move |result| {
                             match result {
                                 Err(download_error) => match error.lock() {
@@ -59,5 +63,9 @@ impl DownloadWindow {
                     }
                 });
             });
+
+        if closed {
+            self.open = false;
+        }
     }
 }
