@@ -5,8 +5,10 @@ mod registers;
 pub mod renderer;
 mod stack;
 
+use std::sync::{Arc, Mutex};
+
 use crab8::Crab8;
-use egui::{menu, Context, TopBottomPanel};
+use egui::{menu, Context, TopBottomPanel, Window};
 
 use about::AboutWindow;
 use playback::PlaybackWindow;
@@ -21,6 +23,8 @@ pub struct Gui {
     pub download: DownloadWindow,
     playback: PlaybackWindow,
     registers: RegisterWindow,
+    rom: Arc<Mutex<Option<Vec<u8>>>>,
+    error: Arc<Mutex<Option<String>>>,
     stack: StackWindow,
 }
 
@@ -79,20 +83,39 @@ impl Gui {
             })
         });
 
-        match self.download.rom.lock() {
+        match self.rom.lock() {
             Err(err) => println!("Attempted to unlock ROM but it was locked: {err}"),
-            Ok(mut download_rom) => {
-                if let Some(rom) = download_rom.clone() {
+            Ok(mut loaded_rom) => {
+                if let Some(rom) = loaded_rom.clone() {
                     crab8.load(&rom);
-                    *download_rom = None;
+                    *loaded_rom = None;
                 }
             }
         };
 
         self.about.render(context);
-        self.download.render(context);
+        self.download
+            .render(context, self.rom.clone(), self.error.clone());
         self.playback.render(context, crab8);
         self.registers.render(context, crab8);
         self.stack.render(context, crab8);
+
+        if let Ok(mut error) = self.error.lock() {
+            let mut closed = false;
+
+            if let Some(error_message) = error.as_mut() {
+                Window::new("Error").open(&mut true).show(context, |ui| {
+                    ui.label(error_message.clone());
+
+                    if ui.button("OK").clicked() {
+                        closed = true;
+                    }
+                });
+            }
+
+            if closed {
+                *error = None;
+            }
+        }
     }
 }
