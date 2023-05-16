@@ -7,7 +7,6 @@ use ehttp::{fetch, Request};
 pub struct DownloadWindow {
     pub open: bool,
     live_url: String,
-    pub url: Option<String>,
     pub rom: Arc<Mutex<Option<Vec<u8>>>>,
     download_error: Arc<Mutex<Option<String>>>,
 }
@@ -21,7 +20,6 @@ impl DownloadWindow {
                     ui.label("URL:");
                     ui.text_edit_singleline(&mut self.live_url);
                     if ui.button("Download").clicked() {
-                        self.url = Some(self.live_url.clone());
                         let rom = self.rom.clone();
                         let download_error = self.download_error.clone();
 
