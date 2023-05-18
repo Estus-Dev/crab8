@@ -456,6 +456,9 @@ dependencies = [
 [[package]]
 name = "crab8_asm"
 version = "0.1.0"
+dependencies = [
+ "crab8",
+]
 
 [[package]]
 name = "crab8_frontend"
