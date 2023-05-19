@@ -2,7 +2,7 @@ use crab8::registers::Register;
 use logos::Logos;
 
 #[derive(Logos, Debug, PartialEq, Eq)]
-#[logos(skip r"[ \t\n\f]")]
+#[logos(skip r"[ \t\f]")]
 pub enum Token {
     // A register identifier.
     #[regex("v([0-9a-f])", |r| r.slice().parse().ok())]
@@ -76,6 +76,10 @@ pub enum Token {
     #[token("-key")]
     NKey,
 
+    // Track newlines because most statements end with one
+    #[token("\n")]
+    Newline,
+
     // Used for tokens we don't know how to parse yet.
     #[regex(r"\S*")]
     Unknown,
@@ -87,7 +91,7 @@ mod test {
 
     #[test]
     fn test_lex_registers() {
-        let input = "v0 v1 v2 v3 v4 v5 v6 v7\nv8 v9 va vb vc vd ve vf";
+        let input = "v0 v1 v2 v3 v4 v5 v6 v7 v8 v9 va vb vc vd ve vf";
         let mut lexer = Token::lexer(input);
 
         assert_eq!(lexer.next(), Some(Ok(Token::Register(Register::V0))));
@@ -224,5 +228,23 @@ mod test {
 
         assert_eq!(lexer.next(), Some(Ok(Token::NKey)));
         assert_eq!(lexer.slice(), "-key");
+    }
+
+    #[test]
+    fn test_lex_newline() {
+        let input = "v0 v1\nv2";
+        let mut lexer = Token::lexer(input);
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Register(Register::V0))));
+        assert_eq!(lexer.slice(), "v0");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Register(Register::V1))));
+        assert_eq!(lexer.slice(), "v1");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Newline)));
+        assert_eq!(lexer.slice(), "\n");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Register(Register::V2))));
+        assert_eq!(lexer.slice(), "v2");
     }
 }
