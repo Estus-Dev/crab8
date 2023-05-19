@@ -41,6 +41,9 @@ pub fn parse(input: &str) -> Vec<Token> {
                 "ve" => Token::Register(position, Register::VE),
                 "vf" => Token::Register(position, Register::VF),
                 ":=" => Token::Assign(position),
+                "+=" => Token::Add(position),
+                "-=" => Token::Sub(position),
+                "=-" => Token::SubFrom(position),
                 _ => Token::Unknown(position, token),
             });
 
@@ -54,13 +57,13 @@ pub fn parse(input: &str) -> Vec<Token> {
 }
 
 #[cfg(test)]
+#[allow(clippy::identity_op, clippy::erasing_op)]
 mod test {
     use super::*;
     use crate::token::{Position, Token};
     use crab8::registers::Register;
 
     #[test]
-    #[allow(clippy::identity_op, clippy::erasing_op)]
     fn test_parse_registers() {
         let cases = [(
             "v0 v1 v2 v3 v4 v5 v6 v7\nv8 v9 va vb vc vd ve vf",
@@ -93,6 +96,18 @@ mod test {
     fn test_parse_assign() {
         let input = ":=";
         let expected = vec![Token::new_assign(Position::new(0, 0, 2))];
+
+        assert_eq!(parse(input), expected);
+    }
+
+    #[test]
+    fn test_basic_math_ops() {
+        let input = "+= -= =-";
+        let expected = vec![
+            Token::Add(Position::new(0, 0 * 3, 2)),
+            Token::Sub(Position::new(0, 1 * 3, 2)),
+            Token::SubFrom(Position::new(0, 2 * 3, 2)),
+        ];
 
         assert_eq!(parse(input), expected);
     }

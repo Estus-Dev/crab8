@@ -47,6 +47,15 @@ pub enum Token {
 
     // The assignment operator.
     Assign(Position),
+
+    // The addition assignment operator
+    Add(Position),
+
+    // The subtraction assignment operator
+    Sub(Position),
+
+    // The reverse subtraction assignment operator
+    SubFrom(Position),
 }
 
 impl Token {
@@ -72,6 +81,18 @@ impl std::fmt::Debug for Token {
 
             Self::Assign(position) => {
                 write!(f, "Token::Assign({position})")
+            }
+
+            Self::Add(position) => {
+                write!(f, "Token::Add({position})")
+            }
+
+            Self::Sub(position) => {
+                write!(f, "Token::Sub({position})")
+            }
+
+            Self::SubFrom(position) => {
+                write!(f, "Token::SubFrom({position})")
             }
         }
     }
