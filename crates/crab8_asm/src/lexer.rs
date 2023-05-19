@@ -1,6 +1,5 @@
-use crab8::registers::Register;
-
 use crate::token::Token;
+use crab8::registers::Register;
 
 pub fn lex(input: &str) -> Vec<Token> {
     // This is a bit overkill on preallocation, but at least it won't have to keep reallocating.
@@ -21,22 +20,22 @@ pub fn lex(input: &str) -> Vec<Token> {
             let length = token.len();
 
             tokens.push(match token.as_str() {
-                "v0" => Token::Register(Register::V0),
-                "v1" => Token::Register(Register::V1),
-                "v2" => Token::Register(Register::V2),
-                "v3" => Token::Register(Register::V3),
-                "v4" => Token::Register(Register::V4),
-                "v5" => Token::Register(Register::V5),
-                "v6" => Token::Register(Register::V6),
-                "v7" => Token::Register(Register::V7),
-                "v8" => Token::Register(Register::V8),
-                "v9" => Token::Register(Register::V9),
-                "va" => Token::Register(Register::VA),
-                "vb" => Token::Register(Register::VB),
-                "vc" => Token::Register(Register::VC),
-                "vd" => Token::Register(Register::VD),
-                "ve" => Token::Register(Register::VE),
-                "vf" => Token::Register(Register::VF),
+                // "v0" => Token::Register(Register::V0),
+                // "v1" => Token::Register(Register::V1),
+                // "v2" => Token::Register(Register::V2),
+                // "v3" => Token::Register(Register::V3),
+                // "v4" => Token::Register(Register::V4),
+                // "v5" => Token::Register(Register::V5),
+                // "v6" => Token::Register(Register::V6),
+                // "v7" => Token::Register(Register::V7),
+                // "v8" => Token::Register(Register::V8),
+                // "v9" => Token::Register(Register::V9),
+                // "va" => Token::Register(Register::VA),
+                // "vb" => Token::Register(Register::VB),
+                // "vc" => Token::Register(Register::VC),
+                // "vd" => Token::Register(Register::VD),
+                // "ve" => Token::Register(Register::VE),
+                // "vf" => Token::Register(Register::VF),
                 ":=" => Token::Assign,
                 "+=" => Token::Add,
                 "-=" => Token::Sub,
@@ -54,7 +53,7 @@ pub fn lex(input: &str) -> Vec<Token> {
                 ">=" => Token::Gte,
                 "key" => Token::Key,
                 "-key" => Token::NKey,
-                _ => Token::Unknown(token),
+                _ => Token::Unknown,
             });
 
             for _ in 0..length {
@@ -68,35 +67,62 @@ pub fn lex(input: &str) -> Vec<Token> {
 
 #[cfg(test)]
 mod test {
+    use logos::Logos;
+
     use super::*;
 
     #[test]
     fn test_lex_registers() {
-        let cases = [(
-            "v0 v1 v2 v3 v4 v5 v6 v7\nv8 v9 va vb vc vd ve vf",
-            vec![
-                Token::Register(Register::V0),
-                Token::Register(Register::V1),
-                Token::Register(Register::V2),
-                Token::Register(Register::V3),
-                Token::Register(Register::V4),
-                Token::Register(Register::V5),
-                Token::Register(Register::V6),
-                Token::Register(Register::V7),
-                Token::Register(Register::V8),
-                Token::Register(Register::V9),
-                Token::Register(Register::VA),
-                Token::Register(Register::VB),
-                Token::Register(Register::VC),
-                Token::Register(Register::VD),
-                Token::Register(Register::VE),
-                Token::Register(Register::VF),
-            ],
-        )];
+        let input = "v0 v1 v2 v3 v4 v5 v6 v7\nv8 v9 va vb vc vd ve vf";
+        let mut lexer = Token::lexer(input);
 
-        for (input, expected) in cases {
-            assert_eq!(lex(input), expected, "{input}");
-        }
+        assert_eq!(lexer.next(), Some(Ok(Token::Register(Register::V0))));
+        assert_eq!(lexer.slice(), "v0");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Register(Register::V1))));
+        assert_eq!(lexer.slice(), "v1");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Register(Register::V2))));
+        assert_eq!(lexer.slice(), "v2");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Register(Register::V3))));
+        assert_eq!(lexer.slice(), "v3");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Register(Register::V4))));
+        assert_eq!(lexer.slice(), "v4");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Register(Register::V5))));
+        assert_eq!(lexer.slice(), "v5");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Register(Register::V6))));
+        assert_eq!(lexer.slice(), "v6");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Register(Register::V7))));
+        assert_eq!(lexer.slice(), "v7");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Register(Register::V8))));
+        assert_eq!(lexer.slice(), "v8");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Register(Register::V9))));
+        assert_eq!(lexer.slice(), "v9");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Register(Register::VA))));
+        assert_eq!(lexer.slice(), "va");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Register(Register::VB))));
+        assert_eq!(lexer.slice(), "vb");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Register(Register::VC))));
+        assert_eq!(lexer.slice(), "vc");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Register(Register::VD))));
+        assert_eq!(lexer.slice(), "vd");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Register(Register::VE))));
+        assert_eq!(lexer.slice(), "ve");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Register(Register::VF))));
+        assert_eq!(lexer.slice(), "vf");
     }
 
     #[test]

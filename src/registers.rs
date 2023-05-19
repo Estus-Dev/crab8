@@ -1,4 +1,4 @@
-use std::{fmt, fmt::Debug, fmt::Display};
+use std::{fmt, fmt::Debug, fmt::Display, str::FromStr};
 
 /// The CHIP-8 has 16 8-bit general-purpose registers, V0-VF.
 /// https://github.com/mattmikolay/chip-8/wiki/CHIP%E2%80%908-Technical-Reference#data-registers
@@ -185,6 +185,29 @@ impl From<u16> for Register {
 impl From<i32> for Register {
     fn from(value: i32) -> Self {
         Register::from(value as u8)
+    }
+}
+
+impl FromStr for Register {
+    type Err = ();
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        if s.len() != 2 {
+            return Err(());
+        }
+
+        if !s.starts_with('v') && !s.starts_with('V') {
+            return Err(());
+        }
+
+        let register = s.chars().last().expect("The string's length is 2.");
+        if !register.is_ascii_hexdigit() {
+            return Err(());
+        }
+
+        let register = register.to_digit(16).unwrap() as u8;
+
+        Ok(register.into())
     }
 }
 
