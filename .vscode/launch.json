@@ -115,6 +115,62 @@
             },
             "args": [],
             "cwd": "${workspaceFolder}"
-        }
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in library 'crab8_asm'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--lib",
+                    "--package=crab8_asm"
+                ],
+                "filter": {
+                    "name": "crab8_asm",
+                    "kind": "lib"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug executable 'crab8_asm'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=crab8_asm",
+                    "--package=crab8_asm"
+                ],
+                "filter": {
+                    "name": "crab8_asm",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in executable 'crab8_asm'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--bin=crab8_asm",
+                    "--package=crab8_asm"
+                ],
+                "filter": {
+                    "name": "crab8_asm",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
     ]
 }
