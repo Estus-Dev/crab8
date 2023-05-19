@@ -2,7 +2,7 @@ use crab8::registers::Register;
 
 use crate::token::{Position, Token};
 
-pub fn parse(input: String) -> Vec<Token> {
+pub fn parse(input: &str) -> Vec<Token> {
     // This is a bit overkill on preallocation, but at least it won't have to keep reallocating.
     let mut tokens = Vec::with_capacity(input.len());
 
@@ -84,7 +84,7 @@ mod test {
         )];
 
         for (input, expected) in cases {
-            assert_eq!(parse(input.into()), expected, "{input}");
+            assert_eq!(parse(input), expected, "{input}");
         }
     }
 }
