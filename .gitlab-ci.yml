@@ -62,6 +62,12 @@ test-crab8:
   script:
     - cargo test
 
+test-crab8_asm:
+  stage: test
+  cache: []
+  script:
+    - cargo test -p crab8_asm
+
 deploy-crab8_frontend_wasm:
   only:
     - main
