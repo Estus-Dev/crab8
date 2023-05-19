@@ -65,6 +65,12 @@ pub enum Token {
 
     // The bitwise xor assignment operator
     Xor(Position),
+
+    // The left shift operator
+    LShift(Position),
+
+    // The right shift operator
+    RShift(Position),
 }
 
 impl std::fmt::Debug for Token {
@@ -104,6 +110,14 @@ impl std::fmt::Debug for Token {
 
             Self::Xor(position) => {
                 write!(f, "Token::Xor({position})")
+            }
+
+            Self::LShift(position) => {
+                write!(f, "Token::LShift({position})")
+            }
+
+            Self::RShift(position) => {
+                write!(f, "Token::RShift({position})")
             }
         }
     }

@@ -47,6 +47,8 @@ pub fn parse(input: &str) -> Vec<Token> {
                 "&=" => Token::And(position),
                 "|=" => Token::Or(position),
                 "^=" => Token::Xor(position),
+                "<<=" => Token::LShift(position),
+                ">>=" => Token::RShift(position),
                 _ => Token::Unknown(position, token),
             });
 
@@ -122,6 +124,17 @@ mod test {
             Token::And(Position::new(0, 0 * 3, 2)),
             Token::Or(Position::new(0, 1 * 3, 2)),
             Token::Xor(Position::new(0, 2 * 3, 2)),
+        ];
+
+        assert_eq!(parse(input), expected);
+    }
+
+    #[test]
+    fn test_shift_ops() {
+        let input = "<<= >>=";
+        let expected = vec![
+            Token::LShift(Position::new(0, 0 * 4, 3)),
+            Token::RShift(Position::new(0, 1 * 4, 3)),
         ];
 
         assert_eq!(parse(input), expected);
