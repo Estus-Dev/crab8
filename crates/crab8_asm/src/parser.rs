@@ -40,6 +40,7 @@ pub fn parse(input: &str) -> Vec<Token> {
                 "vd" => Token::Register(position, Register::VD),
                 "ve" => Token::Register(position, Register::VE),
                 "vf" => Token::Register(position, Register::VF),
+                ":=" => Token::Assign(position),
                 _ => Token::Unknown(position, token),
             });
 
@@ -86,5 +87,13 @@ mod test {
         for (input, expected) in cases {
             assert_eq!(parse(input), expected, "{input}");
         }
+    }
+
+    #[test]
+    fn test_parse_assign() {
+        let input = ":=";
+        let expected = vec![Token::new_assign(Position::new(0, 0, 2))];
+
+        assert_eq!(parse(input), expected);
     }
 }

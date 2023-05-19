@@ -44,11 +44,18 @@ pub enum Token {
 
     // A register identifier.
     Register(Position, Register),
+
+    // The assignment operator.
+    Assign(Position),
 }
 
 impl Token {
     pub fn new_register(position: Position, register: Register) -> Self {
         Self::Register(position, register)
+    }
+
+    pub fn new_assign(position: Position) -> Self {
+        Self::Assign(position)
     }
 }
 
@@ -61,6 +68,10 @@ impl std::fmt::Debug for Token {
 
             Self::Register(position, register) => {
                 write!(f, "Token::Register({position}: {register:?})")
+            }
+
+            Self::Assign(position) => {
+                write!(f, "Token::Assign({position})")
             }
         }
     }
