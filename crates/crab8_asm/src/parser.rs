@@ -112,7 +112,7 @@ mod test {
     }
 
     #[test]
-    fn test_basic_math_ops() {
+    fn test_parse_basic_math_ops() {
         let input = "+= -= =-";
         let expected = vec![
             Token::Add(Position::new(0, 0 * 3, 2)),
@@ -124,7 +124,7 @@ mod test {
     }
 
     #[test]
-    fn test_bitwise_ops() {
+    fn test_parse_bitwise_ops() {
         let input = "&= |= ^=";
         let expected = vec![
             Token::And(Position::new(0, 0 * 3, 2)),
@@ -136,7 +136,7 @@ mod test {
     }
 
     #[test]
-    fn test_shift_ops() {
+    fn test_parse_shift_ops() {
         let input = "<<= >>=";
         let expected = vec![
             Token::LShift(Position::new(0, 0 * 4, 3)),
