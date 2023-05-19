@@ -58,16 +58,6 @@ pub enum Token {
     SubFrom(Position),
 }
 
-impl Token {
-    pub fn new_register(position: Position, register: Register) -> Self {
-        Self::Register(position, register)
-    }
-
-    pub fn new_assign(position: Position) -> Self {
-        Self::Assign(position)
-    }
-}
-
 impl std::fmt::Debug for Token {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

@@ -68,22 +68,22 @@ mod test {
         let cases = [(
             "v0 v1 v2 v3 v4 v5 v6 v7\nv8 v9 va vb vc vd ve vf",
             vec![
-                Token::new_register(Position::new(0, 0 * 3, 2), Register::V0),
-                Token::new_register(Position::new(0, 1 * 3, 2), Register::V1),
-                Token::new_register(Position::new(0, 2 * 3, 2), Register::V2),
-                Token::new_register(Position::new(0, 3 * 3, 2), Register::V3),
-                Token::new_register(Position::new(0, 4 * 3, 2), Register::V4),
-                Token::new_register(Position::new(0, 5 * 3, 2), Register::V5),
-                Token::new_register(Position::new(0, 6 * 3, 2), Register::V6),
-                Token::new_register(Position::new(0, 7 * 3, 2), Register::V7),
-                Token::new_register(Position::new(1, 0 * 3, 2), Register::V8),
-                Token::new_register(Position::new(1, 1 * 3, 2), Register::V9),
-                Token::new_register(Position::new(1, 2 * 3, 2), Register::VA),
-                Token::new_register(Position::new(1, 3 * 3, 2), Register::VB),
-                Token::new_register(Position::new(1, 4 * 3, 2), Register::VC),
-                Token::new_register(Position::new(1, 5 * 3, 2), Register::VD),
-                Token::new_register(Position::new(1, 6 * 3, 2), Register::VE),
-                Token::new_register(Position::new(1, 7 * 3, 2), Register::VF),
+                Token::Register(Position::new(0, 0 * 3, 2), Register::V0),
+                Token::Register(Position::new(0, 1 * 3, 2), Register::V1),
+                Token::Register(Position::new(0, 2 * 3, 2), Register::V2),
+                Token::Register(Position::new(0, 3 * 3, 2), Register::V3),
+                Token::Register(Position::new(0, 4 * 3, 2), Register::V4),
+                Token::Register(Position::new(0, 5 * 3, 2), Register::V5),
+                Token::Register(Position::new(0, 6 * 3, 2), Register::V6),
+                Token::Register(Position::new(0, 7 * 3, 2), Register::V7),
+                Token::Register(Position::new(1, 0 * 3, 2), Register::V8),
+                Token::Register(Position::new(1, 1 * 3, 2), Register::V9),
+                Token::Register(Position::new(1, 2 * 3, 2), Register::VA),
+                Token::Register(Position::new(1, 3 * 3, 2), Register::VB),
+                Token::Register(Position::new(1, 4 * 3, 2), Register::VC),
+                Token::Register(Position::new(1, 5 * 3, 2), Register::VD),
+                Token::Register(Position::new(1, 6 * 3, 2), Register::VE),
+                Token::Register(Position::new(1, 7 * 3, 2), Register::VF),
             ],
         )];
 
@@ -95,7 +95,7 @@ mod test {
     #[test]
     fn test_parse_assign() {
         let input = ":=";
-        let expected = vec![Token::new_assign(Position::new(0, 0, 2))];
+        let expected = vec![Token::Assign(Position::new(0, 0, 2))];
 
         assert_eq!(parse(input), expected);
     }
