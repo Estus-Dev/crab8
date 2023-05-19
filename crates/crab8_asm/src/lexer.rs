@@ -2,7 +2,7 @@ use crab8::registers::Register;
 
 use crate::token::{Position, Token};
 
-pub fn parse(input: &str) -> Vec<Token> {
+pub fn lex(input: &str) -> Vec<Token> {
     // This is a bit overkill on preallocation, but at least it won't have to keep reallocating.
     let mut tokens = Vec::with_capacity(input.len());
 
@@ -77,7 +77,7 @@ mod test {
     use crab8::registers::Register;
 
     #[test]
-    fn test_parse_registers() {
+    fn test_lex_registers() {
         let cases = [(
             "v0 v1 v2 v3 v4 v5 v6 v7\nv8 v9 va vb vc vd ve vf",
             vec![
@@ -101,20 +101,20 @@ mod test {
         )];
 
         for (input, expected) in cases {
-            assert_eq!(parse(input), expected, "{input}");
+            assert_eq!(lex(input), expected, "{input}");
         }
     }
 
     #[test]
-    fn test_parse_assign() {
+    fn test_lex_assign() {
         let input = ":=";
         let expected = vec![Token::Assign(Position::new(0, 0, 2))];
 
-        assert_eq!(parse(input), expected);
+        assert_eq!(lex(input), expected);
     }
 
     #[test]
-    fn test_parse_basic_math_ops() {
+    fn test_lex_basic_math_ops() {
         let input = "+= -= =-";
         let expected = vec![
             Token::Add(Position::new(0, 0 * 3, 2)),
@@ -122,11 +122,11 @@ mod test {
             Token::SubFrom(Position::new(0, 2 * 3, 2)),
         ];
 
-        assert_eq!(parse(input), expected);
+        assert_eq!(lex(input), expected);
     }
 
     #[test]
-    fn test_parse_bitwise_ops() {
+    fn test_lex_bitwise_ops() {
         let input = "&= |= ^=";
         let expected = vec![
             Token::And(Position::new(0, 0 * 3, 2)),
@@ -134,22 +134,22 @@ mod test {
             Token::Xor(Position::new(0, 2 * 3, 2)),
         ];
 
-        assert_eq!(parse(input), expected);
+        assert_eq!(lex(input), expected);
     }
 
     #[test]
-    fn test_parse_shift_ops() {
+    fn test_lex_shift_ops() {
         let input = "<<= >>=";
         let expected = vec![
             Token::LShift(Position::new(0, 0 * 4, 3)),
             Token::RShift(Position::new(0, 1 * 4, 3)),
         ];
 
-        assert_eq!(parse(input), expected);
+        assert_eq!(lex(input), expected);
     }
 
     #[test]
-    fn test_parse_comparison_ops() {
+    fn test_lex_comparison_ops() {
         let input = "== != <  >  <= >=";
         let expected = vec![
             Token::Eq(Position::new(0, 0 * 3, 2)),
@@ -160,17 +160,17 @@ mod test {
             Token::Gte(Position::new(0, 5 * 3, 2)),
         ];
 
-        assert_eq!(parse(input), expected);
+        assert_eq!(lex(input), expected);
     }
 
     #[test]
-    fn test_parse_input_ops() {
+    fn test_lex_input_ops() {
         let input = "key -key";
         let expected = vec![
             Token::Key(Position::new(0, 0, 3)),
             Token::NKey(Position::new(0, 4, 4)),
         ];
 
-        assert_eq!(parse(input), expected);
+        assert_eq!(lex(input), expected);
     }
 }
