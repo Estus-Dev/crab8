@@ -44,6 +44,9 @@ pub fn parse(input: &str) -> Vec<Token> {
                 "+=" => Token::Add(position),
                 "-=" => Token::Sub(position),
                 "=-" => Token::SubFrom(position),
+                "&=" => Token::And(position),
+                "|=" => Token::Or(position),
+                "^=" => Token::Xor(position),
                 _ => Token::Unknown(position, token),
             });
 
@@ -107,6 +110,18 @@ mod test {
             Token::Add(Position::new(0, 0 * 3, 2)),
             Token::Sub(Position::new(0, 1 * 3, 2)),
             Token::SubFrom(Position::new(0, 2 * 3, 2)),
+        ];
+
+        assert_eq!(parse(input), expected);
+    }
+
+    #[test]
+    fn test_bitwise_ops() {
+        let input = "&= |= ^=";
+        let expected = vec![
+            Token::And(Position::new(0, 0 * 3, 2)),
+            Token::Or(Position::new(0, 1 * 3, 2)),
+            Token::Xor(Position::new(0, 2 * 3, 2)),
         ];
 
         assert_eq!(parse(input), expected);

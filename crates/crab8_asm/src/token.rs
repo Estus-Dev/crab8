@@ -56,6 +56,15 @@ pub enum Token {
 
     // The reverse subtraction assignment operator
     SubFrom(Position),
+
+    // The bitwise and assignment operator
+    And(Position),
+
+    // The bitwise or assignment operator
+    Or(Position),
+
+    // The bitwise xor assignment operator
+    Xor(Position),
 }
 
 impl std::fmt::Debug for Token {
@@ -83,6 +92,18 @@ impl std::fmt::Debug for Token {
 
             Self::SubFrom(position) => {
                 write!(f, "Token::SubFrom({position})")
+            }
+
+            Self::And(position) => {
+                write!(f, "Token::And({position})")
+            }
+
+            Self::Or(position) => {
+                write!(f, "Token::Or({position})")
+            }
+
+            Self::Xor(position) => {
+                write!(f, "Token::Xor({position})")
             }
         }
     }
