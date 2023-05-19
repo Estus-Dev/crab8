@@ -71,6 +71,24 @@ pub enum Token {
 
     // The right shift operator
     RShift(Position),
+
+    // The equality comparison operator
+    Eq(Position),
+
+    // The not equal comparison operator
+    Neq(Position),
+
+    // The less than comparison operator
+    Lt(Position),
+
+    // The greater than comparison operator
+    Gt(Position),
+
+    // The less than or equal comparison operator
+    Lte(Position),
+
+    // The greater than or equal comparison operator
+    Gte(Position),
 }
 
 impl std::fmt::Debug for Token {
@@ -118,6 +136,30 @@ impl std::fmt::Debug for Token {
 
             Self::RShift(position) => {
                 write!(f, "Token::RShift({position})")
+            }
+
+            Self::Eq(position) => {
+                write!(f, "Token::Eq({position})")
+            }
+
+            Self::Neq(position) => {
+                write!(f, "Token::Neq({position})")
+            }
+
+            Self::Lt(position) => {
+                write!(f, "Token::Lt({position})")
+            }
+
+            Self::Gt(position) => {
+                write!(f, "Token::Gt({position})")
+            }
+
+            Self::Lte(position) => {
+                write!(f, "Token::Lte({position})")
+            }
+
+            Self::Gte(position) => {
+                write!(f, "Token::Gte({position})")
             }
         }
     }

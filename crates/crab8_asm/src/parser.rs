@@ -49,6 +49,12 @@ pub fn parse(input: &str) -> Vec<Token> {
                 "^=" => Token::Xor(position),
                 "<<=" => Token::LShift(position),
                 ">>=" => Token::RShift(position),
+                "==" => Token::Eq(position),
+                "!=" => Token::Neq(position),
+                "<" => Token::Lt(position),
+                ">" => Token::Gt(position),
+                "<=" => Token::Lte(position),
+                ">=" => Token::Gte(position),
                 _ => Token::Unknown(position, token),
             });
 
@@ -135,6 +141,21 @@ mod test {
         let expected = vec![
             Token::LShift(Position::new(0, 0 * 4, 3)),
             Token::RShift(Position::new(0, 1 * 4, 3)),
+        ];
+
+        assert_eq!(parse(input), expected);
+    }
+
+    #[test]
+    fn test_parse_comparison_ops() {
+        let input = "== != <  >  <= >=";
+        let expected = vec![
+            Token::Eq(Position::new(0, 0 * 3, 2)),
+            Token::Neq(Position::new(0, 1 * 3, 2)),
+            Token::Lt(Position::new(0, 2 * 3, 1)),
+            Token::Gt(Position::new(0, 3 * 3, 1)),
+            Token::Lte(Position::new(0, 4 * 3, 2)),
+            Token::Gte(Position::new(0, 5 * 3, 2)),
         ];
 
         assert_eq!(parse(input), expected);
