@@ -89,6 +89,12 @@ pub enum Token {
 
     // The greater than or equal comparison operator
     Gte(Position),
+
+    // A unary conditional operator for whether the key in a specified register is pressed
+    Key(Position),
+
+    // A unary conditional operator for whether the key in a specified register is not pressed
+    NKey(Position),
 }
 
 impl std::fmt::Debug for Token {
@@ -160,6 +166,14 @@ impl std::fmt::Debug for Token {
 
             Self::Gte(position) => {
                 write!(f, "Token::Gte({position})")
+            }
+
+            Self::Key(position) => {
+                write!(f, "Token::Key({position})")
+            }
+
+            Self::NKey(position) => {
+                write!(f, "Token::NKey({position})")
             }
         }
     }

@@ -55,6 +55,8 @@ pub fn parse(input: &str) -> Vec<Token> {
                 ">" => Token::Gt(position),
                 "<=" => Token::Lte(position),
                 ">=" => Token::Gte(position),
+                "key" => Token::Key(position),
+                "-key" => Token::NKey(position),
                 _ => Token::Unknown(position, token),
             });
 
@@ -156,6 +158,17 @@ mod test {
             Token::Gt(Position::new(0, 3 * 3, 1)),
             Token::Lte(Position::new(0, 4 * 3, 2)),
             Token::Gte(Position::new(0, 5 * 3, 2)),
+        ];
+
+        assert_eq!(parse(input), expected);
+    }
+
+    #[test]
+    fn test_parse_input_ops() {
+        let input = "key -key";
+        let expected = vec![
+            Token::Key(Position::new(0, 0, 3)),
+            Token::NKey(Position::new(0, 4, 4)),
         ];
 
         assert_eq!(parse(input), expected);
