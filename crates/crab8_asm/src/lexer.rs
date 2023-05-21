@@ -116,6 +116,10 @@ pub enum Token {
     #[token("jump0")]
     Jump0,
 
+    // A keyword to specify a number in hex
+    #[token("hex")]
+    Hex,
+
     // Track newlines because most statements end with one
     #[token("\n")]
     Newline,
@@ -305,7 +309,7 @@ mod test {
 
     #[test]
     fn text_lex_keywords() {
-        let input = "return clear bcd save load jump jump0";
+        let input = "return clear bcd save load jump jump0 hex";
         let mut lexer = Token::lexer(input);
 
         assert_eq!(lexer.next(), Some(Ok(Token::Return)));
@@ -328,5 +332,8 @@ mod test {
 
         assert_eq!(lexer.next(), Some(Ok(Token::Jump0)));
         assert_eq!(lexer.slice(), "jump0");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Hex)));
+        assert_eq!(lexer.slice(), "hex");
     }
 }
