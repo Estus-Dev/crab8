@@ -16,6 +16,10 @@ pub enum Token {
     #[token("buzzer")]
     Buzzer,
 
+    // The address register
+    #[token("i")]
+    I,
+
     // The assignment operator.
     #[token(":=")]
     Assign,
@@ -181,7 +185,7 @@ mod test {
 
     #[test]
     fn test_lex_special_registers() {
-        let input = "delay buzzer";
+        let input = "delay buzzer i";
         let mut lexer = Token::lexer(input);
 
         assert_eq!(lexer.next(), Some(Ok(Token::Delay)));
@@ -189,6 +193,9 @@ mod test {
 
         assert_eq!(lexer.next(), Some(Ok(Token::Buzzer)));
         assert_eq!(lexer.slice(), "buzzer");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::I)));
+        assert_eq!(lexer.slice(), "i");
     }
 
     #[test]
