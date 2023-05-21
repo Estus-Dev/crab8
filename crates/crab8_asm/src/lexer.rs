@@ -165,6 +165,10 @@ pub enum Token {
     #[token("\n")]
     Newline,
 
+    // A comment consumes the rest of the line
+    #[regex(r"#.*")]
+    Comment,
+
     // Used for tokens we don't know how to parse yet.
     #[regex(r"\S*")]
     Unknown,
@@ -421,5 +425,38 @@ mod test {
 
         assert_eq!(lexer.next(), Some(Ok(Token::End)));
         assert_eq!(lexer.slice(), "end");
+    }
+
+    #[test]
+    fn test_lex_comments() {
+        let input = "
+            v0 v1 # v2 v3 v4
+            #v5 v6 v7
+            v8
+        "
+        .trim();
+
+        let mut lexer = Token::lexer(input);
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Register(Register::V0))));
+        assert_eq!(lexer.slice(), "v0");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Register(Register::V1))));
+        assert_eq!(lexer.slice(), "v1");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Comment)));
+        assert_eq!(lexer.slice(), "# v2 v3 v4");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Newline)));
+        assert_eq!(lexer.slice(), "\n");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Comment)));
+        assert_eq!(lexer.slice(), "#v5 v6 v7");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Newline)));
+        assert_eq!(lexer.slice(), "\n");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Register(Register::V8))));
+        assert_eq!(lexer.slice(), "v8");
     }
 }
