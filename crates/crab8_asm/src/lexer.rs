@@ -90,6 +90,7 @@ pub enum Token {
 
     // A keyword to return from a function
     #[token("return")]
+    #[token(";")]
     Return,
 
     // A keyword for clearing the screen
@@ -349,11 +350,14 @@ mod test {
 
     #[test]
     fn text_lex_keywords() {
-        let input = "return clear bcd save load jump jump0 hex long random";
+        let input = "return ; clear bcd save load jump jump0 hex long random";
         let mut lexer = Token::lexer(input);
 
         assert_eq!(lexer.next(), Some(Ok(Token::Return)));
         assert_eq!(lexer.slice(), "return");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Return)));
+        assert_eq!(lexer.slice(), ";");
 
         assert_eq!(lexer.next(), Some(Ok(Token::Clear)));
         assert_eq!(lexer.slice(), "clear");
