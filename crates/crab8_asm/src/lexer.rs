@@ -8,6 +8,14 @@ pub enum Token {
     #[regex("v([0-9a-f])", |r| r.slice().parse().ok())]
     Register(Register),
 
+    // The delay register
+    #[token("delay")]
+    Delay,
+
+    // The sound register
+    #[token("buzzer")]
+    Buzzer,
+
     // The assignment operator.
     #[token(":=")]
     Assign,
@@ -169,6 +177,18 @@ mod test {
 
         assert_eq!(lexer.next(), Some(Ok(Token::Register(Register::VF))));
         assert_eq!(lexer.slice(), "vf");
+    }
+
+    #[test]
+    fn test_lex_special_registers() {
+        let input = "delay buzzer";
+        let mut lexer = Token::lexer(input);
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Delay)));
+        assert_eq!(lexer.slice(), "delay");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Buzzer)));
+        assert_eq!(lexer.slice(), "buzzer");
     }
 
     #[test]
