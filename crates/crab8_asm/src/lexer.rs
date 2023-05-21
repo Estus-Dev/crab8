@@ -76,6 +76,34 @@ pub enum Token {
     #[token("-key")]
     NKey,
 
+    // A keyword to return from a function
+    #[token("return")]
+    Return,
+
+    // A keyword for clearing the screen
+    #[token("clear")]
+    Clear,
+
+    // A keyword to store a value in memory in Binary Coded Decimal
+    #[token("bcd")]
+    Bcd,
+
+    // A keyword to save a value in memory
+    #[token("save")]
+    Save,
+
+    // A keyword to load a value from memory
+    #[token("load")]
+    Load,
+
+    // A keyword to jump the program counter
+    #[token("jump")]
+    Jump,
+
+    // A keyword to jump the program counter with an offset in V0
+    #[token("jump0")]
+    Jump0,
+
     // Track newlines because most statements end with one
     #[token("\n")]
     Newline,
@@ -246,5 +274,32 @@ mod test {
 
         assert_eq!(lexer.next(), Some(Ok(Token::Register(Register::V2))));
         assert_eq!(lexer.slice(), "v2");
+    }
+
+    #[test]
+    fn text_lex_keywords() {
+        let input = "return clear bcd save load jump jump0";
+        let mut lexer = Token::lexer(input);
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Return)));
+        assert_eq!(lexer.slice(), "return");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Clear)));
+        assert_eq!(lexer.slice(), "clear");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Bcd)));
+        assert_eq!(lexer.slice(), "bcd");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Save)));
+        assert_eq!(lexer.slice(), "save");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Load)));
+        assert_eq!(lexer.slice(), "load");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Jump)));
+        assert_eq!(lexer.slice(), "jump");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Jump0)));
+        assert_eq!(lexer.slice(), "jump0");
     }
 }
