@@ -120,6 +120,26 @@ pub enum Token {
     #[token("hex")]
     Hex,
 
+    // A keyword to test a condition
+    #[token("if")]
+    If,
+
+    // A keyword for the start of an if-else block
+    #[token("begin")]
+    Begin,
+
+    // A keyword for the true branch of a conditional statement
+    #[token("then")]
+    Then,
+
+    // A keyword for the else branch of a conditonal statement
+    #[token("else")]
+    Else,
+
+    // A keyword for the end of an if-else block
+    #[token("end")]
+    End,
+
     // Track newlines because most statements end with one
     #[token("\n")]
     Newline,
@@ -335,5 +355,26 @@ mod test {
 
         assert_eq!(lexer.next(), Some(Ok(Token::Hex)));
         assert_eq!(lexer.slice(), "hex");
+    }
+
+    #[test]
+    fn test_lex_conditional_keywords() {
+        let input = "if begin then else end";
+        let mut lexer = Token::lexer(input);
+
+        assert_eq!(lexer.next(), Some(Ok(Token::If)));
+        assert_eq!(lexer.slice(), "if");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Begin)));
+        assert_eq!(lexer.slice(), "begin");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Then)));
+        assert_eq!(lexer.slice(), "then");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Else)));
+        assert_eq!(lexer.slice(), "else");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::End)));
+        assert_eq!(lexer.slice(), "end");
     }
 }
