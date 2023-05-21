@@ -120,6 +120,14 @@ pub enum Token {
     #[token("hex")]
     Hex,
 
+    // A keyword to specify a 16 bit address
+    #[token("long")]
+    Long,
+
+    // A keyword to generate a random number
+    #[token("random")]
+    Random,
+
     // A keyword to test a condition
     #[token("if")]
     If,
@@ -341,7 +349,7 @@ mod test {
 
     #[test]
     fn text_lex_keywords() {
-        let input = "return clear bcd save load jump jump0 hex";
+        let input = "return clear bcd save load jump jump0 hex long random";
         let mut lexer = Token::lexer(input);
 
         assert_eq!(lexer.next(), Some(Ok(Token::Return)));
@@ -367,6 +375,12 @@ mod test {
 
         assert_eq!(lexer.next(), Some(Ok(Token::Hex)));
         assert_eq!(lexer.slice(), "hex");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Long)));
+        assert_eq!(lexer.slice(), "long");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Random)));
+        assert_eq!(lexer.slice(), "random");
     }
 
     #[test]
