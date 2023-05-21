@@ -140,6 +140,18 @@ pub enum Token {
     #[token("end")]
     End,
 
+    // A keyword to begin a loop
+    #[token("loop")]
+    Loop,
+
+    // A keyword for a loop-breaking conditional
+    #[token("while")]
+    While,
+
+    // A keyword to mark the end of a loop
+    #[token("again")]
+    Again,
+
     // Track newlines because most statements end with one
     #[token("\n")]
     Newline,
@@ -373,6 +385,21 @@ mod test {
 
         assert_eq!(lexer.next(), Some(Ok(Token::Else)));
         assert_eq!(lexer.slice(), "else");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::End)));
+        assert_eq!(lexer.slice(), "end");
+    }
+
+    #[test]
+    fn test_lex_loop_keywords() {
+        let input = "loop while end";
+        let mut lexer = Token::lexer(input);
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Loop)));
+        assert_eq!(lexer.slice(), "loop");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::While)));
+        assert_eq!(lexer.slice(), "while");
 
         assert_eq!(lexer.next(), Some(Ok(Token::End)));
         assert_eq!(lexer.slice(), "end");
