@@ -1,5 +1,7 @@
+use std::num::ParseIntError;
+
 use crab8::registers::Register;
-use logos::Logos;
+use logos::{Lexer, Logos};
 
 #[derive(Logos, Debug, PartialEq, Eq)]
 #[logos(skip r"[ \t\f]")]
@@ -169,9 +171,79 @@ pub enum Token {
     #[regex(r"#.*")]
     Comment,
 
+    // An 8-bit numeric literal
+    #[regex(r"0x([0-9a-fA-F]{1,2})", hex_byte, priority = 2)]
+    #[regex(r"0b([0,1]{1,8})", binary_byte, priority = 2)]
+    #[regex(r"(25[0-5])|(2[0-4]\d)|([0,1]?\d{1,2})", byte, priority = 2)]
+    Byte(u8),
+
+    // A 16-bit numeric literal
+    #[regex(r"0x([0-9a-fA-F]{1,4})", hex_number, priority = 1)]
+    #[regex(r"0b([0,1]{1,16})", binary_number, priority = 1)]
+    #[regex(r"\d+", number, priority = 1)]
+    Number(u16),
+
     // Used for tokens we don't know how to parse yet.
-    #[regex(r"\S*")]
+    #[regex(r"\S*", priority = 0)]
     Unknown,
+}
+
+fn hex_byte(n: &mut Lexer<Token>) -> Option<u8> {
+    let n = n.slice();
+    let n = &n[2..];
+
+    match u8::from_str_radix(n, 16) {
+        Ok(n) => Some(n),
+        Err(_) => None,
+    }
+}
+
+fn binary_byte(n: &mut Lexer<Token>) -> Option<u8> {
+    let n = n.slice();
+    let n = &n[2..];
+
+    match u8::from_str_radix(n, 2) {
+        Ok(n) => Some(n),
+        Err(_) => None,
+    }
+}
+
+fn byte(n: &mut Lexer<Token>) -> Option<u8> {
+    let n = n.slice();
+
+    match n.parse() {
+        Ok(n) => Some(n),
+        Err(_) => None,
+    }
+}
+
+fn hex_number(n: &mut Lexer<Token>) -> Option<u16> {
+    let n = n.slice();
+    let n = &n[2..];
+
+    match u16::from_str_radix(n, 16) {
+        Ok(n) => Some(n),
+        Err(_) => None,
+    }
+}
+
+fn binary_number(n: &mut Lexer<Token>) -> Option<u16> {
+    let n = n.slice();
+    let n = &n[2..];
+
+    match u16::from_str_radix(n, 2) {
+        Ok(n) => Some(n),
+        Err(_) => None,
+    }
+}
+
+fn number(n: &mut Lexer<Token>) -> Option<u16> {
+    let n = n.slice();
+
+    match n.parse() {
+        Ok(n) => Some(n),
+        Err(_) => None,
+    }
 }
 
 #[cfg(test)]
@@ -458,5 +530,139 @@ mod test {
 
         assert_eq!(lexer.next(), Some(Ok(Token::Register(Register::V8))));
         assert_eq!(lexer.slice(), "v8");
+    }
+
+    #[test]
+    fn test_lex_bytes() {
+        let input = "0 1 2 12 32 52 123 249 255 0xFF 0xAC 0x3D 0x00 0x12
+        0b0 0b1 0b10 0b00000000 0b10101010 0b11111110";
+        let mut lexer = Token::lexer(input);
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Byte(0))));
+        assert_eq!(lexer.slice(), "0");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Byte(1))));
+        assert_eq!(lexer.slice(), "1");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Byte(2))));
+        assert_eq!(lexer.slice(), "2");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Byte(12))));
+        assert_eq!(lexer.slice(), "12");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Byte(32))));
+        assert_eq!(lexer.slice(), "32");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Byte(52))));
+        assert_eq!(lexer.slice(), "52");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Byte(123))));
+        assert_eq!(lexer.slice(), "123");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Byte(249))));
+        assert_eq!(lexer.slice(), "249");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Byte(255))));
+        assert_eq!(lexer.slice(), "255");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Byte(0xFF))));
+        assert_eq!(lexer.slice(), "0xFF");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Byte(0xAC))));
+        assert_eq!(lexer.slice(), "0xAC");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Byte(0x3D))));
+        assert_eq!(lexer.slice(), "0x3D");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Byte(0x00))));
+        assert_eq!(lexer.slice(), "0x00");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Byte(0x12))));
+        assert_eq!(lexer.slice(), "0x12");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Newline)));
+        assert_eq!(lexer.slice(), "\n");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Byte(0b0))));
+        assert_eq!(lexer.slice(), "0b0");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Byte(0b1))));
+        assert_eq!(lexer.slice(), "0b1");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Byte(0b10))));
+        assert_eq!(lexer.slice(), "0b10");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Byte(0b00000000))));
+        assert_eq!(lexer.slice(), "0b00000000");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Byte(0b10101010))));
+        assert_eq!(lexer.slice(), "0b10101010");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Byte(0b11111110))));
+        assert_eq!(lexer.slice(), "0b11111110");
+    }
+
+    #[test]
+    fn test_lex_numbers() {
+        let input = "256 300 512 768 999 1024 0xFFF 0x123 0x234 0x001 0x000 0xA4C 0x100
+        0b000000000 0b0000000000000001 0b1010101010101010 0b1110001100011100 0b1111111111111111";
+        let mut lexer = Token::lexer(input);
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Number(256))));
+        assert_eq!(lexer.slice(), "256");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Number(300))));
+        assert_eq!(lexer.slice(), "300");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Number(512))));
+        assert_eq!(lexer.slice(), "512");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Number(768))));
+        assert_eq!(lexer.slice(), "768");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Number(999))));
+        assert_eq!(lexer.slice(), "999");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Number(1024))));
+        assert_eq!(lexer.slice(), "1024");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Number(0xFFF))));
+        assert_eq!(lexer.slice(), "0xFFF");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Number(0x123))));
+        assert_eq!(lexer.slice(), "0x123");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Number(0x234))));
+        assert_eq!(lexer.slice(), "0x234");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Number(0x001))));
+        assert_eq!(lexer.slice(), "0x001");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Number(0x000))));
+        assert_eq!(lexer.slice(), "0x000");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Number(0xA4C))));
+        assert_eq!(lexer.slice(), "0xA4C");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Number(0x100))));
+        assert_eq!(lexer.slice(), "0x100");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Newline)));
+        assert_eq!(lexer.slice(), "\n");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Number(0b000000000))));
+        assert_eq!(lexer.slice(), "0b000000000");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Number(0b0000000000000001))));
+        assert_eq!(lexer.slice(), "0b0000000000000001");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Number(0b1010101010101010))));
+        assert_eq!(lexer.slice(), "0b1010101010101010");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Number(0b1110001100011100))));
+        assert_eq!(lexer.slice(), "0b1110001100011100");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Number(0b1111111111111111))));
+        assert_eq!(lexer.slice(), "0b1111111111111111");
     }
 }
