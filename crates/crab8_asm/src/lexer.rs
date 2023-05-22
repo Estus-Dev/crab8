@@ -170,25 +170,26 @@ pub enum Token {
     Comment,
 
     // An 8-bit numeric literal
-    #[regex(r"0x([0-9a-fA-F]{1,2})", hex_byte, priority = 2)]
-    #[regex(r"0b([0,1]{1,8})", binary_byte, priority = 2)]
-    #[regex(r"(25[0-5])|(2[0-4]\d)|([0,1]?\d{1,2})", byte, priority = 2)]
+    #[regex(r"0x([0-9a-fA-F]{1,2})", hex_byte, priority = 3)]
+    #[regex(r"0b([0,1]{1,8})", binary_byte, priority = 3)]
+    #[regex(r"(25[0-5])|(2[0-4]\d)|([0,1]?\d{1,2})", byte, priority = 3)]
     Byte(u8),
 
     // A 16-bit numeric literal
-    #[regex(r"0x([0-9a-fA-F]{1,4})", hex_number, priority = 1)]
-    #[regex(r"0b([0,1]{1,16})", binary_number, priority = 1)]
-    #[regex(r"\d+", number, priority = 1)]
+    #[regex(r"0x([0-9a-fA-F]{1,4})", hex_number, priority = 2)]
+    #[regex(r"0b([0,1]{1,16})", binary_number, priority = 2)]
+    #[regex(r"\d+", number, priority = 2)]
     Number(u16),
 
     // A label, used for jumps, macros, and builtins.
     // Made up of any (unicode) alphanumeric character, '-', or '_'.
-    #[regex(r":\S+", label, priority = 2)]
+    #[regex(r":\S+", label, priority = 1)]
     Label(String),
 
-    // Used for tokens we don't know how to parse yet.
-    #[regex(r"\S*", priority = 0)]
-    Unknown,
+    // An identifier
+    // Made up of any (unicode) alphanumeric character, '-', or '_'.
+    #[regex(r"\S+", identifier, priority = 0)]
+    Identifier(String),
 }
 
 fn hex_byte(n: &mut Lexer<Token>) -> Option<u8> {
@@ -229,8 +230,15 @@ fn number(n: &mut Lexer<Token>) -> Option<u16> {
 
 fn label(s: &mut Lexer<Token>) -> Option<String> {
     let s = s.slice();
-    let s = &s[1..];
 
+    parse_identifier(&s[1..])
+}
+
+fn identifier(s: &mut Lexer<Token>) -> Option<String> {
+    parse_identifier(s.slice())
+}
+
+fn parse_identifier(s: &str) -> Option<String> {
     for c in s.chars() {
         if !c.is_alphanumeric() && !['-', '_'].contains(&c) {
             return None;
@@ -698,5 +706,51 @@ mod test {
 
         assert_eq!(lexer.next(), Some(Err(())));
         assert_eq!(lexer.slice(), ":and-also-not\u{2044}");
+    }
+
+    #[test]
+    fn test_lex_identifiers() {
+        let input = "identifier another-id _yet_another_id_ could_we_do_その他の言語
+        but-not⭐ and-not💩 and-not\u{2066}\u{2069} and-also-not\u{2044}";
+        let mut lexer = Token::lexer(input);
+
+        assert_eq!(
+            lexer.next(),
+            Some(Ok(Token::Identifier("identifier".into())))
+        );
+        assert_eq!(lexer.slice(), "identifier");
+
+        assert_eq!(
+            lexer.next(),
+            Some(Ok(Token::Identifier("another-id".into())))
+        );
+        assert_eq!(lexer.slice(), "another-id");
+
+        assert_eq!(
+            lexer.next(),
+            Some(Ok(Token::Identifier("_yet_another_id_".into())))
+        );
+        assert_eq!(lexer.slice(), "_yet_another_id_");
+
+        assert_eq!(
+            lexer.next(),
+            Some(Ok(Token::Identifier("could_we_do_その他の言語".into())))
+        );
+        assert_eq!(lexer.slice(), "could_we_do_その他の言語");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Newline)));
+        assert_eq!(lexer.slice(), "\n");
+
+        assert_eq!(lexer.next(), Some(Err(())));
+        assert_eq!(lexer.slice(), "but-not⭐");
+
+        assert_eq!(lexer.next(), Some(Err(())));
+        assert_eq!(lexer.slice(), "and-not💩");
+
+        assert_eq!(lexer.next(), Some(Err(())));
+        assert_eq!(lexer.slice(), "and-not\u{2066}\u{2069}");
+
+        assert_eq!(lexer.next(), Some(Err(())));
+        assert_eq!(lexer.slice(), "and-also-not\u{2044}");
     }
 }
