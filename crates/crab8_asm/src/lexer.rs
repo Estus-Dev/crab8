@@ -192,60 +192,60 @@ pub enum Token {
     Identifier(String),
 }
 
-fn hex_byte(n: &mut Lexer<Token>) -> Option<u8> {
-    let n = n.slice();
-    let n = &n[2..];
+fn hex_byte(num: &mut Lexer<Token>) -> Option<u8> {
+    let num = num.slice();
+    let num = &num[2..];
 
-    u8::from_str_radix(n, 16).ok()
+    u8::from_str_radix(num, 16).ok()
 }
 
-fn binary_byte(n: &mut Lexer<Token>) -> Option<u8> {
-    let n = n.slice();
-    let n = &n[2..];
+fn binary_byte(num: &mut Lexer<Token>) -> Option<u8> {
+    let num = num.slice();
+    let num = &num[2..];
 
-    u8::from_str_radix(n, 2).ok()
+    u8::from_str_radix(num, 2).ok()
 }
 
-fn byte(n: &mut Lexer<Token>) -> Option<u8> {
-    n.slice().parse().ok()
+fn byte(num: &mut Lexer<Token>) -> Option<u8> {
+    num.slice().parse().ok()
 }
 
-fn hex_number(n: &mut Lexer<Token>) -> Option<u16> {
-    let n = n.slice();
-    let n = &n[2..];
+fn hex_number(num: &mut Lexer<Token>) -> Option<u16> {
+    let num = num.slice();
+    let num = &num[2..];
 
-    u16::from_str_radix(n, 16).ok()
+    u16::from_str_radix(num, 16).ok()
 }
 
-fn binary_number(n: &mut Lexer<Token>) -> Option<u16> {
-    let n = n.slice();
-    let n = &n[2..];
+fn binary_number(num: &mut Lexer<Token>) -> Option<u16> {
+    let num = num.slice();
+    let num = &num[2..];
 
-    u16::from_str_radix(n, 2).ok()
+    u16::from_str_radix(num, 2).ok()
 }
 
-fn number(n: &mut Lexer<Token>) -> Option<u16> {
-    n.slice().parse().ok()
+fn number(num: &mut Lexer<Token>) -> Option<u16> {
+    num.slice().parse().ok()
 }
 
-fn label(s: &mut Lexer<Token>) -> Option<String> {
-    let s = s.slice();
+fn label(label: &mut Lexer<Token>) -> Option<String> {
+    let label = label.slice();
 
-    parse_identifier(&s[1..])
+    parse_identifier(&label[1..])
 }
 
-fn identifier(s: &mut Lexer<Token>) -> Option<String> {
-    parse_identifier(s.slice())
+fn identifier(id: &mut Lexer<Token>) -> Option<String> {
+    parse_identifier(id.slice())
 }
 
-fn parse_identifier(s: &str) -> Option<String> {
-    for c in s.chars() {
+fn parse_identifier(id: &str) -> Option<String> {
+    for c in id.chars() {
         if !c.is_alphanumeric() && !['-', '_'].contains(&c) {
             return None;
         }
     }
 
-    Some(s.to_owned())
+    Some(id.to_owned())
 }
 
 #[cfg(test)]
