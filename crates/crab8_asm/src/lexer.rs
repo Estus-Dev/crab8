@@ -183,6 +183,11 @@ pub enum Token {
     #[regex(r"\d+", number, priority = 1)]
     Number(u16),
 
+    // A label, used for jumps, macros, and builtins.
+    // Made up of any (unicode) alphanumeric character, '-', or '_'.
+    #[regex(r":\S+", label, priority = 2)]
+    Label(String),
+
     // Used for tokens we don't know how to parse yet.
     #[regex(r"\S*", priority = 0)]
     Unknown,
@@ -222,6 +227,19 @@ fn binary_number(n: &mut Lexer<Token>) -> Option<u16> {
 
 fn number(n: &mut Lexer<Token>) -> Option<u16> {
     n.slice().parse().ok()
+}
+
+fn label(s: &mut Lexer<Token>) -> Option<String> {
+    let s = s.slice();
+    let s = &s[1..];
+
+    for c in s.chars() {
+        if !c.is_alphanumeric() && !['-', '_'].contains(&c) {
+            return None;
+        }
+    }
+
+    Some(s.to_owned())
 }
 
 #[cfg(test)]
@@ -642,5 +660,45 @@ mod test {
 
         assert_eq!(lexer.next(), Some(Ok(Token::Number(0b1111111111111111))));
         assert_eq!(lexer.slice(), "0b1111111111111111");
+    }
+
+    #[test]
+    fn test_lex_labels() {
+        let input = ":label :another-label :_yet_another_label_ :could_we_do_その他の言語
+        :but-not⭐ :and-not💩 :and-not\u{2066}\u{2069} :and-also-not\u{2044}";
+        let mut lexer = Token::lexer(input);
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Label("label".into()))));
+        assert_eq!(lexer.slice(), ":label");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Label("another-label".into()))));
+        assert_eq!(lexer.slice(), ":another-label");
+
+        assert_eq!(
+            lexer.next(),
+            Some(Ok(Token::Label("_yet_another_label_".into())))
+        );
+        assert_eq!(lexer.slice(), ":_yet_another_label_");
+
+        assert_eq!(
+            lexer.next(),
+            Some(Ok(Token::Label("could_we_do_その他の言語".into())))
+        );
+        assert_eq!(lexer.slice(), ":could_we_do_その他の言語");
+
+        assert_eq!(lexer.next(), Some(Ok(Token::Newline)));
+        assert_eq!(lexer.slice(), "\n");
+
+        assert_eq!(lexer.next(), Some(Err(())));
+        assert_eq!(lexer.slice(), ":but-not⭐");
+
+        assert_eq!(lexer.next(), Some(Err(())));
+        assert_eq!(lexer.slice(), ":and-not💩");
+
+        assert_eq!(lexer.next(), Some(Err(())));
+        assert_eq!(lexer.slice(), ":and-not\u{2066}\u{2069}");
+
+        assert_eq!(lexer.next(), Some(Err(())));
+        assert_eq!(lexer.slice(), ":and-also-not\u{2044}");
     }
 }
