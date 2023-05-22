@@ -421,7 +421,7 @@ mod test {
     }
 
     #[test]
-    fn text_lex_keywords() {
+    fn test_lex_keywords() {
         let input = "return ; clear bcd save load jump jump0 hex long random";
         let mut lexer = Token::lexer(input);
 
