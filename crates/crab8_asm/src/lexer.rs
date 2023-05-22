@@ -192,58 +192,36 @@ fn hex_byte(n: &mut Lexer<Token>) -> Option<u8> {
     let n = n.slice();
     let n = &n[2..];
 
-    match u8::from_str_radix(n, 16) {
-        Ok(n) => Some(n),
-        Err(_) => None,
-    }
+    u8::from_str_radix(n, 16).ok()
 }
 
 fn binary_byte(n: &mut Lexer<Token>) -> Option<u8> {
     let n = n.slice();
     let n = &n[2..];
 
-    match u8::from_str_radix(n, 2) {
-        Ok(n) => Some(n),
-        Err(_) => None,
-    }
+    u8::from_str_radix(n, 2).ok()
 }
 
 fn byte(n: &mut Lexer<Token>) -> Option<u8> {
-    let n = n.slice();
-
-    match n.parse() {
-        Ok(n) => Some(n),
-        Err(_) => None,
-    }
+    n.slice().parse().ok()
 }
 
 fn hex_number(n: &mut Lexer<Token>) -> Option<u16> {
     let n = n.slice();
     let n = &n[2..];
 
-    match u16::from_str_radix(n, 16) {
-        Ok(n) => Some(n),
-        Err(_) => None,
-    }
+    u16::from_str_radix(n, 16).ok()
 }
 
 fn binary_number(n: &mut Lexer<Token>) -> Option<u16> {
     let n = n.slice();
     let n = &n[2..];
 
-    match u16::from_str_radix(n, 2) {
-        Ok(n) => Some(n),
-        Err(_) => None,
-    }
+    u16::from_str_radix(n, 2).ok()
 }
 
 fn number(n: &mut Lexer<Token>) -> Option<u16> {
-    let n = n.slice();
-
-    match n.parse() {
-        Ok(n) => Some(n),
-        Err(_) => None,
-    }
+    n.slice().parse().ok()
 }
 
 #[cfg(test)]
