@@ -1,5 +1,3 @@
-use std::num::ParseIntError;
-
 use crab8::registers::Register;
 use logos::{Lexer, Logos};
 
