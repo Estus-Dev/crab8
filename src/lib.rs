@@ -203,4 +203,5 @@ pub enum ExecutionState {
     StepFrame,
     #[default]
     Running,
+    Stopped,
 }

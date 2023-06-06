@@ -1,4 +1,4 @@
-use crate::{memory::Address, registers::Register::*, Crab8};
+use crate::{memory::Address, registers::Register::*, Crab8, ExecutionState};
 
 impl Crab8 {
     pub fn exec_return(&mut self) {
@@ -8,6 +8,7 @@ impl Crab8 {
     }
 
     pub fn exec_jump(&mut self, address: Address) {
+        self.halt_on_jump_to_self(address);
         self.program_counter = address;
     }
 
@@ -15,15 +16,24 @@ impl Crab8 {
         self.stack
             .push(self.program_counter)
             .expect("Stack Overflow");
+
+        self.halt_on_jump_to_self(address);
         self.program_counter = address;
     }
 
     pub fn exec_jump_offset(&mut self, address: Address) {
         let offset = self.registers.get(V0);
         // UNDEFINED BEHAVIOR: I'm choosing to implement overflow by wrapping.
-        let result = address.wrapping_add(offset as u16);
+        let address = address.wrapping_add(offset as u16);
 
-        self.program_counter = result;
+        self.halt_on_jump_to_self(address);
+        self.program_counter = address;
+    }
+
+    fn halt_on_jump_to_self(&mut self, address: Address) {
+        if address == self.program_counter.wrapping_sub(2) {
+            self.execution_state = ExecutionState::Stopped;
+        }
     }
 }
 
