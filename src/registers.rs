@@ -194,22 +194,27 @@ impl FromStr for Register {
     type Err = InvalidRegisterError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        if s.len() != 2 {
-            return Err(InvalidRegisterError(s.to_owned()));
+        use Register::*;
+
+        match s.to_lowercase().as_str() {
+            "v0" => Ok(V0),
+            "v1" => Ok(V1),
+            "v2" => Ok(V2),
+            "v3" => Ok(V3),
+            "v4" => Ok(V4),
+            "v5" => Ok(V5),
+            "v6" => Ok(V6),
+            "v7" => Ok(V7),
+            "v8" => Ok(V8),
+            "v9" => Ok(V9),
+            "va" => Ok(VA),
+            "vb" => Ok(VB),
+            "vc" => Ok(VC),
+            "vd" => Ok(VD),
+            "ve" => Ok(VE),
+            "vf" => Ok(VF),
+            _ => Err(InvalidRegisterError(s.to_owned())),
         }
-
-        if !s.starts_with('v') && !s.starts_with('V') {
-            return Err(InvalidRegisterError(s.to_owned()));
-        }
-
-        let register = s.chars().last().expect("The string's length is 2.");
-        if !register.is_ascii_hexdigit() {
-            return Err(InvalidRegisterError(s.to_owned()));
-        }
-
-        let register = register.to_digit(16).unwrap() as u8;
-
-        Ok(register.into())
     }
 }
 
