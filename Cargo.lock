@@ -457,6 +457,7 @@ dependencies = [
  "getrandom",
  "rand",
  "reqwest",
+ "thiserror",
 ]
 
 [[package]]
