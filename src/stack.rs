@@ -1,3 +1,5 @@
+use thiserror::Error;
+
 use crate::prelude::*;
 use std::{fmt, fmt::Debug, fmt::Display, fmt::Formatter};
 
@@ -25,26 +27,26 @@ impl Stack {
     /// Push a new address to the stack.
     /// UNDEFINED BEHAVIOR: It's not clear what should happen when pushing too many things onto the
     /// stack.
-    pub fn push(&mut self, address: Address) -> Result<(), ()> {
+    pub fn push(&mut self, address: Address) -> Result<(), StackError> {
         if self.length < MAX_STACK_DEPTH {
             self.stack[self.length] = address;
             self.length += 1;
 
             Ok(())
         } else {
-            Err(())
+            Err(StackError::StackOverflow)
         }
     }
 
     /// Pop the latest address off the stack.
     /// UNDEFINED BEHAVIOR: It's unspecified what happens when a value is popped off an empty stack.
-    pub fn pop(&mut self) -> Result<Address, ()> {
+    pub fn pop(&mut self) -> Result<Address, StackError> {
         if self.length > 0 {
             self.length -= 1;
 
             Ok(self.stack[self.length])
         } else {
-            Err(())
+            Err(StackError::StackEmpty)
         }
     }
 
@@ -101,6 +103,15 @@ impl IntoIterator for Stack {
     }
 }
 
+#[derive(Debug, Error, Eq, PartialEq)]
+pub enum StackError {
+    #[error("Tried to pop a value from an empty stack")]
+    StackEmpty,
+
+    #[error("Tried to push a value to a full stack")]
+    StackOverflow,
+}
+
 pub struct StackIterator {
     stack: Stack,
     index: usize,
@@ -125,7 +136,7 @@ mod test {
     use super::*;
 
     #[test]
-    fn test_stack() -> Result<(), ()> {
+    fn test_stack() -> Result<(), StackError> {
         let mut stack = Stack::empty();
 
         assert_eq!(stack.len(), 0);
@@ -173,7 +184,7 @@ mod test {
     }
 
     #[test]
-    fn test_stack_overflow() -> Result<(), ()> {
+    fn test_stack_overflow() -> Result<(), StackError> {
         let mut stack = Stack::empty();
 
         for i in 0..MAX_STACK_DEPTH {
