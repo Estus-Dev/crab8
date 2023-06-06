@@ -1,5 +1,7 @@
 use std::{fmt, fmt::Debug, fmt::Display, str::FromStr};
 
+use thiserror::Error;
+
 /// The CHIP-8 has 16 8-bit general-purpose registers, V0-VF.
 /// https://github.com/mattmikolay/chip-8/wiki/CHIP%E2%80%908-Technical-Reference#data-registers
 #[derive(Default, PartialEq, Eq)]
@@ -189,20 +191,20 @@ impl From<i32> for Register {
 }
 
 impl FromStr for Register {
-    type Err = ();
+    type Err = InvalidRegisterError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         if s.len() != 2 {
-            return Err(());
+            return Err(InvalidRegisterError(s.to_owned()));
         }
 
         if !s.starts_with('v') && !s.starts_with('V') {
-            return Err(());
+            return Err(InvalidRegisterError(s.to_owned()));
         }
 
         let register = s.chars().last().expect("The string's length is 2.");
         if !register.is_ascii_hexdigit() {
-            return Err(());
+            return Err(InvalidRegisterError(s.to_owned()));
         }
 
         let register = register.to_digit(16).unwrap() as u8;
@@ -210,6 +212,10 @@ impl FromStr for Register {
         Ok(register.into())
     }
 }
+
+#[derive(Debug, Eq, Error, PartialEq)]
+#[error("Invalid register {0}")]
+pub struct InvalidRegisterError(String);
 
 #[cfg(test)]
 mod test {
