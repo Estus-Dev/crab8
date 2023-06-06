@@ -120,7 +120,7 @@ mod test {
     }
 
     #[test]
-    fn test_read_write() -> Result<(), ()> {
+    fn test_read_write() {
         let mut crab8 = Crab8::default();
         let mut address = Address::new(FIRST_CHAR_ADDRESS);
 
@@ -155,7 +155,5 @@ mod test {
         crab8.exec(Read(V5));
 
         assert_eq!(crab8.registers.get_range(V5), result);
-
-        Ok(())
     }
 }
