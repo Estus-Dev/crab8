@@ -8,3 +8,4 @@ edition = "2021"
 [dependencies]
 crab8 = { workspace = true }
 logos = { workspace = true }
+regex = { workspace = true }
