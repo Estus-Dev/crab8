@@ -28,6 +28,7 @@ egui = "^0.21.0"
 egui-wgpu = "^0.21.0"
 egui-winit = { version = "^0.21.1", default-features = false }
 ehttp = "^0.2.0"
+env_logger = "0.10.0"
 getrandom = "^0.2.9"
 instant = "^0.1.12"
 log = "^0.4.17"
