@@ -21,6 +21,7 @@ pub mod prelude {
 
 use crate::prelude::*;
 use input::InputBuilder;
+use log::info;
 #[cfg(feature = "download")]
 use reqwest::{blocking::get, Result};
 use std::{fmt, fmt::Display, fs::File, io::Read, path::Path};
@@ -98,6 +99,8 @@ impl Crab8 {
     }
 
     fn execute_instruction(&mut self) {
+        self.log_registers();
+
         let instruction = self.memory.get_instruction(self.program_counter);
 
         self.program_counter = self.program_counter.next_instruction();
@@ -153,6 +156,23 @@ impl Crab8 {
         self.next_input = Default::default();
         self.screen = Default::default();
         self.instructions_since_frame = 0;
+    }
+
+    pub fn log_registers(&self) {
+        // Based on wheremyfoodat's gameboy test log output.
+        log::error!(target: "execution_state",
+        "0-F: {} I: {:4X?} D: {:2X?} S: {:2X?} CS: {:2X?} PC: {:4X?} ({:2X?} {:2X?} {:2X?} {:2X?})",
+            self.registers,
+            self.address_register,
+            self.delay,
+            self.sound,
+            self.stack.len(),
+            self.program_counter,
+            self.memory.get(self.program_counter),
+            self.memory.get(self.program_counter.wrapping_add(1)),
+            self.memory.get(self.program_counter.wrapping_add(2)),
+            self.memory.get(self.program_counter.wrapping_add(3)),
+        );
     }
 }
 

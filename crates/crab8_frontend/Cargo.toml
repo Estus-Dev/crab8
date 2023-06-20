@@ -18,6 +18,7 @@ crab8 = { workspace = true }
 egui = { workspace = true }
 egui-wgpu = { workspace = true }
 ehttp = { workspace = true }
+env_logger = { workspace = true }
 instant = { workspace = true }
 log = { workspace = true }
 pixels = { workspace = true }
