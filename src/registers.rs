@@ -37,9 +37,9 @@ impl Debug for Registers {
             .0
             .iter()
             .map(|value| format!("{:02X}", value))
-            .fold(String::new(), |str, register| str + &register + " ");
+            .fold(String::new(), |str, register| str + " " + &register);
 
-        write!(f, "0-F: {string_representation}")
+        write!(f, "0-F:{string_representation}")
     }
 }
 
