@@ -160,7 +160,7 @@ impl Crab8 {
     pub fn log_registers(&self) {
         // Based on wheremyfoodat's gameboy test log output.
         log::error!(target: "execution_state",
-        "{} I: {:04X?} D: {:02X?} S: {:02X?} CS: {:2X?} PC: {:04X?} ({:2X?} {:2X?} {:2X?} {:2X?})",
+        "{} I: {:04X?} D: {:02X?} S: {:02X?} CS: {:02X?} PC: {:04X?} ({:02X?} {:02X?} {:02X?} {:02X?})",
             self.registers,
             self.address_register,
             self.delay,
