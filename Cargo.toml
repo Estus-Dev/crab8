@@ -10,10 +10,13 @@ getrandom = { workspace = true, features = ["js"] }
 log = { workspace = true }
 rand = { workspace = true }
 reqwest = { workspace = true, optional = true, features = ["blocking"] }
-thiserror = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true, optional = true }
+thiserror = { workspace = true, optional = true }
 
 [features]
 download = ["dep:reqwest"]
+serde = ["dep:serde", "dep:serde_json"]
 
 [workspace]
 members = ["crates/*"]
@@ -40,6 +43,8 @@ rand = "^0.8"
 regex = "^1.8.4"
 reqwest = "^0.11.16"
 rfd = "^0.11.3"
+serde = "^1.0.164"
+serde_json = "^1.0.97"
 thiserror = "^1.0.40"
 tokio = "^1.28.0"
 tracing-subscriber = "^0.3.17"
