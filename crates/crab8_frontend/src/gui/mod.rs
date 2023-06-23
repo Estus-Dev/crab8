@@ -83,7 +83,7 @@ impl Gui {
         });
 
         match self.rom.lock() {
-            Err(err) => println!("Attempted to unlock ROM but it was locked: {err}"),
+            Err(err) => log::error!("Attempted to unlock ROM but it was locked: {err}"),
             Ok(mut loaded_rom) => {
                 if let Some(rom) = loaded_rom.clone() {
                     crab8.load(&rom);
@@ -124,7 +124,7 @@ impl Gui {
                 let file = file.read().await;
                 match rom.lock() {
                     Err(l_err) => match error.lock() {
-                        Err(el_err) => println!("Failed to lock error: {l_err} {el_err}"),
+                        Err(el_err) => log::error!("Failed to lock error: {l_err} {el_err}"),
                         Ok(mut error) => {
                             *error = Some("Failed to load file".into());
                         }
@@ -137,7 +137,7 @@ impl Gui {
             }
 
             None => match error.lock() {
-                Err(l_err) => println!("Failed to lock error: {l_err}"),
+                Err(l_err) => log::error!("Failed to lock error: {l_err}"),
                 Ok(mut error) => {
                     *error = Some("Failed to load file".into());
                 }

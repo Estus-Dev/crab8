@@ -71,7 +71,7 @@ pub async fn run() {
                 last_update = now;
 
                 if delta_time > Duration::from_millis(18) {
-                    println!("Long frame detected: {delta_time:?}");
+                    log::warn!("Long frame detected: {delta_time:?}");
                 }
 
                 crab8.execute();

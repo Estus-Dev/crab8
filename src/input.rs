@@ -161,7 +161,7 @@ impl InputBuilder {
 
     pub fn set_released(&mut self, key: Key) -> &mut Self {
         if self.0[key as usize] != KeyState::Pressed {
-            println!("Released {key} when it was not pressed");
+            log::warn!("Released {key} when it was not pressed");
         }
 
         self.set(key, KeyState::Released)

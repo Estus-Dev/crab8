@@ -31,7 +31,7 @@ impl DownloadWindow {
                             match result {
                                 Err(download_error) => match error.lock() {
                                     Err(l_err) => {
-                                        println!(
+                                        log::error!(
                                             "Failed to acquire lock on download error: {l_err}"
                                         );
                                     }
@@ -43,7 +43,7 @@ impl DownloadWindow {
 
                                 Ok(response) => match rom.lock() {
                                     Err(l_err) => match error.lock() {
-                                        Err(el_err) => println!(
+                                        Err(el_err) => log::error!(
                                             "Failed to acquire lock on download or error message: {el_err}, {l_err}"
                                         ),
 
