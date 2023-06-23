@@ -1,6 +1,9 @@
-use std::{fmt, fmt::Display};
+use std::{
+    fmt,
+    fmt::{Debug, Display},
+};
 
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+#[derive(Clone, Copy, Default, PartialEq, Eq)]
 /// CHIP-8 timers are u8 values that tick down at a rate of 60hz.
 pub struct Timer(u8);
 
@@ -16,9 +19,15 @@ impl Timer {
     }
 }
 
+impl Debug for Timer {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        std::fmt::Debug::fmt(&self.0, f)
+    }
+}
+
 impl Display for Timer {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{:#04X}", self.0)
+        std::fmt::Display::fmt(&self.0, f)
     }
 }
 
