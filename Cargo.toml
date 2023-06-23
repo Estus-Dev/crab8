@@ -10,9 +10,9 @@ getrandom = { workspace = true, features = ["js"] }
 log = { workspace = true }
 rand = { workspace = true }
 reqwest = { workspace = true, optional = true, features = ["blocking"] }
-serde = { workspace = true }
+serde = { workspace = true, optional = true }
 serde_json = { workspace = true, optional = true }
-thiserror = { workspace = true, optional = true }
+thiserror = { workspace = true }
 
 [features]
 download = ["dep:reqwest"]
