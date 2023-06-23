@@ -2,6 +2,11 @@
 
 use std::collections::HashMap;
 
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
+
+#[derive(Clone, Debug, Default, Eq, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Program {
     title: String,
     description: Option<String>,
@@ -21,20 +26,27 @@ pub struct Program {
 }
 
 #[non_exhaustive]
+#[derive(Clone, Debug, Default, Eq, Hash, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum OriginType {
     GameJam,
     Event,
     Magazine,
     Manual,
-    Other(String),
+    #[default]
+    Unknown,
 }
 
+#[derive(Clone, Debug, Default, Eq, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Origin {
     // Originally `type` in the JSON Schema
     origin_type: Option<OriginType>,
     reference: Option<String>,
 }
 
+#[derive(Clone, Debug, Default, Eq, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Rom {
     file_name: Option<String>,
     embedded_title: Option<String>,
@@ -58,6 +70,8 @@ pub struct Rom {
 }
 
 #[non_exhaustive]
+#[derive(Clone, Debug, Eq, Hash, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum Platform {
     OriginalChip8,
     HybridVIP,
@@ -70,7 +84,10 @@ pub enum Platform {
     MegaChip8,
 }
 
+#[derive(Clone, Debug, Default, Eq, Hash, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum ScreenRotation {
+    #[default]
     Landscape = 0,
     Portrait = 90,
     LandscapeFlipped = 180,
@@ -78,6 +95,8 @@ pub enum ScreenRotation {
 }
 
 #[non_exhaustive]
+#[derive(Clone, Debug, Eq, Hash, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum Keymap {
     P1Up,
     P1Down,
@@ -94,7 +113,10 @@ pub enum Keymap {
 }
 
 #[non_exhaustive]
+#[derive(Clone, Debug, Default, Eq, Hash, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum TouchInputMode {
+    #[default]
     None,
     Swipe,
     Seg16,
@@ -104,8 +126,11 @@ pub enum TouchInputMode {
 }
 
 #[non_exhaustive]
+#[derive(Clone, Debug, Default, Eq, Hash, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum FontStyle {
     Octo,
+    #[default]
     VIP,
     SCHIP,
     Dream6800,
@@ -114,6 +139,8 @@ pub enum FontStyle {
     Akouz1,
 }
 
+#[derive(Clone, Debug, Default, Eq, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct QuirkSet {
     shift: bool,
     memory_increment_by_x: bool,
@@ -125,6 +152,8 @@ pub struct QuirkSet {
 }
 
 // TODO: Better color type than strings here
+#[derive(Clone, Debug, Default, Eq, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Colors {
     pixels: Option<Vec<String>>,
     buzzer: Option<String>,
