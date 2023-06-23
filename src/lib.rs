@@ -1,4 +1,5 @@
 pub mod character;
+pub mod database;
 pub mod input;
 pub mod instructions;
 pub mod memory;
