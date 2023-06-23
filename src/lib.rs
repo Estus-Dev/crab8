@@ -160,12 +160,16 @@ impl Crab8 {
     pub fn log_registers(&self) {
         // Based on wheremyfoodat's gameboy test log output.
         log::trace!(target: "execution_state",
-        "{} I: {:04X?} D: {:02X?} S: {:02X?} CS: {:02X?} PC: {:04X?} ({:02X?} {:02X?} {:02X?} {:02X?})",
+        "{} D: {:02X?} S: {:02X?} CS: {:02X?} I: {:04X?} ({:02X?} {:02X?} {:02X?} {:02X?}) PC: {:04X?} ({:02X?} {:02X?} {:02X?} {:02X?})",
             self.registers,
-            self.address_register,
             self.delay,
             self.sound,
             self.stack.len(),
+            self.address_register,
+            self.memory.get(self.address_register),
+            self.memory.get(self.address_register.wrapping_add(1)),
+            self.memory.get(self.address_register.wrapping_add(2)),
+            self.memory.get(self.address_register.wrapping_add(3)),
             self.program_counter,
             self.memory.get(self.program_counter),
             self.memory.get(self.program_counter.wrapping_add(1)),
