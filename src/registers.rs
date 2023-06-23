@@ -36,12 +36,10 @@ impl Debug for Registers {
         let string_representation = self
             .0
             .iter()
-            .enumerate()
-            .map(|(register, value)| (Register::from(register), value))
-            .map(|(register, value)| format!("{:?}={:#04X}", register, value))
+            .map(|value| format!("{:02X}", value))
             .fold(String::new(), |str, register| str + &register + " ");
 
-        write!(f, "{string_representation}")
+        write!(f, "0-F: {string_representation}")
     }
 }
 
