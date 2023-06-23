@@ -60,13 +60,13 @@ impl Address {
 
 impl Debug for Address {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        write!(f, "Address({:#05x?})", self.0)
+        std::fmt::Debug::fmt(&self.0, f)
     }
 }
 
 impl Display for Address {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        write!(f, "{:#05X}", self.0)
+        std::fmt::Display::fmt(&self.0, f)
     }
 }
 
