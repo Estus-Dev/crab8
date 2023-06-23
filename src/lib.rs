@@ -21,7 +21,6 @@ pub mod prelude {
 
 use crate::prelude::*;
 use input::InputBuilder;
-use log::info;
 #[cfg(feature = "download")]
 use reqwest::{blocking::get, Result};
 use std::{fmt, fmt::Display, fs::File, io::Read, path::Path};
