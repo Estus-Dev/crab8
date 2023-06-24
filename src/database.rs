@@ -1,6 +1,7 @@
 #![allow(dead_code)] // TODO:
 
 use serde::{Deserialize, Serialize};
+use serde_repr::{Deserialize_repr, Serialize_repr};
 use std::collections::HashMap;
 
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
@@ -72,7 +73,9 @@ pub struct Rom {
     #[serde(rename = "startAddress")]
     start_address: Option<u16>,
 
+    #[serde(rename = "screenRotation")]
     screen_rotation: Option<ScreenRotation>,
+
     keys: Option<HashMap<Keymap, u8>>,
     touch_input_mode: Option<TouchInputMode>,
     font_style: Option<FontStyle>,
@@ -110,7 +113,8 @@ pub enum Platform {
     MegaChip8,
 }
 
-#[derive(Clone, Debug, Default, Deserialize, Eq, Hash, PartialEq, Serialize)]
+#[derive(Clone, Debug, Default, Deserialize_repr, Eq, Hash, PartialEq, Serialize_repr)]
+#[repr(usize)]
 pub enum ScreenRotation {
     #[default]
     Landscape = 0,
@@ -376,6 +380,7 @@ mod test {
             );
             assert_eq!(10, rom.tickrate.unwrap());
             assert_eq!(0x200, rom.start_address.unwrap());
+            assert_eq!(ScreenRotation::Landscape, rom.screen_rotation.unwrap());
 
             Ok(())
         }
