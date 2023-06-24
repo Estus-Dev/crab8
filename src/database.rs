@@ -25,11 +25,20 @@ pub struct Program {
 #[non_exhaustive]
 #[derive(Clone, Debug, Default, Deserialize, Eq, Hash, PartialEq, Serialize)]
 pub enum OriginType {
+    #[serde(rename = "gamejam")]
     GameJam,
+
+    #[serde(rename = "event")]
     Event,
+
+    #[serde(rename = "magazine")]
     Magazine,
+
+    #[serde(rename = "manual")]
     Manual,
+
     #[default]
+    #[serde(rename = "unknown")]
     Unknown,
 }
 
@@ -66,14 +75,31 @@ pub struct Rom {
 #[non_exhaustive]
 #[derive(Clone, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
 pub enum Platform {
+    #[serde(rename = "originalChip8")]
     OriginalChip8,
+
+    #[serde(rename = "hybridVIP")]
     HybridVIP,
+
+    #[serde(rename = "modernChip8")]
     ModernChip8,
+
+    #[serde(rename = "chip48")]
     Chip48,
+
+    #[serde(rename = "superchip1")]
     Superchip1,
+
+    #[serde(rename = "superchip")]
     Superchip,
+
+    #[serde(rename = "xochip")]
     XOChip,
+
+    #[serde(rename = "chip8X")]
     Chip8X,
+
+    #[serde(rename = "megachip8")]
     MegaChip8,
 }
 
@@ -89,17 +115,40 @@ pub enum ScreenRotation {
 #[non_exhaustive]
 #[derive(Clone, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
 pub enum Keymap {
+    #[serde(rename = "up")]
     P1Up,
+
+    #[serde(rename = "down")]
     P1Down,
+
+    #[serde(rename = "left")]
     P1Left,
+
+    #[serde(rename = "right")]
     P1Right,
+
+    #[serde(rename = "a")]
     P1A,
+
+    #[serde(rename = "b")]
     P1B,
+
+    #[serde(rename = "player2Up")]
     P2Up,
+
+    #[serde(rename = "player2Down")]
     P2Down,
+
+    #[serde(rename = "player2Left")]
     P2Left,
+
+    #[serde(rename = "player2Right")]
     P2Right,
+
+    #[serde(rename = "player2A")]
     P2A,
+
+    #[serde(rename = "player2B")]
     P2B,
 }
 
@@ -107,24 +156,48 @@ pub enum Keymap {
 #[derive(Clone, Debug, Default, Deserialize, Eq, Hash, PartialEq, Serialize)]
 pub enum TouchInputMode {
     #[default]
+    #[serde(rename = "none")]
     None,
+
+    #[serde(rename = "swipe")]
     Swipe,
+
+    #[serde(rename = "seg16")]
     Seg16,
+
+    #[serde(rename = "seg16fill")]
     Seg16Fill,
+
+    #[serde(rename = "gamepad")]
     Gamepad,
+
+    #[serde(rename = "vip")]
     VIP,
 }
 
 #[non_exhaustive]
 #[derive(Clone, Debug, Default, Deserialize, Eq, Hash, PartialEq, Serialize)]
 pub enum FontStyle {
-    Octo,
     #[default]
+    #[serde(rename = "vip")]
     VIP,
+
+    #[serde(rename = "octo")]
+    Octo,
+
+    #[serde(rename = "schip")]
     SCHIP,
+
+    #[serde(rename = "dream6800")]
     Dream6800,
+
+    #[serde(rename = "eti660")]
     ETI660,
+
+    #[serde(rename = "fish")]
     Fish,
+
+    #[serde(rename = "akouz1")]
     Akouz1,
 }
 
@@ -145,4 +218,85 @@ pub struct Colors {
     pixels: Option<Vec<String>>,
     buzzer: Option<String>,
     silence: Option<String>,
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    mod serde {
+        use super::*;
+        use serde_json::Result;
+
+        #[test]
+        fn program_roundtrip() -> Result<()> {
+            let input = r##"{
+                "title": "Test Program",
+                "origin": {
+                    "type": "manual",
+                    "reference": "What's this supposed to be?"
+                },
+                "description": "A description of the program",
+                "release": "2023-06-24",
+                "copyright": "Probably copyrighted or something",
+                "license": "MIT",
+                "authors": ["Someone"],
+                "images": ["https://example.com/chip8/test-program.png"],
+                "urls": ["https://example.com/chip8/test-program.html"],
+                "roms": {
+                    "0123456789abcdef0123456789abcdef01234567": {
+                        "file": "test-program.ch8",
+                        "embeddedTitle": "Test Program Embedded",
+                        "description": "The test program to test all programs",
+                        "release": "2023-06-24",
+                        "platforms": ["originalChip8"],
+                        "quirkyPlatforms": {
+                            "originalChip8": {
+                                "shift": false,
+                                "memoryIncrementByX": false,
+                                "memoryLeaveIUnchanged": false,
+                                "wrap": false,
+                                "jump": false,
+                                "vblank": false,
+                                "logic": false
+                            }
+                        },
+                        "authors": ["Someone Else"],
+                        "images": ["https://example.com/chip8/test-program-detail.png"],
+                        "urls": ["https://example.com/chip8/test-program.ch8"],
+                        "tickrate": 10,
+                        "startAddress": 512,
+                        "screenRotation": 0,
+                        "keys": {
+                            "up": 0,
+                            "down": 1,
+                            "left": 2,
+                            "right": 3,
+                            "a": 4,
+                            "b": 5,
+                            "player2Up": 16,
+                            "player2Down": 17,
+                            "player2Left": 18,
+                            "player2Right": 19,
+                            "player2A": 20,
+                            "player2B": 21
+                        },
+                        "touchInputMode": "none",
+                        "fontStyle": "vip",
+                        "colors": {
+                            "pixels": ["#000000", "#ff0000", "#00ff00", "#0000ff"],
+                            "buzzer": "#cccccc",
+                            "silence": "#555555"
+                        }
+                    }
+                }
+            }"##;
+
+            let program: Program = serde_json::from_str(input)?;
+
+            assert_eq!(program.title, "Test Program");
+
+            Ok(())
+        }
+    }
 }
