@@ -51,7 +51,9 @@ pub struct Rom {
     #[serde(rename = "file")]
     file_name: Option<String>,
 
+    #[serde(rename = "embeddedTitle")]
     embedded_title: Option<String>,
+
     description: Option<String>,
     // TODO: This should be a date of some kind
     release: Option<String>,
@@ -334,6 +336,7 @@ mod test {
             let rom = program.roms["0123456789abcdef0123456789abcdef01234567"].clone();
 
             assert_eq!("test-program.ch8", &rom.file_name.unwrap());
+            assert_eq!("Test Program Embedded", &rom.embedded_title.unwrap());
 
             Ok(())
         }
