@@ -58,7 +58,10 @@ pub struct Rom {
     // TODO: This should be a date of some kind
     release: Option<String>,
     platforms: Vec<Platform>,
+
+    #[serde(rename = "quirkyPlatforms")]
     quirky_platforms: Option<HashMap<Platform, QuirkSet>>,
+
     authors: Option<Vec<String>>,
     // TODO: Support real images here
     images: Option<Vec<String>>,
@@ -205,8 +208,13 @@ pub enum FontStyle {
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 pub struct QuirkSet {
     shift: bool,
+
+    #[serde(rename = "memoryIncrementByX")]
     memory_increment_by_x: bool,
+
+    #[serde(rename = "memoryLeaveIUnchanged")]
     memory_leave_i_unchanged: bool,
+
     wrap: bool,
     jump: bool,
     vblank: bool,
@@ -343,6 +351,16 @@ mod test {
             );
             assert_eq!("2023-06-24", rom.release.unwrap());
             assert_eq!(vec![Platform::OriginalChip8], rom.platforms);
+
+            let quirks = rom.quirky_platforms.unwrap()[&Platform::OriginalChip8].clone();
+
+            assert!(quirks.shift);
+            assert!(!quirks.memory_increment_by_x);
+            assert!(quirks.memory_leave_i_unchanged);
+            assert!(!quirks.wrap);
+            assert!(quirks.jump);
+            assert!(!quirks.vblank);
+            assert!(quirks.logic);
 
             Ok(())
         }
