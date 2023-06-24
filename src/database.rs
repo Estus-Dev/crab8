@@ -253,13 +253,13 @@ mod test {
                         "platforms": ["originalChip8"],
                         "quirkyPlatforms": {
                             "originalChip8": {
-                                "shift": false,
+                                "shift": true,
                                 "memoryIncrementByX": false,
-                                "memoryLeaveIUnchanged": false,
+                                "memoryLeaveIUnchanged": true,
                                 "wrap": false,
-                                "jump": false,
+                                "jump": true,
                                 "vblank": false,
-                                "logic": false
+                                "logic": true
                             }
                         },
                         "authors": ["Someone Else"],
