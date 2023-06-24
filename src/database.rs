@@ -81,7 +81,9 @@ pub struct Rom {
     #[serde(rename = "touchInputMode")]
     touch_input_mode: Option<TouchInputMode>,
 
+    #[serde(rename = "fontStyle")]
     font_style: Option<FontStyle>,
+
     colors: Option<Colors>,
 }
 
@@ -402,6 +404,7 @@ mod test {
             assert_eq!(0x15, keys[&Keymap::P2B]);
 
             assert_eq!(TouchInputMode::None, rom.touch_input_mode.unwrap());
+            assert_eq!(FontStyle::VIP, rom.font_style.unwrap());
 
             Ok(())
         }
