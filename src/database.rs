@@ -77,7 +77,10 @@ pub struct Rom {
     screen_rotation: Option<ScreenRotation>,
 
     keys: Option<HashMap<Keymap, u8>>,
+
+    #[serde(rename = "touchInputMode")]
     touch_input_mode: Option<TouchInputMode>,
+
     font_style: Option<FontStyle>,
     colors: Option<Colors>,
 }
@@ -397,6 +400,8 @@ mod test {
             assert_eq!(0x13, keys[&Keymap::P2Right]);
             assert_eq!(0x14, keys[&Keymap::P2A]);
             assert_eq!(0x15, keys[&Keymap::P2B]);
+
+            assert_eq!(TouchInputMode::None, rom.touch_input_mode.unwrap());
 
             Ok(())
         }
