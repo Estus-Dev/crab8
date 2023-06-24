@@ -25,17 +25,11 @@ pub struct Program {
 
 #[non_exhaustive]
 #[derive(Clone, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
+#[serde(rename_all = "lowercase")]
 pub enum OriginType {
-    #[serde(rename = "gamejam")]
     GameJam,
-
-    #[serde(rename = "event")]
     Event,
-
-    #[serde(rename = "magazine")]
     Magazine,
-
-    #[serde(rename = "manual")]
     Manual,
 }
 
@@ -48,42 +42,28 @@ pub struct Origin {
 }
 
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Rom {
     #[serde(rename = "file")]
     file_name: Option<String>,
 
-    #[serde(rename = "embeddedTitle")]
     embedded_title: Option<String>,
-
     description: Option<String>,
     // TODO: This should be a date of some kind
     release: Option<String>,
     platforms: Vec<Platform>,
-
-    #[serde(rename = "quirkyPlatforms")]
     quirky_platforms: Option<HashMap<Platform, QuirkSet>>,
-
     authors: Option<Vec<String>>,
     // TODO: Support real images here
     images: Option<Vec<String>>,
     // TODO: Use an appropriate URL type here
     urls: Option<Vec<String>>,
     tickrate: Option<usize>,
-
-    #[serde(rename = "startAddress")]
     start_address: Option<u16>,
-
-    #[serde(rename = "screenRotation")]
     screen_rotation: Option<ScreenRotation>,
-
     keys: Option<HashMap<Keymap, u8>>,
-
-    #[serde(rename = "touchInputMode")]
     touch_input_mode: Option<TouchInputMode>,
-
-    #[serde(rename = "fontStyle")]
     font_style: Option<FontStyle>,
-
     colors: Option<Colors>,
 }
 
@@ -170,50 +150,28 @@ pub enum Keymap {
 
 #[non_exhaustive]
 #[derive(Clone, Debug, Default, Deserialize, Eq, Hash, PartialEq, Serialize)]
+#[serde(rename_all = "lowercase")]
 pub enum TouchInputMode {
     #[default]
-    #[serde(rename = "none")]
     None,
-
-    #[serde(rename = "swipe")]
     Swipe,
-
-    #[serde(rename = "seg16")]
     Seg16,
-
-    #[serde(rename = "seg16fill")]
     Seg16Fill,
-
-    #[serde(rename = "gamepad")]
     Gamepad,
-
-    #[serde(rename = "vip")]
     VIP,
 }
 
 #[non_exhaustive]
 #[derive(Clone, Debug, Default, Deserialize, Eq, Hash, PartialEq, Serialize)]
+#[serde(rename_all = "lowercase")]
 pub enum FontStyle {
     #[default]
-    #[serde(rename = "vip")]
     VIP,
-
-    #[serde(rename = "octo")]
     Octo,
-
-    #[serde(rename = "schip")]
     SCHIP,
-
-    #[serde(rename = "dream6800")]
     Dream6800,
-
-    #[serde(rename = "eti660")]
     ETI660,
-
-    #[serde(rename = "fish")]
     Fish,
-
-    #[serde(rename = "akouz1")]
     Akouz1,
 }
 
