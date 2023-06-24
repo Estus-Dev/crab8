@@ -406,6 +406,15 @@ mod test {
             assert_eq!(TouchInputMode::None, rom.touch_input_mode.unwrap());
             assert_eq!(FontStyle::VIP, rom.font_style.unwrap());
 
+            let colors = rom.colors.unwrap();
+
+            assert_eq!(
+                vec!["#000000", "#ff0000", "#00ff00", "#0000ff"],
+                colors.pixels.unwrap()
+            );
+            assert_eq!("#cccccc", colors.buzzer.unwrap());
+            assert_eq!("#555555", colors.silence.unwrap());
+
             Ok(())
         }
     }
