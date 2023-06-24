@@ -250,7 +250,7 @@ mod test {
         use serde_json::Result;
 
         #[test]
-        fn program_roundtrip() -> Result<()> {
+        fn deserialize_program() -> Result<()> {
             let input = r##"{
                 "title": "Test Program",
                 "origin": {
@@ -314,9 +314,6 @@ mod test {
             }"##;
 
             let program: Program = serde_json::from_str(input)?;
-            // let output = serde_json::to_string_pretty(&program)?;
-
-            // assert_eq!(input, output);
 
             assert_eq!(program.title, "Test Program");
             assert_eq!(
