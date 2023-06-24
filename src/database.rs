@@ -362,6 +362,17 @@ mod test {
             assert!(!quirks.vblank);
             assert!(quirks.logic);
 
+            assert_eq!(vec!["Someone Else"], rom.authors.unwrap());
+            assert_eq!(
+                vec!["https://example.com/chip8/test-program-detail.png"],
+                rom.images.unwrap()
+            );
+            assert_eq!(
+                vec!["https://example.com/chip8/test-program.ch8"],
+                rom.urls.unwrap()
+            );
+            assert_eq!(10, rom.tickrate.unwrap());
+
             Ok(())
         }
     }
