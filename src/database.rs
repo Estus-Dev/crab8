@@ -296,8 +296,37 @@ mod test {
 
             assert_eq!(program.title, "Test Program");
             assert_eq!(
-                program.origin.unwrap().origin_type.unwrap(),
-                OriginType::Manual
+                &OriginType::Manual,
+                program
+                    .origin
+                    .as_ref()
+                    .unwrap()
+                    .origin_type
+                    .as_ref()
+                    .unwrap()
+            );
+            assert_eq!(
+                "What's this supposed to be?",
+                program.origin.unwrap().reference.unwrap()
+            );
+            assert_eq!(
+                "A description of the program",
+                &program.description.unwrap()
+            );
+            assert_eq!("2023-06-24", &program.release.unwrap());
+            assert_eq!(
+                "Probably copyrighted or something",
+                &program.copyright.unwrap()
+            );
+            assert_eq!("MIT", &program.license.unwrap());
+            assert_eq!(vec!["Someone".to_owned()], program.authors.unwrap());
+            assert_eq!(
+                vec!["https://example.com/chip8/test-program.png"],
+                program.images.unwrap()
+            );
+            assert_eq!(
+                vec!["https://example.com/chip8/test-program.html"],
+                program.urls.unwrap()
             );
 
             Ok(())
