@@ -337,6 +337,12 @@ mod test {
 
             assert_eq!("test-program.ch8", &rom.file_name.unwrap());
             assert_eq!("Test Program Embedded", &rom.embedded_title.unwrap());
+            assert_eq!(
+                "The test program to test all programs",
+                rom.description.unwrap()
+            );
+            assert_eq!("2023-06-24", rom.release.unwrap());
+            assert_eq!(vec![Platform::OriginalChip8], rom.platforms);
 
             Ok(())
         }
