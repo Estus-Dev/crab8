@@ -40,8 +40,9 @@ pub enum OriginType {
 
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 pub struct Origin {
-    // Originally `type` in the JSON Schema
+    #[serde(rename = "type")]
     origin_type: Option<OriginType>,
+
     reference: Option<String>,
 }
 
@@ -294,6 +295,10 @@ mod test {
             // assert_eq!(input, output);
 
             assert_eq!(program.title, "Test Program");
+            assert_eq!(
+                program.origin.unwrap().origin_type.unwrap(),
+                OriginType::Manual
+            );
 
             Ok(())
         }
