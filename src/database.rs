@@ -48,7 +48,9 @@ pub struct Origin {
 
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 pub struct Rom {
+    #[serde(rename = "file")]
     file_name: Option<String>,
+
     embedded_title: Option<String>,
     description: Option<String>,
     // TODO: This should be a date of some kind
@@ -328,6 +330,10 @@ mod test {
                 vec!["https://example.com/chip8/test-program.html"],
                 program.urls.unwrap()
             );
+
+            let rom = program.roms["0123456789abcdef0123456789abcdef01234567"].clone();
+
+            assert_eq!("test-program.ch8", &rom.file_name.unwrap());
 
             Ok(())
         }
