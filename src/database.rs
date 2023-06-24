@@ -176,13 +176,10 @@ pub enum FontStyle {
 }
 
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct QuirkSet {
     shift: bool,
-
-    #[serde(rename = "memoryIncrementByX")]
     memory_increment_by_x: bool,
-
-    #[serde(rename = "memoryLeaveIUnchanged")]
     memory_leave_i_unchanged: bool,
 
     wrap: bool,
