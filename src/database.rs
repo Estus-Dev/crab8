@@ -382,6 +382,22 @@ mod test {
             assert_eq!(0x200, rom.start_address.unwrap());
             assert_eq!(ScreenRotation::Landscape, rom.screen_rotation.unwrap());
 
+            let keys = rom.keys.unwrap();
+
+            assert_eq!(0x00, keys[&Keymap::P1Up]);
+            assert_eq!(0x01, keys[&Keymap::P1Down]);
+            assert_eq!(0x02, keys[&Keymap::P1Left]);
+            assert_eq!(0x03, keys[&Keymap::P1Right]);
+            assert_eq!(0x04, keys[&Keymap::P1A]);
+            assert_eq!(0x05, keys[&Keymap::P1B]);
+
+            assert_eq!(0x10, keys[&Keymap::P2Up]);
+            assert_eq!(0x11, keys[&Keymap::P2Down]);
+            assert_eq!(0x12, keys[&Keymap::P2Left]);
+            assert_eq!(0x13, keys[&Keymap::P2Right]);
+            assert_eq!(0x14, keys[&Keymap::P2A]);
+            assert_eq!(0x15, keys[&Keymap::P2B]);
+
             Ok(())
         }
     }
