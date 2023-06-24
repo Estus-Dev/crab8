@@ -68,7 +68,10 @@ pub struct Rom {
     // TODO: Use an appropriate URL type here
     urls: Option<Vec<String>>,
     tickrate: Option<usize>,
+
+    #[serde(rename = "startAddress")]
     start_address: Option<u16>,
+
     screen_rotation: Option<ScreenRotation>,
     keys: Option<HashMap<Keymap, u8>>,
     touch_input_mode: Option<TouchInputMode>,
@@ -372,6 +375,7 @@ mod test {
                 rom.urls.unwrap()
             );
             assert_eq!(10, rom.tickrate.unwrap());
+            assert_eq!(0x200, rom.start_address.unwrap());
 
             Ok(())
         }
