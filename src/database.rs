@@ -23,7 +23,7 @@ pub struct Program {
 }
 
 #[non_exhaustive]
-#[derive(Clone, Debug, Default, Deserialize, Eq, Hash, PartialEq, Serialize)]
+#[derive(Clone, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
 pub enum OriginType {
     #[serde(rename = "gamejam")]
     GameJam,
@@ -36,10 +36,6 @@ pub enum OriginType {
 
     #[serde(rename = "manual")]
     Manual,
-
-    #[default]
-    #[serde(rename = "unknown")]
-    Unknown,
 }
 
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
