@@ -46,7 +46,7 @@ mod test {
     fn test_jump() {
         let cases = [0x1000, 0x1234, 0x1FFF, 0x1CED, 0x12BA];
 
-        let mut crab8 = Crab8::default();
+        let mut crab8 = Crab8::new();
 
         assert_eq!(crab8.program_counter, 0x200.into());
 
@@ -60,7 +60,7 @@ mod test {
     fn test_call() {
         let cases = [0x2000, 0x2234, 0x2FFF, 0x2CED, 0x22BA];
 
-        let mut crab8 = Crab8::default();
+        let mut crab8 = Crab8::new();
 
         for instruction in cases {
             crab8.exec(instruction);
@@ -90,7 +90,7 @@ mod test {
             (0xB123, 0x45, 0x168),
         ];
 
-        let mut crab8 = Crab8::default();
+        let mut crab8 = Crab8::new();
 
         for (instruction, offset, expected) in cases {
             crab8.registers.set(V0, offset);

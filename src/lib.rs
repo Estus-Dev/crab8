@@ -65,6 +65,10 @@ pub struct Crab8 {
 }
 
 impl Crab8 {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
     pub fn execute(&mut self) {
         use ExecutionState::*;
 

@@ -50,7 +50,7 @@ mod test {
             (0x3642, 0x46, false),
         ];
 
-        let mut crab8 = Crab8::default();
+        let mut crab8 = Crab8::new();
 
         for (instruction, value, skipped) in cases {
             let register = Register::from((instruction & 0x0F00) >> 8);
@@ -80,7 +80,7 @@ mod test {
             (0x4642, 0x46, true),
         ];
 
-        let mut crab8 = Crab8::default();
+        let mut crab8 = Crab8::new();
 
         for (instruction, value, skipped) in cases {
             let register = Register::from((instruction & 0x0F00) >> 8);
@@ -111,7 +111,7 @@ mod test {
             (0x5640, 0x46, 0x45, false),
         ];
 
-        let mut crab8 = Crab8::default();
+        let mut crab8 = Crab8::new();
 
         for (instruction, x_value, y_value, skipped) in cases {
             let x = Register::from((instruction & 0x0F00) >> 8);
@@ -144,7 +144,7 @@ mod test {
             (0x9640, 0x46, 0x45, true),
         ];
 
-        let mut crab8 = Crab8::default();
+        let mut crab8 = Crab8::new();
 
         for (instruction, x_value, y_value, skipped) in cases {
             let x = Register::from((instruction & 0x0F00) >> 8);

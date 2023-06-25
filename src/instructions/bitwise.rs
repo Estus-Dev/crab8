@@ -54,7 +54,7 @@ mod test {
 
     #[test]
     fn test_or() {
-        let mut crab8 = Crab8::default();
+        let mut crab8 = Crab8::new();
 
         assert_eq!(crab8.registers, 0x00000000000000000000000000000000.into());
 
@@ -77,7 +77,7 @@ mod test {
 
     #[test]
     fn test_and() {
-        let mut crab8 = Crab8::default();
+        let mut crab8 = Crab8::new();
 
         assert_eq!(crab8.registers, 0x00000000000000000000000000000000.into());
 
@@ -102,7 +102,7 @@ mod test {
 
     #[test]
     fn test_xor() {
-        let mut crab8 = Crab8::default();
+        let mut crab8 = Crab8::new();
 
         assert_eq!(crab8.registers, 0x00000000000000000000000000000000.into());
 
@@ -127,7 +127,7 @@ mod test {
 
     #[test]
     fn test_shift_right() {
-        let mut crab8 = Crab8::default();
+        let mut crab8 = Crab8::new();
 
         assert_eq!(crab8.registers, 0x00000000000000000000000000000000.into());
 
@@ -162,7 +162,7 @@ mod test {
 
     #[test]
     fn test_shift_left() {
-        let mut crab8 = Crab8::default();
+        let mut crab8 = Crab8::new();
 
         assert_eq!(crab8.registers, 0x00000000000000000000000000000000.into());
 

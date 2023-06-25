@@ -54,7 +54,7 @@ mod test {
 
     #[test]
     fn test_store_address() {
-        let mut crab8 = Crab8::default();
+        let mut crab8 = Crab8::new();
 
         assert_eq!(crab8.address_register, 0x000.into());
 
@@ -73,7 +73,7 @@ mod test {
 
     #[test]
     fn test_add_address() {
-        let mut crab8 = Crab8::default();
+        let mut crab8 = Crab8::new();
 
         assert_eq!(crab8.address_register, 0x000.into());
 
@@ -99,7 +99,7 @@ mod test {
     // This test uses bytes written in decimal for ease of use.
     #[test]
     fn test_write_decimal() {
-        let mut crab8 = Crab8::default();
+        let mut crab8 = Crab8::new();
         let start = crab8.address_register;
         let end = start.wrapping_add(3);
 
@@ -121,7 +121,7 @@ mod test {
 
     #[test]
     fn test_read_write() {
-        let mut crab8 = Crab8::default();
+        let mut crab8 = Crab8::new();
         let mut address = Address::new(FIRST_CHAR_ADDRESS);
 
         crab8.address_register = address;

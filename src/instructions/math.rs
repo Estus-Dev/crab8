@@ -50,7 +50,7 @@ mod test {
 
     #[test]
     fn test_add() {
-        let mut crab8 = Crab8::default();
+        let mut crab8 = Crab8::new();
 
         assert_eq!(crab8.registers, 0x00000000000000000000000000000000.into());
 
@@ -77,7 +77,7 @@ mod test {
 
     #[test]
     fn test_add_register_with_carry() {
-        let mut crab8 = Crab8::default();
+        let mut crab8 = Crab8::new();
 
         assert_eq!(crab8.registers, 0x00000000000000000000000000000000.into());
 
@@ -101,7 +101,7 @@ mod test {
 
     #[test]
     fn test_subtract_register_with_carry() {
-        let mut crab8 = Crab8::default();
+        let mut crab8 = Crab8::new();
 
         assert_eq!(crab8.registers, 0x00000000000000000000000000000000.into());
 
@@ -125,7 +125,7 @@ mod test {
 
     #[test]
     fn test_sub_from_register_with_carry() {
-        let mut crab8 = Crab8::default();
+        let mut crab8 = Crab8::new();
 
         assert_eq!(crab8.registers, 0x00000000000000000000000000000000.into());
 

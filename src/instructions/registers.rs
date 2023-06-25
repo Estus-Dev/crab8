@@ -20,7 +20,7 @@ mod test {
 
     #[test]
     fn test_store() {
-        let mut crab8 = Crab8::default();
+        let mut crab8 = Crab8::new();
 
         assert_eq!(crab8.registers, 0x00000000000000000000000000000000.into());
 
@@ -39,7 +39,7 @@ mod test {
 
     #[test]
     fn test_copy() {
-        let mut crab8 = Crab8::default();
+        let mut crab8 = Crab8::new();
 
         assert_eq!(crab8.registers, 0x00000000000000000000000000000000.into());
 

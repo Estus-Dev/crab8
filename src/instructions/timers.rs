@@ -28,7 +28,7 @@ mod test {
 
     #[test]
     fn test_delay_timer() {
-        let mut crab8 = Crab8::default();
+        let mut crab8 = Crab8::new();
 
         assert_eq!(crab8.delay, 0x00.into());
 
@@ -58,7 +58,7 @@ mod test {
 
     #[test]
     fn test_sound_timer() {
-        let mut crab8 = Crab8::default();
+        let mut crab8 = Crab8::new();
 
         assert_eq!(crab8.sound, 0x00.into());
 

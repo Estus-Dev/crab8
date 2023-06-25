@@ -53,7 +53,7 @@ mod test {
     #[test]
     // TODO: Most of these tests should use some form of property-based testing
     fn test_is_not_pressed() {
-        let mut crab8 = Crab8::default();
+        let mut crab8 = Crab8::new();
 
         for register in (0x0..=0x0F).map(Register::from) {
             for pressed_key in (0x0..=0x0F).map(Key::new) {
@@ -108,7 +108,7 @@ mod test {
     #[test]
     // TODO: Most of these tests should use some form of property-based testing
     fn test_is_pressed() {
-        let mut crab8 = Crab8::default();
+        let mut crab8 = Crab8::new();
 
         for register in (0x0..=0x0F).map(Register::from) {
             for pressed_key in (0x0..=0x0F).map(Key::new) {
@@ -162,7 +162,7 @@ mod test {
 
     #[test]
     fn test_blocking_input() {
-        let mut crab8 = Crab8::default();
+        let mut crab8 = Crab8::new();
 
         let expected = crab8.program_counter.wrapping_sub(2);
         let key = Key::KeyC;

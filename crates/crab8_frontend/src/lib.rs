@@ -16,7 +16,7 @@ use winit::{
 
 use crate::screen::DrawScreen;
 pub async fn run() {
-    let mut crab8 = crab8::Crab8::default();
+    let mut crab8 = crab8::Crab8::new();
     let event_loop = EventLoop::new();
     let mut last_update = Instant::now();
     let url =
