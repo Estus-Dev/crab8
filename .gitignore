@@ -3,3 +3,4 @@
 /crates/crab8_frontend/wasm/assets/
 /crates/crab8_frontend/wasm/built/
 *.code-workspace
+/database
