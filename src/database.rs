@@ -2,7 +2,52 @@
 
 use serde::{Deserialize, Serialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
-use std::collections::HashMap;
+use sha1::{Digest, Sha1};
+use std::{collections::HashMap, fs, path::Path};
+
+#[derive(Clone, Debug, Default)]
+pub struct Database {
+    programs: Vec<Program>,
+    hashes: HashMap<String, usize>,
+}
+
+impl Database {
+    pub fn load<P: AsRef<Path>, Q: AsRef<Path>>(programs: P, hashes: Q) -> std::io::Result<Self> {
+        let programs = fs::read_to_string(programs)?;
+        let programs = serde_json::from_str(&programs)?;
+
+        let hashes = fs::read_to_string(hashes)?;
+        let hashes = serde_json::from_str(&hashes)?;
+
+        Ok(Database { programs, hashes })
+    }
+
+    pub fn get_metadata(&self, rom: &[u8]) -> Option<Program> {
+        let mut hasher = Sha1::new();
+        hasher.update(rom);
+        let hash = hasher.finalize();
+        let mut buf = [0u8; 40];
+        let hash = base16ct::lower::encode_str(&hash, &mut buf).unwrap();
+
+        log::info!("Looking up ROM with hash {hash}");
+
+        self.hashes.get(hash).map(|i| {
+            let mut program = self.programs[*i].clone();
+            let rom = program
+                .roms
+                .get(hash)
+                .expect("If the hash matches above it should match here")
+                .clone();
+
+            program.roms = HashMap::new();
+            program.roms.insert(hash.to_owned(), rom);
+
+            log::info!(r#"Found ROM "{}" ({hash})"#, program.title);
+
+            program
+        })
+    }
+}
 
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 pub struct Program {
@@ -176,12 +221,11 @@ pub enum FontStyle {
 }
 
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", default)]
 pub struct QuirkSet {
     shift: bool,
     memory_increment_by_x: bool,
     memory_leave_i_unchanged: bool,
-
     wrap: bool,
     jump: bool,
     vblank: bool,
