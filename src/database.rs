@@ -3,7 +3,7 @@
 use serde::{Deserialize, Serialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
 use sha1::{Digest, Sha1};
-use std::{collections::HashMap, fs, path::Path};
+use std::collections::HashMap;
 
 #[derive(Clone, Debug, Default)]
 pub struct Database {
@@ -12,12 +12,12 @@ pub struct Database {
 }
 
 impl Database {
-    pub fn load<P: AsRef<Path>, Q: AsRef<Path>>(programs: P, hashes: Q) -> std::io::Result<Self> {
-        let programs = fs::read_to_string(programs)?;
-        let programs = serde_json::from_str(&programs)?;
+    pub fn load() -> std::io::Result<Self> {
+        let programs = include_str!("../vendor/chip-8-database/database/programs.json");
+        let programs = serde_json::from_str(programs)?;
 
-        let hashes = fs::read_to_string(hashes)?;
-        let hashes = serde_json::from_str(&hashes)?;
+        let hashes = include_str!("../vendor/chip-8-database/database/sha1-hashes.json");
+        let hashes = serde_json::from_str(hashes)?;
 
         Ok(Database { programs, hashes })
     }
