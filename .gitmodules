@@ -1,0 +1,3 @@
+[submodule "vendor/chip-8-database"]
+	path = vendor/chip-8-database
+	url = git@github.com:chip-8/chip-8-database.git
