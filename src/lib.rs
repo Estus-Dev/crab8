@@ -74,8 +74,11 @@ pub struct Crab8 {
 impl Crab8 {
     pub fn new() -> Self {
         let mut crab8 = Self::default();
+        let database_path = "./vendor/chip-8-database/database";
+        let programs_path = format!("{database_path}/programs.json");
+        let hashes_path = format!("{database_path}/sha1-hashes.json");
 
-        if let Ok(database) = Database::load("./db/programs.json", "./db/sha1-hashes.json") {
+        if let Ok(database) = Database::load(programs_path, hashes_path) {
             crab8.database = Some(database);
             log::info!("Loaded CHIP-8 Database");
         } else {
