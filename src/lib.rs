@@ -1,5 +1,4 @@
 pub mod character;
-pub mod database;
 pub mod input;
 pub mod instructions;
 pub mod memory;
@@ -21,7 +20,6 @@ pub mod prelude {
 }
 
 use crate::prelude::*;
-use database::{Database, Program};
 use input::InputBuilder;
 #[cfg(feature = "download")]
 use reqwest::{blocking::get, Result};
@@ -64,25 +62,12 @@ pub struct Crab8 {
 
     instructions_since_frame: usize,
 
-    database: Option<Database>,
-
     program: Option<Vec<u8>>,
-
-    metadata: Option<Program>,
 }
 
 impl Crab8 {
     pub fn new() -> Self {
-        let mut crab8 = Self::default();
-
-        if let Ok(database) = Database::load() {
-            crab8.database = Some(database);
-            log::info!("Loaded CHIP-8 Database");
-        } else {
-            log::warn!("Failed to load CHIP-8 Database");
-        }
-
-        crab8
+        Self::default()
     }
 
     pub fn execute(&mut self) {
@@ -139,7 +124,6 @@ impl Crab8 {
         self.reset();
         self.program = Some(Vec::from(rom));
         self.memory.set_range(Address::initial_instruction(), rom);
-        self.metadata = self.database.as_ref().and_then(|db| db.get_metadata(rom));
     }
 
     pub fn load_file<P: AsRef<Path>>(&mut self, filename: P) -> std::io::Result<()> {
@@ -218,9 +202,7 @@ impl Default for Crab8 {
             execution_state: Default::default(),
             instructions_per_frame: 10,
             instructions_since_frame: 0,
-            database: None,
             program: None,
-            metadata: None,
         }
     }
 }
