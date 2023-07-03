@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 chip8_db = { workspace = true }
 getrandom = { workspace = true, features = ["js"] }
+log = { workspace = true }
 rand = { workspace = true }
 reqwest = { workspace = true, optional = true, features = ["blocking"] }
 
