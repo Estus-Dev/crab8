@@ -350,9 +350,9 @@ checksum = "fd16c4719339c4530435d38e511904438d07cce7950afa3718a84ac36c10e89e"
 
 [[package]]
 name = "chip8_db"
-version = "2.0.0"
+version = "2.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c1700bcd5c66a54470c76b0bb997b06e11f382ade5c03b84429b543696f7b6bc"
+checksum = "1f9070a0940795948ae096391313821a37c2a0d31edc46486b433e5543bb3b2b"
 dependencies = [
  "base16ct",
  "serde",
