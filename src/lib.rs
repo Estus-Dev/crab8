@@ -20,6 +20,7 @@ pub mod prelude {
 }
 
 use crate::prelude::*;
+use chip8_db::{Database, Metadata};
 use input::InputBuilder;
 #[cfg(feature = "download")]
 use reqwest::{blocking::get, Result};
@@ -63,6 +64,11 @@ pub struct Crab8 {
     instructions_since_frame: usize,
 
     rom: Option<Vec<u8>>,
+
+    // TODO: This should not be owned by Crab8, lazy_static/once_cell instead?
+    pub database: Database,
+
+    pub metadata: Option<Metadata>,
 }
 
 impl Crab8 {
@@ -121,9 +127,18 @@ impl Crab8 {
     }
 
     pub fn load(&mut self, rom: &[u8]) {
+        let metadata = self.database.get_metadata(rom);
+
+        if let Some(program) = &metadata.program {
+            log::info!(r#"Loaded ROM "{}" ({})"#, program.title, metadata.hash);
+        } else {
+            log::warn!("Loaded unknown ROM ({})", metadata.hash);
+        }
+
         self.reset();
         self.rom = Some(Vec::from(rom));
         self.memory.set_range(Address::initial_instruction(), rom);
+        self.metadata = Some(metadata);
     }
 
     pub fn load_file<P: AsRef<Path>>(&mut self, filename: P) -> std::io::Result<()> {
@@ -203,6 +218,8 @@ impl Default for Crab8 {
             instructions_per_frame: 10,
             instructions_since_frame: 0,
             rom: None,
+            database: Database::new(),
+            metadata: None,
         }
     }
 }
