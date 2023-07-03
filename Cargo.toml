@@ -6,6 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+chip8_db = { workspace = true }
 getrandom = { workspace = true, features = ["js"] }
 log = { workspace = true }
 rand = { workspace = true }
@@ -20,6 +21,7 @@ members = ["crates/*"]
 
 [workspace.dependencies]
 anyhow = "^1.0.71"
+chip8_db = "^2.1.0"
 chrono = "^0.4.24"
 console_error_panic_hook = "^0.1.7"
 console_log = "^1.0.0"
