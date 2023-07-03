@@ -62,7 +62,7 @@ pub struct Crab8 {
 
     instructions_since_frame: usize,
 
-    program: Option<Vec<u8>>,
+    rom: Option<Vec<u8>>,
 }
 
 impl Crab8 {
@@ -122,7 +122,7 @@ impl Crab8 {
 
     pub fn load(&mut self, rom: &[u8]) {
         self.reset();
-        self.program = Some(Vec::from(rom));
+        self.rom = Some(Vec::from(rom));
         self.memory.set_range(Address::initial_instruction(), rom);
     }
 
@@ -202,7 +202,7 @@ impl Default for Crab8 {
             execution_state: Default::default(),
             instructions_per_frame: 10,
             instructions_since_frame: 0,
-            program: None,
+            rom: None,
         }
     }
 }
