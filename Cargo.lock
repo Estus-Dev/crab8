@@ -511,7 +511,6 @@ dependencies = [
  "getrandom",
  "log",
  "rand",
- "reqwest",
  "thiserror",
 ]
 
