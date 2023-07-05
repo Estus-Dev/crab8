@@ -22,7 +22,7 @@ pub mod prelude {
 use crate::prelude::*;
 use chip8_db::{Database, Metadata};
 use input::InputBuilder;
-use std::{fmt, fmt::Display, fs::File, io::Read, path::Path};
+use std::{fmt, fmt::Display};
 
 /// Chip8 represents the current state of the entire machine.
 /// https://github.com/mattmikolay/chip-8/wiki/CHIP%E2%80%908-Technical-Reference
@@ -139,17 +139,6 @@ impl Crab8 {
         self.metadata = Some(metadata);
     }
 
-    pub fn load_file<P: AsRef<Path>>(&mut self, filename: P) -> std::io::Result<()> {
-        let mut file = File::open(filename)?;
-        let mut buffer = Vec::new();
-
-        // TODO: Check to see if it will fit in memory
-        file.read_to_end(&mut buffer)?;
-
-        self.load(&buffer);
-
-        Ok(())
-    }
     pub fn reset(&mut self) {
         self.address_register = Address::default();
         self.program_counter = Address::initial_instruction();
