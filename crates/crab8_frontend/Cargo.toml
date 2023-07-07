@@ -19,6 +19,7 @@ egui = { workspace = true }
 egui-wgpu = { workspace = true }
 ehttp = { workspace = true }
 env_logger = { workspace = true }
+image = { workspace = true, features = ["png"] }
 instant = { workspace = true }
 log = { workspace = true }
 pixels = { workspace = true }
