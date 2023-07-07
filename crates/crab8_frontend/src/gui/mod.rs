@@ -1,5 +1,6 @@
 mod about;
 mod download;
+mod images;
 mod playback;
 mod registers;
 pub mod renderer;

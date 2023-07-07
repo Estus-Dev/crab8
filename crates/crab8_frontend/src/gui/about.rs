@@ -1,4 +1,6 @@
-use egui::{Context, Window};
+use egui::{Context, TextureOptions, Window};
+
+use super::images;
 
 #[derive(Default)]
 pub struct AboutWindow {
@@ -10,8 +12,14 @@ impl AboutWindow {
         Window::new("About")
             .open(&mut self.open)
             .show(context, |ui| {
-                // TODO: Add logo
-                ui.heading("CRAB-8");
+                let handle = images::load_egui_image(images::LOGO).expect("Logo is built-in");
+
+                let logo = context.load_texture("crab8-logo", handle, TextureOptions::LINEAR);
+
+                ui.vertical_centered(|ui| {
+                    ui.image(logo.id(), (128.0, 128.0));
+                    ui.heading("CRAB-8");
+                });
 
                 ui.add_space(20.0);
 
