@@ -21,7 +21,7 @@ impl PlaybackWindow {
                     };
 
                 if ui.button("Reset").clicked() {
-                    crab8.reset();
+                    crab8.reload();
                 }
 
                 if ui.button("Stop").clicked() {
