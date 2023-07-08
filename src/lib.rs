@@ -55,7 +55,7 @@ pub struct Crab8 {
 
     pub screen: Screen,
 
-    pub execution_state: ExecutionState,
+    execution_state: ExecutionState,
 
     pub instructions_per_frame: usize,
 
@@ -158,6 +158,31 @@ impl Crab8 {
         if let Some(rom) = self.rom.clone() {
             self.load(&rom);
         }
+    }
+
+    pub fn is_running(&self) -> bool {
+        matches!(self.execution_state, ExecutionState::Running)
+    }
+
+    pub fn play(&mut self) {
+        self.execution_state = ExecutionState::Running;
+    }
+
+    pub fn pause(&mut self) {
+        self.execution_state = ExecutionState::Paused;
+    }
+
+    pub fn stop(&mut self) {
+        self.execution_state = ExecutionState::Stopped;
+        self.reload();
+    }
+
+    pub fn step_instruction(&mut self) {
+        self.execution_state = ExecutionState::StepInstruction;
+    }
+
+    pub fn step_frame(&mut self) {
+        self.execution_state = ExecutionState::StepFrame;
     }
 
     pub fn log_registers(&self) {
