@@ -58,19 +58,19 @@ impl Screen {
 
 impl Debug for Screen {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        writeln!(f, "/{}\\", "-".repeat(64))?;
+        writeln!(f, "/{}\\", "--".repeat(WIDTH))?;
 
         for row in self.0 {
             write!(f, "|")?;
 
             for pixel in row {
-                write!(f, "{}", if pixel { "X" } else { " " })?;
+                write!(f, "{}", if pixel { "XX" } else { "  " })?;
             }
 
             writeln!(f, "|")?;
         }
 
-        writeln!(f, "\\{}/", "-".repeat(64))?;
+        writeln!(f, "\\{}/", "--".repeat(WIDTH))?;
 
         Ok(())
     }
