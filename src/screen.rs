@@ -10,18 +10,20 @@ pub struct Screen([[bool; WIDTH]; HEIGHT]);
 
 impl Screen {
     pub fn draw(&self, x: u8, y: u8, sprite: &[u8]) -> (Self, bool) {
+        let x = x as usize % WIDTH;
+        let y = y as usize % HEIGHT;
         let mut screen = self.clone();
         let mut collision_flag = false;
 
         'y: for (sprite_y, &sprite_row) in sprite.iter().enumerate() {
-            let screen_y = sprite_y + y as usize;
+            let screen_y = sprite_y + y;
 
             if screen_y >= HEIGHT {
                 break 'y;
             }
 
             'x: for sprite_x in 0..8 {
-                let screen_x = sprite_x as usize + x as usize;
+                let screen_x = sprite_x + x;
                 let mask = 0b_1000_0000 >> sprite_x;
                 let sprite_pixel = sprite_row & mask;
 
