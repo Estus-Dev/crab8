@@ -137,6 +137,7 @@ impl Crab8 {
         self.rom = Some(Vec::from(rom));
         self.memory.set_range(Address::initial_instruction(), rom);
         self.metadata = Some(metadata);
+        self.execution_state = ExecutionState::Running;
     }
 
     pub fn reset(&mut self) {
@@ -220,10 +221,10 @@ impl Display for Crab8 {
 
 #[derive(Debug, Default, PartialEq, Eq)]
 pub enum ExecutionState {
+    #[default]
+    Stopped,
+    Running,
     Paused,
     StepInstruction,
     StepFrame,
-    #[default]
-    Running,
-    Stopped,
 }
