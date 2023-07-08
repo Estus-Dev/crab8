@@ -180,7 +180,7 @@ impl Crab8 {
         }
 
         self.execution_state = ExecutionState::Stopped;
-        self.reload();
+        log::info!("Execution Terminated. Final Screen:\n{}", self.screen);
     }
 
     pub fn step_instruction(&mut self) {
