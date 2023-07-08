@@ -152,6 +152,10 @@ impl Crab8 {
         self.next_input = Default::default();
         self.screen = Default::default();
         self.instructions_since_frame = 0;
+
+        if let Some(rom) = self.rom.clone() {
+            self.load(&rom);
+        }
     }
 
     pub fn log_registers(&self) {
