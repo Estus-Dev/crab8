@@ -64,7 +64,7 @@ impl Debug for Screen {
             write!(f, "|")?;
 
             for pixel in row {
-                write!(f, "{}", if pixel { "XX" } else { "  " })?;
+                write!(f, "{}", if pixel { "██" } else { "  " })?;
             }
 
             writeln!(f, "|")?;
