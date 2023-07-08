@@ -133,7 +133,6 @@ impl Crab8 {
             log::warn!("Loaded unknown ROM ({})", metadata.hash);
         }
 
-        self.reset();
         self.rom = Some(Vec::from(rom));
         self.memory.set_range(Address::initial_instruction(), rom);
         self.metadata = Some(metadata);
@@ -166,6 +165,8 @@ impl Crab8 {
     }
 
     pub fn play(&mut self) {
+        self.resume_if_stopped();
+
         self.execution_state = ExecutionState::Running;
     }
 
@@ -183,11 +184,21 @@ impl Crab8 {
     }
 
     pub fn step_instruction(&mut self) {
+        self.resume_if_stopped();
+
         self.execution_state = ExecutionState::StepInstruction;
     }
 
     pub fn step_frame(&mut self) {
+        self.resume_if_stopped();
+
         self.execution_state = ExecutionState::StepFrame;
+    }
+
+    fn resume_if_stopped(&mut self) {
+        if matches!(self.execution_state, ExecutionState::Stopped) {
+            self.reload();
+        }
     }
 
     pub fn log_registers(&self) {
