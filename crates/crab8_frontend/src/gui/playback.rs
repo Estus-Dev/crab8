@@ -20,6 +20,10 @@ impl PlaybackWindow {
                         ("Play", ExecutionState::Running)
                     };
 
+                if ui.button("Stop").clicked() {
+                    crab8.execution_state = ExecutionState::Stopped;
+                }
+
                 if ui.button(play_pause_label).clicked() {
                     crab8.execution_state = play_pause_state;
                 }
