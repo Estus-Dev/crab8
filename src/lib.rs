@@ -103,7 +103,7 @@ impl Crab8 {
         }
 
         if matches!(self.execution_state, StepFrame | StepInstruction) {
-            self.execution_state = Paused;
+            self.pause();
         }
     }
 
@@ -137,7 +137,7 @@ impl Crab8 {
         self.rom = Some(Vec::from(rom));
         self.memory.set_range(Address::initial_instruction(), rom);
         self.metadata = Some(metadata);
-        self.execution_state = ExecutionState::Running;
+        self.play();
     }
 
     pub fn reset(&mut self) {
@@ -173,6 +173,10 @@ impl Crab8 {
     }
 
     pub fn stop(&mut self) {
+        if matches!(self.execution_state, ExecutionState::Stopped) {
+            return;
+        }
+
         self.execution_state = ExecutionState::Stopped;
         self.reload();
     }

@@ -32,7 +32,7 @@ impl Crab8 {
 
     fn halt_on_jump_to_self(&mut self, address: Address) {
         if address == self.program_counter.wrapping_sub(2) {
-            self.execution_state = ExecutionState::Stopped;
+            self.stop();
         }
     }
 }
