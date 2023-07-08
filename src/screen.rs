@@ -58,6 +58,26 @@ impl Screen {
 
 impl Debug for Screen {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        for row in self.0 {
+            for pixel in row {
+                write!(f, "{}", if pixel { "██" } else { "  " })?;
+            }
+
+            writeln!(f)?;
+        }
+
+        Ok(())
+    }
+}
+
+impl Default for Screen {
+    fn default() -> Self {
+        Self([[false; 64]; 32])
+    }
+}
+
+impl Display for Screen {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         writeln!(f, "/{}\\", "--".repeat(WIDTH))?;
 
         for row in self.0 {
@@ -73,17 +93,5 @@ impl Debug for Screen {
         writeln!(f, "\\{}/", "--".repeat(WIDTH))?;
 
         Ok(())
-    }
-}
-
-impl Default for Screen {
-    fn default() -> Self {
-        Self([[false; 64]; 32])
-    }
-}
-
-impl Display for Screen {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{self:?}")
     }
 }
