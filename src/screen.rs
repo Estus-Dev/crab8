@@ -78,19 +78,19 @@ impl Default for Screen {
 
 impl Display for Screen {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        writeln!(f, "/{}\\", "--".repeat(WIDTH))?;
+        writeln!(f, "╭{}╮", "──".repeat(WIDTH))?;
 
         for row in self.0 {
-            write!(f, "|")?;
+            write!(f, "│")?;
 
             for pixel in row {
                 write!(f, "{}", if pixel { "██" } else { "  " })?;
             }
 
-            writeln!(f, "|")?;
+            writeln!(f, "│")?;
         }
 
-        writeln!(f, "\\{}/", "--".repeat(WIDTH))?;
+        writeln!(f, "╰{}╯", "──".repeat(WIDTH))?;
 
         Ok(())
     }
