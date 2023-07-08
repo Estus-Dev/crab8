@@ -40,10 +40,7 @@ impl Gui {
             menu::bar(ui, |ui| {
                 ui.menu_button("File", |ui| {
                     if ui.button("Open").clicked() {
-                        wasm_bindgen_futures::spawn_local(Self::open_file(
-                            self.rom.clone(),
-                            self.error.clone(),
-                        ));
+                        self.open_file_wrapper();
 
                         ui.close_menu();
                     }
@@ -144,5 +141,15 @@ impl Gui {
                 }
             },
         };
+    }
+
+    #[cfg(not(platform = "wasm32"))]
+    fn open_file_wrapper(&mut self) {
+        pollster::block_on(Self::open_file(self.rom.clone(), self.error.clone()));
+    }
+
+    #[cfg(platform = "wasm32")]
+    fn open_file_wrapper(&mut self) {
+        wasm_bindgen_futures::spawn_local(Self::open_file(self.rom.clone(), self.error.clone()));
     }
 }
