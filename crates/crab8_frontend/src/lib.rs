@@ -7,7 +7,6 @@ mod window;
 pub mod wasm;
 
 use instant::{Duration, Instant};
-use reqwest::{Client, Method, Request};
 use window::Crab8Window;
 use winit::{
     event::{Event, KeyboardInput, WindowEvent},
@@ -19,20 +18,6 @@ pub async fn run() {
     let mut crab8 = crab8::Crab8::new();
     let event_loop = EventLoop::new();
     let mut last_update = Instant::now();
-    let url =
-        "https://raw.githubusercontent.com/Timendus/chip8-test-suite/master/bin/1-chip8-logo.ch8"
-            .try_into()
-            .expect("It's a valid URL");
-
-    let test_rom = Client::new()
-        .execute(Request::new(Method::GET, url))
-        .await
-        .expect("The network could never fail, right?")
-        .bytes()
-        .await
-        .expect("I should look up how getting a successful response's bytes could fail.");
-
-    crab8.load(&test_rom);
 
     let mut window = {
         let (crab8_width, crab8_height) = crab8.screen.size();
