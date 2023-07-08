@@ -152,7 +152,9 @@ impl Crab8 {
         self.next_input = Default::default();
         self.screen = Default::default();
         self.instructions_since_frame = 0;
+    }
 
+    pub fn reload(&mut self) {
         if let Some(rom) = self.rom.clone() {
             self.load(&rom);
         }
