@@ -1,4 +1,6 @@
-use std::{fmt, fmt::Debug, fmt::Display};
+use itertools::Itertools;
+use std::{fmt, fmt::Debug, fmt::Display, str::FromStr};
+use thiserror::Error;
 
 const WIDTH: usize = 64;
 const HEIGHT: usize = 32;
@@ -94,4 +96,87 @@ impl Display for Screen {
 
         Ok(())
     }
+}
+
+impl FromStr for Screen {
+    type Err = ScreenParseError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let mut pixel_lines: Vec<[bool; WIDTH]> = Vec::with_capacity(HEIGHT);
+
+        for (line_num, line) in s.lines().enumerate() {
+            let mut pixels = Vec::with_capacity(WIDTH);
+
+            for (column, pixel) in line
+                .chars()
+                .chunks(2)
+                .into_iter()
+                .enumerate()
+                .map(|(column, chars)| (column, chars.collect::<String>()))
+            {
+                pixels.push(match pixel.as_str() {
+                    "██" => true,
+                    "  " => false,
+                    _ => {
+                        return Err(ScreenParseError::InvalidPixel {
+                            pixel: pixel.to_owned(),
+                            line_num,
+                            column,
+                        })
+                    }
+                });
+            }
+
+            if pixels.len() != WIDTH {
+                return Err(ScreenParseError::InvalidWidth {
+                    line_num,
+                    len: line.len(),
+                    expected: WIDTH * 2,
+                });
+            }
+
+            if pixels.len() != WIDTH {
+                return Err(ScreenParseError::InvalidWidth {
+                    line_num,
+                    len: line.len(),
+                    expected: WIDTH * 2,
+                });
+            }
+
+            let pixels = pixels[0..WIDTH].try_into().unwrap();
+
+            pixel_lines.push(pixels);
+        }
+
+        if pixel_lines.len() != HEIGHT {
+            return Err(ScreenParseError::InvalidHeight {
+                len: pixel_lines.len(),
+                expected: HEIGHT,
+            });
+        }
+
+        let pixel_lines = pixel_lines[0..HEIGHT].try_into().unwrap();
+
+        Ok(Screen(pixel_lines))
+    }
+}
+
+#[derive(Debug, Error)]
+pub enum ScreenParseError {
+    #[error("Invalid pixel {} (line {}:{}", pixel, line_num, column)]
+    InvalidPixel {
+        pixel: String,
+        line_num: usize,
+        column: usize,
+    },
+
+    #[error("Expected {} chars, found {} (line {})", len, expected, line_num)]
+    InvalidWidth {
+        len: usize,
+        expected: usize,
+        line_num: usize,
+    },
+
+    #[error("Expected {} lines, found {}", len, expected)]
+    InvalidHeight { len: usize, expected: usize },
 }
