@@ -1,3 +1,6 @@
 [submodule "vendor/chip-8-database"]
 	path = vendor/chip-8-database
 	url = git@github.com:chip-8/chip-8-database.git
+[submodule "tests/timendus-test-suite"]
+	path = tests/timendus-test-suite
+	url = git@github.com:Timendus/chip8-test-suite.git
