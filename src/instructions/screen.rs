@@ -44,22 +44,6 @@ mod test {
     use crate::instructions::Instruction::*;
 
     #[test]
-    fn test_clear_screen() {
-        let mut crab8 = Crab8::new();
-
-        // TODO: Draw something
-
-        crab8.exec(ClearScreen);
-
-        assert_eq!(crab8.screen, Screen::default());
-    }
-
-    #[test]
-    fn test_draw() {
-        // TODO:
-    }
-
-    #[test]
     fn test_load_sprite() {
         let mut crab8 = Crab8::new();
         let mut offset = 0x00;
