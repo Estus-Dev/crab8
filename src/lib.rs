@@ -240,7 +240,7 @@ impl Default for Crab8 {
             memory: Default::default(),
             input: Default::default(),
             next_input: Default::default(),
-            screen: Default::default(),
+            screen: Screen::startup(),
             execution_state: Default::default(),
             instructions_per_frame: 10,
             instructions_since_frame: 0,

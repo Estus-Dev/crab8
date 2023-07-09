@@ -11,6 +11,11 @@ const HEIGHT: usize = 32;
 pub struct Screen([[bool; WIDTH]; HEIGHT]);
 
 impl Screen {
+    pub fn startup() -> Self {
+        let screen = include_str!("../assets/sprites/crab8-startup.ch8s");
+        Self::from_str(screen).unwrap()
+    }
+
     pub fn draw(&self, x: u8, y: u8, sprite: &[u8]) -> (Self, bool) {
         let x = x as usize % WIDTH;
         let y = y as usize % HEIGHT;
