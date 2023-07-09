@@ -186,6 +186,8 @@ impl Crab8 {
     }
 
     pub fn pause(&mut self) {
+        self.resume_if_stopped();
+
         log::debug!("Execution paused");
         self.execution_state = ExecutionState::Paused;
     }
@@ -200,14 +202,20 @@ impl Crab8 {
     }
 
     pub fn step_instruction(&mut self) {
-        self.resume_if_stopped();
+        if matches!(self.execution_state, ExecutionState::Stopped) {
+            log::warn!("Attempted to step instructions after execution has stopped.");
+            return;
+        }
 
         log::debug!("Stepping instruction");
         self.execution_state = ExecutionState::StepInstruction;
     }
 
     pub fn step_frame(&mut self) {
-        self.resume_if_stopped();
+        if matches!(self.execution_state, ExecutionState::Stopped) {
+            log::warn!("Attempted to step frames after execution has stopped.");
+            return;
+        }
 
         log::debug!("Stepping frame");
         self.execution_state = ExecutionState::StepFrame;
