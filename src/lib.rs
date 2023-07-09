@@ -207,8 +207,12 @@ impl Crab8 {
     }
 
     pub fn log_registers(&self) {
+        log::trace!(target: "execution_state", "{}", self.dump_registers());
+    }
+
+    pub fn dump_registers(&self) -> String {
         // Based on wheremyfoodat's gameboy test log output.
-        log::trace!(target: "execution_state",
+        format!(
         "{} D: {:02X?} S: {:02X?} CS: {:02X?} I: {:04X?} ({:02X?} {:02X?} {:02X?} {:02X?}) PC: {:04X?} ({:02X?} {:02X?} {:02X?} {:02X?})",
             self.registers,
             self.delay,
@@ -224,7 +228,7 @@ impl Crab8 {
             self.memory.get(self.program_counter.wrapping_add(1)),
             self.memory.get(self.program_counter.wrapping_add(2)),
             self.memory.get(self.program_counter.wrapping_add(3)),
-        );
+        )
     }
 }
 
