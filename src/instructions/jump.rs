@@ -1,4 +1,4 @@
-use crate::{memory::Address, registers::Register::*, Crab8, ExecutionState};
+use crate::{memory::Address, registers::Register::*, Crab8};
 
 impl Crab8 {
     pub fn exec_return(&mut self) {
