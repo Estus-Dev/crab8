@@ -52,7 +52,7 @@ mod test {
 
     #[test]
     // TODO: Most of these tests should use some form of property-based testing
-    fn test_is_not_pressed() {
+    fn is_not_pressed() {
         let mut crab8 = Crab8::new();
 
         for register in (0x0..=0x0F).map(Register::from) {
@@ -107,7 +107,7 @@ mod test {
 
     #[test]
     // TODO: Most of these tests should use some form of property-based testing
-    fn test_is_pressed() {
+    fn is_pressed() {
         let mut crab8 = Crab8::new();
 
         for register in (0x0..=0x0F).map(Register::from) {
@@ -161,7 +161,7 @@ mod test {
     }
 
     #[test]
-    fn test_blocking_input() {
+    fn blocking_input() {
         let mut crab8 = Crab8::new();
 
         let expected = crab8.program_counter.wrapping_sub(2);

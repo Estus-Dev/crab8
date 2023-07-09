@@ -225,7 +225,7 @@ mod test {
     use super::*;
 
     #[test]
-    fn test_registers_from_u128() {
+    fn registers_from_u128() {
         let cases: [(u128, [u8; 16]); 2] = [
             (
                 0x000000000000000000000000000000FF,

@@ -253,7 +253,7 @@ mod test {
     use super::*;
 
     #[test]
-    fn test_lex_registers() {
+    fn lex_registers() {
         let input = "v0 v1 v2 v3 v4 v5 v6 v7 v8 v9 va vb vc vd ve vf";
         let mut lexer = Token::lexer(input);
 
@@ -307,7 +307,7 @@ mod test {
     }
 
     #[test]
-    fn test_lex_special_registers() {
+    fn lex_special_registers() {
         let input = "delay buzzer i";
         let mut lexer = Token::lexer(input);
 
@@ -322,7 +322,7 @@ mod test {
     }
 
     #[test]
-    fn test_lex_assign() {
+    fn lex_assign() {
         let input = ":=";
         let mut lexer = Token::lexer(input);
 
@@ -331,7 +331,7 @@ mod test {
     }
 
     #[test]
-    fn test_lex_basic_math_ops() {
+    fn lex_basic_math_ops() {
         let input = "+= -= =-";
         let mut lexer = Token::lexer(input);
 
@@ -346,7 +346,7 @@ mod test {
     }
 
     #[test]
-    fn test_lex_bitwise_ops() {
+    fn lex_bitwise_ops() {
         let input = "&= |= ^=";
         let mut lexer = Token::lexer(input);
 
@@ -361,7 +361,7 @@ mod test {
     }
 
     #[test]
-    fn test_lex_shift_ops() {
+    fn lex_shift_ops() {
         let input = "<<= >>=";
         let mut lexer = Token::lexer(input);
 
@@ -373,7 +373,7 @@ mod test {
     }
 
     #[test]
-    fn test_lex_comparison_ops() {
+    fn lex_comparison_ops() {
         let input = "== != <  >  <= >=";
         let mut lexer = Token::lexer(input);
 
@@ -397,7 +397,7 @@ mod test {
     }
 
     #[test]
-    fn test_lex_input_ops() {
+    fn lex_input_ops() {
         let input = "key -key";
         let mut lexer = Token::lexer(input);
 
@@ -409,7 +409,7 @@ mod test {
     }
 
     #[test]
-    fn test_lex_newline() {
+    fn lex_newline() {
         let input = "v0 v1\nv2";
         let mut lexer = Token::lexer(input);
 
@@ -427,7 +427,7 @@ mod test {
     }
 
     #[test]
-    fn test_lex_keywords() {
+    fn lex_keywords() {
         let input = "return ; clear bcd save load jump jump0 hex long random";
         let mut lexer = Token::lexer(input);
 
@@ -466,7 +466,7 @@ mod test {
     }
 
     #[test]
-    fn test_lex_conditional_keywords() {
+    fn lex_conditional_keywords() {
         let input = "if begin then else end";
         let mut lexer = Token::lexer(input);
 
@@ -487,7 +487,7 @@ mod test {
     }
 
     #[test]
-    fn test_lex_loop_keywords() {
+    fn lex_loop_keywords() {
         let input = "loop while end";
         let mut lexer = Token::lexer(input);
 
@@ -502,7 +502,7 @@ mod test {
     }
 
     #[test]
-    fn test_lex_comments() {
+    fn lex_comments() {
         let input = "
             v0 v1 # v2 v3 v4
             #v5 v6 v7
@@ -535,7 +535,7 @@ mod test {
     }
 
     #[test]
-    fn test_lex_bytes() {
+    fn lex_bytes() {
         let input = "0 1 2 12 32 52 123 249 255 0xFF 0xAC 0x3D 0x00 0x12
         0b0 0b1 0b10 0b00000000 0b10101010 0b11111110";
         let mut lexer = Token::lexer(input);
@@ -605,7 +605,7 @@ mod test {
     }
 
     #[test]
-    fn test_lex_numbers() {
+    fn lex_numbers() {
         let input = "256 300 512 768 999 1024 0xFFF 0x123 0x234 0x001 0x000 0xA4C 0x100
         0b000000000 0b0000000000000001 0b1010101010101010 0b1110001100011100 0b1111111111111111";
         let mut lexer = Token::lexer(input);
@@ -669,7 +669,7 @@ mod test {
     }
 
     #[test]
-    fn test_lex_labels() {
+    fn lex_labels() {
         let input = ":label :another-label :_yet_another_label_ :could_we_do_その他の言語
         :but-not⭐ :and-not💩 :and-not\u{2066}\u{2069} :and-also-not\u{2044}";
         let mut lexer = Token::lexer(input);
@@ -709,7 +709,7 @@ mod test {
     }
 
     #[test]
-    fn test_lex_identifiers() {
+    fn lex_identifiers() {
         let input = "identifier another-id _yet_another_id_ could_we_do_その他の言語
         but-not⭐ and-not💩 and-not\u{2066}\u{2069} and-also-not\u{2044}";
         let mut lexer = Token::lexer(input);

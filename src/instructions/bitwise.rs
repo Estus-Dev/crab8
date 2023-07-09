@@ -53,7 +53,7 @@ mod test {
     use crate::instructions::Instruction::*;
 
     #[test]
-    fn test_or() {
+    fn or() {
         let mut crab8 = Crab8::new();
 
         assert_eq!(crab8.registers, 0x00000000000000000000000000000000.into());
@@ -76,7 +76,7 @@ mod test {
     }
 
     #[test]
-    fn test_and() {
+    fn and() {
         let mut crab8 = Crab8::new();
 
         assert_eq!(crab8.registers, 0x00000000000000000000000000000000.into());
@@ -101,7 +101,7 @@ mod test {
     }
 
     #[test]
-    fn test_xor() {
+    fn xor() {
         let mut crab8 = Crab8::new();
 
         assert_eq!(crab8.registers, 0x00000000000000000000000000000000.into());
@@ -126,7 +126,7 @@ mod test {
     }
 
     #[test]
-    fn test_shift_right() {
+    fn shift_right() {
         let mut crab8 = Crab8::new();
 
         assert_eq!(crab8.registers, 0x00000000000000000000000000000000.into());
@@ -161,7 +161,7 @@ mod test {
     }
 
     #[test]
-    fn test_shift_left() {
+    fn shift_left() {
         let mut crab8 = Crab8::new();
 
         assert_eq!(crab8.registers, 0x00000000000000000000000000000000.into());

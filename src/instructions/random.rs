@@ -13,7 +13,7 @@ impl Crab8 {
 #[cfg(test)]
 mod test {
     #[test]
-    fn test_rand() {
+    fn rand() {
         // TODO: I don't know how I want to approach testing this.
         // The bitmask needs to be tested too.
     }

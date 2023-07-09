@@ -136,7 +136,7 @@ mod test {
     use super::*;
 
     #[test]
-    fn test_stack() -> Result<(), StackError> {
+    fn stack() -> Result<(), StackError> {
         let mut stack = Stack::empty();
 
         assert_eq!(stack.len(), 0);
@@ -184,7 +184,7 @@ mod test {
     }
 
     #[test]
-    fn test_stack_overflow() -> Result<(), StackError> {
+    fn stack_overflow() -> Result<(), StackError> {
         let mut stack = Stack::empty();
 
         for i in 0..MAX_STACK_DEPTH {

@@ -271,7 +271,7 @@ mod test {
     use crate::prelude::*;
 
     #[test]
-    fn test_instruction_from() {
+    fn instruction_from() {
         let cases = [
             (0x00E0, ClearScreen),
             (0x00EE, Return),

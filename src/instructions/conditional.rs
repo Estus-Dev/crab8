@@ -42,7 +42,7 @@ mod test {
     use crate::instructions::Instruction::*;
 
     #[test]
-    fn test_if_not() {
+    fn if_not() {
         let cases = [
             (0x3000u16, 0x00u8, true),
             (0x3000, 0x01, false),
@@ -72,7 +72,7 @@ mod test {
     }
 
     #[test]
-    fn test_if() {
+    fn if_then() {
         let cases = [
             (0x4000u16, 0x00u8, false),
             (0x4000, 0x01, true),
@@ -102,7 +102,7 @@ mod test {
     }
 
     #[test]
-    fn test_if_not_register() {
+    fn if_not_register() {
         let cases = [
             (0x5000u16, 0x00u8, 0x00u8, true),
             (0x5010, 0xF5, 0xF5, true),
@@ -135,7 +135,7 @@ mod test {
     }
 
     #[test]
-    fn test_if_register() {
+    fn if_register() {
         let cases = [
             (0x9000u16, 0x00u8, 0x00u8, false),
             (0x9010, 0xF5, 0xF5, false),

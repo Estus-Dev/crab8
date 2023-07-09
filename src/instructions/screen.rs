@@ -44,7 +44,7 @@ mod test {
     use crate::instructions::Instruction::*;
 
     #[test]
-    fn test_load_sprite() {
+    fn load_sprite() {
         let mut crab8 = Crab8::new();
         let mut offset = 0x00;
 
