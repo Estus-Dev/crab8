@@ -164,6 +164,10 @@ impl Crab8 {
         matches!(self.execution_state, ExecutionState::Running)
     }
 
+    pub fn is_stopped(&self) -> bool {
+        matches!(self.execution_state, ExecutionState::Stopped)
+    }
+
     pub fn play(&mut self) {
         self.resume_if_stopped();
 
