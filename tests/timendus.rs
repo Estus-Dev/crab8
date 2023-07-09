@@ -15,11 +15,7 @@ fn timendus_1_chip8_logo() {
     let mut crab8 = Crab8::new();
 
     crab8.load(test_rom);
-    crab8.play();
-
-    while !crab8.is_stopped() {
-        crab8.execute();
-    }
+    crab8.run_to_completion(100, 1000);
 
     assert_eq!(expected_screen, crab8.screen);
     assert_eq!(expected_registers, crab8.dump_registers());
@@ -36,11 +32,7 @@ fn timendus_2_ibm_logo() {
     let mut crab8 = Crab8::new();
 
     crab8.load(test_rom);
-    crab8.play();
-
-    while !crab8.is_stopped() {
-        crab8.execute();
-    }
+    crab8.run_to_completion(100, 1000);
 
     assert_eq!(expected_screen, crab8.screen);
     assert_eq!(expected_registers, crab8.dump_registers());
@@ -57,11 +49,7 @@ fn timendus_3_corax_plus() {
     let mut crab8 = Crab8::new();
 
     crab8.load(test_rom);
-    crab8.play();
-
-    while !crab8.is_stopped() {
-        crab8.execute();
-    }
+    crab8.run_to_completion(1000, 10000);
 
     assert_eq!(expected_screen, crab8.screen);
     assert_eq!(expected_registers, crab8.dump_registers());
