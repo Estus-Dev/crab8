@@ -36,6 +36,14 @@ impl PlaybackWindow {
                 if ui.button("Step Frame").clicked() {
                     crab8.step_frame();
                 }
+
+                ui.separator();
+
+                ui.horizontal(|ui| {
+                    ui.label(format!("Frames: {}", crab8.frame_count));
+                    ui.spacing();
+                    ui.label(format!("Cycles: {}", crab8.cycle_count));
+                })
             });
     }
 }

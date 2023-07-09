@@ -67,6 +67,12 @@ pub struct Crab8 {
     pub database: Database,
 
     pub metadata: Option<Metadata>,
+
+    // Making this public for ease of wiring to the UI, but don't mutate outside of this struct
+    pub frame_count: u64,
+
+    // Making this public for ease of wiring to the UI, but don't mutate outside of this struct
+    pub cycle_count: u64,
 }
 
 impl Crab8 {
@@ -115,6 +121,7 @@ impl Crab8 {
         self.program_counter = self.program_counter.next_instruction();
 
         self.exec(instruction);
+        self.cycle_count += 1;
     }
 
     pub fn tick(&mut self) {
@@ -122,6 +129,7 @@ impl Crab8 {
         self.sound.tick();
 
         self.instructions_since_frame = 0;
+        self.frame_count += 1;
     }
 
     pub fn load(&mut self, rom: &[u8]) {
@@ -151,6 +159,8 @@ impl Crab8 {
         self.next_input = Default::default();
         self.screen = Default::default();
         self.instructions_since_frame = 0;
+        self.cycle_count = 0;
+        self.frame_count = 0;
     }
 
     pub fn reload(&mut self) {
@@ -255,6 +265,8 @@ impl Default for Crab8 {
             rom: None,
             database: Database::new(),
             metadata: None,
+            cycle_count: 0,
+            frame_count: 0,
         }
     }
 }
