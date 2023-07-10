@@ -59,7 +59,7 @@ pub async fn run() {
                 {
                     log::warn!(target: "frame_time", "{delta_time:?}");
                 } else {
-                    log::trace!(target: "frame_time", "{delta_time:?}");
+                    log::debug!(target: "frame_time", "{delta_time:?}");
                 }
 
                 crab8.execute();
