@@ -1,5 +1,8 @@
 image: "estusdev/rust-ci:rust-wasm-1.69"
 
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+
 default:
   before_script:
     - rustc --version
