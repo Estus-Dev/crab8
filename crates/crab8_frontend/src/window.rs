@@ -41,7 +41,6 @@ impl Crab8Window {
 
         let surface = SurfaceTexture::new(crab8_width, crab8_height, &winit);
 
-        // Broken until I refactor to use Pixels::new_async
         let mut pixels = Pixels::new_async(crab8_width, crab8_height, surface).await?;
         let window_inner_size = winit.inner_size();
         pixels.resize_surface(window_inner_size.width, window_inner_size.height)?;
