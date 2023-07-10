@@ -55,7 +55,8 @@ pub async fn run() {
                 let delta_time = Instant::now() - last_update;
                 last_update = now;
 
-                if delta_time > Duration::from_millis(18) {
+                if delta_time > Duration::from_millis(18) || delta_time < Duration::from_millis(14)
+                {
                     log::warn!(target: "frame_time", "{delta_time:?}");
                 } else {
                     log::trace!(target: "frame_time", "{delta_time:?}");
