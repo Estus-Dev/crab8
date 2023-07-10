@@ -149,8 +149,16 @@ impl Crab8 {
             log::warn!("Loaded unknown ROM ({})", metadata.hash);
         }
 
+        let start_address = metadata
+            .rom
+            .as_ref()
+            .and_then(|rom| rom.start_address)
+            .map(Address::from)
+            .unwrap_or_else(Address::initial_instruction);
+
         self.rom = Some(Vec::from(rom));
-        self.memory.set_range(Address::initial_instruction(), rom);
+        self.memory.set_range(start_address, rom);
+
         self.metadata = Some(metadata);
         self.play();
     }
