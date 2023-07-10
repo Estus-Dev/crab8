@@ -10,3 +10,6 @@ trim_trailing_whitespace = true
 [*.ch8s]
 insert_final_newline = false
 trim_trailing_whitespace = false
+
+[{*.yml,*.yaml}]
+indent_size = 2
