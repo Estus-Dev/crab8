@@ -97,6 +97,38 @@ mod test {
     }
 
     #[test]
+    fn or_vf_reset() {
+        let mut crab8 = Crab8::new();
+
+        crab8.quirks.vf_reset = true;
+
+        assert_eq!(crab8.registers, 0x00000000000000000000000000000000.into());
+
+        crab8.exec(Store(V0, 0b00100100));
+
+        assert_eq!(crab8.registers.get(V0), 0b00100100);
+
+        crab8.exec(Store(VF, 0xBC));
+
+        assert_eq!(crab8.registers.get(VF), 0xBC);
+
+        crab8.exec(Store(V1, 0b00111000));
+        crab8.exec(Or(V0, V1));
+
+        assert_eq!(crab8.registers.get(V0), 0b00111100);
+        assert_eq!(crab8.registers.get(V1), 0b00111000);
+        assert_eq!(crab8.registers.get(VF), 0x00);
+
+        crab8.exec(Store(V6, 0b00000000));
+        crab8.exec(Store(VF, 0x1F));
+        crab8.exec(Or(V6, V1));
+
+        assert_eq!(crab8.registers.get(V6), 0b00111000);
+        assert_eq!(crab8.registers.get(V1), 0b00111000);
+        assert_eq!(crab8.registers.get(VF), 0x00);
+    }
+
+    #[test]
     fn and() {
         let mut crab8 = Crab8::new();
 
@@ -129,6 +161,38 @@ mod test {
     }
 
     #[test]
+    fn and_vf_reset() {
+        let mut crab8 = Crab8::new();
+
+        crab8.quirks.vf_reset = true;
+
+        assert_eq!(crab8.registers, 0x00000000000000000000000000000000.into());
+
+        crab8.exec(Store(V0, 0b00100100));
+        crab8.exec(Store(V1, 0b00111000));
+        crab8.exec(Store(VF, 0xA5));
+
+        assert_eq!(crab8.registers.get(V0), 0b00100100);
+        assert_eq!(crab8.registers.get(V1), 0b00111000);
+        assert_eq!(crab8.registers.get(VF), 0xA5);
+
+        crab8.exec(And(V0, V1));
+
+        assert_eq!(crab8.registers.get(V0), 0b00100000);
+        assert_eq!(crab8.registers.get(V1), 0b00111000);
+        assert_eq!(crab8.registers.get(VF), 0x00);
+
+        crab8.exec(Store(V6, 0b00000000));
+        crab8.exec(Store(VF, 0x01));
+
+        crab8.exec(Or(V6, V1));
+
+        assert_eq!(crab8.registers.get(V6), 0b00111000);
+        assert_eq!(crab8.registers.get(V1), 0b00111000);
+        assert_eq!(crab8.registers.get(VF), 0x00);
+    }
+
+    #[test]
     fn xor() {
         let mut crab8 = Crab8::new();
 
@@ -158,6 +222,38 @@ mod test {
         assert_eq!(crab8.registers.get(V6), 0b00111000);
         assert_eq!(crab8.registers.get(V1), 0b00111000);
         assert_eq!(crab8.registers.get(VF), 0x6C);
+    }
+
+    #[test]
+    fn xor_vf_reset() {
+        let mut crab8 = Crab8::new();
+
+        crab8.quirks.vf_reset = true;
+
+        assert_eq!(crab8.registers, 0x00000000000000000000000000000000.into());
+
+        crab8.exec(Store(V0, 0b00100100));
+        crab8.exec(Store(V1, 0b00111000));
+        crab8.exec(Store(VF, 0x23));
+
+        assert_eq!(crab8.registers.get(V0), 0b00100100);
+        assert_eq!(crab8.registers.get(V1), 0b00111000);
+        assert_eq!(crab8.registers.get(VF), 0x23);
+
+        crab8.exec(Xor(V0, V1));
+
+        assert_eq!(crab8.registers.get(V0), 0b00011100);
+        assert_eq!(crab8.registers.get(V1), 0b00111000);
+        assert_eq!(crab8.registers.get(VF), 0x00);
+
+        crab8.exec(Store(V6, 0b00000000));
+        crab8.exec(Store(VF, 0x6C));
+
+        crab8.exec(Xor(V6, V1));
+
+        assert_eq!(crab8.registers.get(V6), 0b00111000);
+        assert_eq!(crab8.registers.get(V1), 0b00111000);
+        assert_eq!(crab8.registers.get(VF), 0x00);
     }
 
     #[test]
