@@ -2,7 +2,7 @@
 
 use std::str::FromStr;
 
-use crab8::{conditions::StopCondition::*, quirks::Quirks, screen::Screen, Crab8};
+use crab8::{conditions::StopCondition::*, screen::Screen, Crab8};
 
 #[test]
 fn timendus_1_chip8_logo() {
