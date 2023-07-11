@@ -10,6 +10,10 @@ impl Crab8 {
         let result = starting_value | value;
 
         self.registers.set(register, result);
+
+        if self.quirks.vf_reset {
+            self.registers.set(VF, 0);
+        }
     }
 
     pub fn exec_and(&mut self, register: Register, other: Register) {
@@ -18,6 +22,10 @@ impl Crab8 {
         let result = starting_value & value;
 
         self.registers.set(register, result);
+
+        if self.quirks.vf_reset {
+            self.registers.set(VF, 0);
+        }
     }
 
     pub fn exec_xor(&mut self, register: Register, other: Register) {
@@ -26,6 +34,10 @@ impl Crab8 {
         let result = starting_value ^ value;
 
         self.registers.set(register, result);
+
+        if self.quirks.vf_reset {
+            self.registers.set(VF, 0);
+        }
     }
 
     pub fn exec_shift_right(&mut self, register: Register, other: Register) {

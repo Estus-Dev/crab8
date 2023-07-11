@@ -4,6 +4,7 @@ pub mod conditions;
 pub mod input;
 pub mod instructions;
 pub mod memory;
+pub mod quirks;
 pub mod registers;
 pub mod screen;
 pub mod stack;
@@ -25,6 +26,7 @@ use crate::prelude::*;
 use chip8_db::{Database, Metadata};
 use conditions::StopCondition;
 use input::InputBuilder;
+use quirks::Quirks;
 use std::{fmt, fmt::Display};
 
 const DEFAULT_TICKRATE: usize = 10;
@@ -81,6 +83,8 @@ pub struct Crab8 {
 
     /// The colors specified by [chip8_db] [Metadata] for this ROM.
     pub colors: Vec<[u8; 4]>,
+
+    pub quirks: Quirks,
 }
 
 impl Crab8 {
@@ -196,6 +200,7 @@ impl Crab8 {
         self.input = Default::default();
         self.next_input = Default::default();
         self.screen = Default::default();
+        self.quirks = Default::default();
         self.instructions_per_frame = DEFAULT_TICKRATE;
         self.instructions_since_frame = 0;
         self.cycle_count = 0;
@@ -327,6 +332,7 @@ impl Default for Crab8 {
             next_input: Default::default(),
             screen: Screen::startup(),
             execution_state: Default::default(),
+            quirks: Default::default(),
             instructions_per_frame: DEFAULT_TICKRATE,
             instructions_since_frame: 0,
             rom: None,
