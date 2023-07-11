@@ -143,6 +143,33 @@ impl Register {
     }
 }
 
+impl Display for Register {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        use Register::*;
+
+        let name = match self {
+            V0 => "v0",
+            V1 => "v1",
+            V2 => "v2",
+            V3 => "v3",
+            V4 => "v4",
+            V5 => "v5",
+            V6 => "v6",
+            V7 => "v7",
+            V8 => "v8",
+            V9 => "v9",
+            VA => "va",
+            VB => "vb",
+            VC => "vc",
+            VD => "vd",
+            VE => "ve",
+            VF => "vf",
+        };
+
+        write!(f, "{name}")
+    }
+}
+
 impl From<usize> for Register {
     fn from(value: usize) -> Self {
         Register::from(value as u8)
