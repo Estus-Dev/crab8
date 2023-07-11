@@ -158,6 +158,12 @@ impl Crab8 {
             .map(Address::from)
             .unwrap_or_else(Address::initial_instruction);
 
+        self.instructions_per_frame = metadata
+            .rom
+            .as_ref()
+            .and_then(|rom| rom.tickrate)
+            .unwrap_or(DEFAULT_TICKRATE);
+
         self.rom = Some(Vec::from(rom));
         self.memory.set_range(start_address, rom);
 
