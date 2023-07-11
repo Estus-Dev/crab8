@@ -1,5 +1,3 @@
-use chip8_db::Metadata;
-
 /// The selected quirks that should be used for this ROM.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct Quirks {
