@@ -13,10 +13,6 @@ impl Timer {
             self.0 -= 1;
         }
     }
-
-    pub fn is_active(&self) -> bool {
-        self.0 > 0
-    }
 }
 
 impl Debug for Timer {
