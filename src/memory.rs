@@ -88,6 +88,12 @@ impl From<Address> for usize {
     }
 }
 
+impl std::fmt::UpperHex for Address {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        std::fmt::UpperHex::fmt(&self.0, f)
+    }
+}
+
 pub struct Memory([u8; 4096]);
 
 impl Memory {
