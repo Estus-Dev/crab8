@@ -1,4 +1,4 @@
-use crate::Crab8;
+use crate::{memory::Address, Crab8};
 
 /// A limit for how long to continue executing.
 pub enum StopCondition {
@@ -7,6 +7,9 @@ pub enum StopCondition {
 
     /// Stop after a certain number of frames.
     MaxFrames(u64),
+
+    /// Stop when the PC reaches a specific address.
+    ProgramCounter(Address),
 }
 
 impl StopCondition {
@@ -17,6 +20,7 @@ impl StopCondition {
         match self {
             MaxCycles(count) => crab8.cycle_count > *count,
             MaxFrames(count) => crab8.frame_count > *count,
+            ProgramCounter(address) => crab8.program_counter == *address,
         }
     }
 }
