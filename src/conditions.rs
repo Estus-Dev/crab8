@@ -1,6 +1,7 @@
 use crate::{memory::Address, Crab8};
 
 /// A limit for how long to continue executing.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum StopCondition {
     /// Stop after a certain number of cycles.
     MaxCycles(u64),
