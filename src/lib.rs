@@ -1,5 +1,6 @@
 pub mod character;
 pub mod color;
+pub mod conditions;
 pub mod input;
 pub mod instructions;
 pub mod memory;
@@ -22,6 +23,7 @@ pub mod prelude {
 
 use crate::prelude::*;
 use chip8_db::{Database, Metadata};
+use conditions::StopCondition;
 use input::InputBuilder;
 use std::{fmt, fmt::Display};
 
@@ -86,10 +88,10 @@ impl Crab8 {
         Self::default()
     }
 
-    pub fn run_to_completion(&mut self, max_frames: u64, max_cycles: u64) {
+    pub fn run_to_completion(&mut self, stop_conditions: &[StopCondition]) {
         self.play();
 
-        while !self.is_stopped() && self.frame_count < max_frames && self.cycle_count < max_cycles {
+        while !self.is_stopped() && !stop_conditions.iter().any(|condition| condition.test(self)) {
             self.execute();
         }
     }

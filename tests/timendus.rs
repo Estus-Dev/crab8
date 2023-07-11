@@ -2,7 +2,7 @@
 
 use std::str::FromStr;
 
-use crab8::{screen::Screen, Crab8};
+use crab8::{conditions::StopCondition::*, screen::Screen, Crab8};
 
 #[test]
 fn timendus_1_chip8_logo() {
@@ -15,7 +15,7 @@ fn timendus_1_chip8_logo() {
     let mut crab8 = Crab8::new();
 
     crab8.load(test_rom);
-    crab8.run_to_completion(100, 1000);
+    crab8.run_to_completion(&[MaxFrames(100), MaxCycles(1000)]);
 
     assert_eq!(expected_screen, crab8.screen);
     assert_eq!(expected_registers, crab8.dump_registers());
@@ -32,7 +32,7 @@ fn timendus_2_ibm_logo() {
     let mut crab8 = Crab8::new();
 
     crab8.load(test_rom);
-    crab8.run_to_completion(100, 1000);
+    crab8.run_to_completion(&[MaxFrames(100), MaxCycles(1000)]);
 
     assert_eq!(expected_screen, crab8.screen);
     assert_eq!(expected_registers, crab8.dump_registers());
@@ -49,7 +49,7 @@ fn timendus_3_corax_plus() {
     let mut crab8 = Crab8::new();
 
     crab8.load(test_rom);
-    crab8.run_to_completion(1000, 10000);
+    crab8.run_to_completion(&[MaxFrames(1000), MaxCycles(10000)]);
 
     assert_eq!(expected_screen, crab8.screen);
     assert_eq!(expected_registers, crab8.dump_registers());
