@@ -2,7 +2,7 @@
 
 use std::str::FromStr;
 
-use crab8::{conditions::StopCondition::*, screen::Screen, Crab8};
+use crab8::{conditions::StopCondition::*, quirks::Quirks, screen::Screen, Crab8};
 
 #[test]
 fn timendus_1_chip8_logo() {
@@ -50,6 +50,33 @@ fn timendus_3_corax_plus() {
 
     crab8.load(test_rom);
     crab8.run_to_completion(&[MaxFrames(1000), MaxCycles(10000)]);
+
+    assert_eq!(expected_screen, crab8.screen);
+    assert_eq!(expected_registers, crab8.dump_registers());
+}
+
+// TODO: Pass Display Wait quirk
+#[test]
+fn timendus_5_quirks() {
+    let test_rom = include_bytes!("./timendus-test-suite/bin/5-quirks.ch8");
+    let expected_screen = include_str!("./expected/5-quirks.ch8s");
+    let expected_screen = Screen::from_str(expected_screen).unwrap();
+    let expected_registers = "0-F: 40 40 40 00 3C 08 00 3C 0C 00 58 64 84 38 1A 00".to_owned()
+        + " D: 00 S: 00 CS: 00 I: 062D (E0 80 C0 80) PC: 05D2 (F0 0A 22 02)";
+
+    let mut crab8 = Crab8::new();
+
+    crab8.load(test_rom);
+
+    // TODO: Set quirks automatically
+    crab8.quirks = Quirks { vf_reset: true };
+
+    // Select default CHIP-8 platform
+    crab8.memory.set(0x1FF.into(), 1);
+
+    // Run until a keypress is required because the test is meant to be rerun
+    let reason = crab8.run_to_completion(&[MaxFrames(1000), MaxCycles(10000), PromptForInput]);
+    assert!(matches!(reason, Some(PromptForInput)));
 
     assert_eq!(expected_screen, crab8.screen);
     assert_eq!(expected_registers, crab8.dump_registers());
