@@ -1,4 +1,4 @@
-use crate::{memory::Address, Crab8};
+use crate::{memory::Address, prelude::Instruction, Crab8};
 
 /// A limit for how long to continue executing.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -11,6 +11,9 @@ pub enum StopCondition {
 
     /// Stop when the PC reaches a specific address.
     ProgramCounter(Address),
+
+    /// Stop when the machine is waiting for a keypress.
+    PromptForInput,
 }
 
 impl StopCondition {
@@ -22,6 +25,10 @@ impl StopCondition {
             MaxCycles(count) => crab8.cycle_count > *count,
             MaxFrames(count) => crab8.frame_count > *count,
             ProgramCounter(address) => crab8.program_counter == *address,
+            PromptForInput => matches!(
+                crab8.memory.get_instruction(crab8.program_counter),
+                Instruction::ReadInput(_)
+            ),
         }
     }
 }
