@@ -88,12 +88,20 @@ impl Crab8 {
         Self::default()
     }
 
-    pub fn run_to_completion(&mut self, stop_conditions: &[StopCondition]) {
+    pub fn run_to_completion(
+        &mut self,
+        stop_conditions: &[StopCondition],
+    ) -> Option<StopCondition> {
         self.play();
 
         while !self.is_stopped() && !stop_conditions.iter().any(|condition| condition.test(self)) {
             self.execute();
         }
+
+        stop_conditions
+            .iter()
+            .find(|condition| condition.test(self))
+            .cloned()
     }
 
     pub fn execute(&mut self) {
