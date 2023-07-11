@@ -24,6 +24,8 @@ use chip8_db::{Database, Metadata};
 use input::InputBuilder;
 use std::{fmt, fmt::Display};
 
+const DEFAULT_TICKRATE: usize = 10;
+
 /// Chip8 represents the current state of the entire machine.
 /// https://github.com/mattmikolay/chip-8/wiki/CHIP%E2%80%908-Technical-Reference
 #[derive(Debug)]
@@ -174,6 +176,7 @@ impl Crab8 {
         self.input = Default::default();
         self.next_input = Default::default();
         self.screen = Default::default();
+        self.instructions_per_frame = DEFAULT_TICKRATE;
         self.instructions_since_frame = 0;
         self.cycle_count = 0;
         self.frame_count = 0;
@@ -284,7 +287,7 @@ impl Default for Crab8 {
             next_input: Default::default(),
             screen: Screen::startup(),
             execution_state: Default::default(),
-            instructions_per_frame: 10,
+            instructions_per_frame: DEFAULT_TICKRATE,
             instructions_since_frame: 0,
             rom: None,
             database: Database::new(),
