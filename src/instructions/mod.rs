@@ -265,6 +265,50 @@ impl Crab8 {
     fn exec_no_op(&mut self, _instruction: u16) {}
 }
 
+impl Debug for Instruction {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let disassembly = match self {
+            Instruction::ClearScreen => "clear".to_owned(),
+            Instruction::Return => "return".to_owned(),
+            Instruction::Jump(addr) => format!("jump {addr}"),
+            Instruction::Call(addr) => format!("call {addr}"),
+            Instruction::IfNot(r, value) => format!("if {r} != {value}"),
+            Instruction::If(r, value) => format!("if {r} == {value}"),
+            Instruction::IfNotRegisters(r1, r2) => format!("if {r1} != {r2}"),
+            Instruction::Store(r, value) => format!("{r} := {value}"),
+            Instruction::Add(r, value) => format!("{r} += {value}"),
+            Instruction::Copy(r1, r2) => format!("{r1} := {r2}"),
+            Instruction::Or(r1, r2) => format!("{r1} |= {r2}"),
+            Instruction::And(r1, r2) => format!("{r1} &= {r2}"),
+            Instruction::Xor(r1, r2) => format!("{r1} ^= {r2}"),
+            Instruction::AddRegister(r1, r2) => format!("{r1} += {r2}"),
+            Instruction::SubtractRegister(r1, r2) => format!("{r1} -= {r2}"),
+            Instruction::ShiftRight(r1, r2) => format!("{r1} >>= {r2}"),
+            Instruction::ShiftLeft(r1, r2) => format!("{r1} <<= {r2}"),
+            Instruction::SubtractFromRegister(r1, r2) => format!("{r1} =- {r2}"),
+            Instruction::IfRegisters(r1, r2) => format!("if {r1} == {r2}"),
+            Instruction::StoreAddress(addr) => format!("i := {addr}"),
+            Instruction::JumpOffset(addr) => format!("jump0  {addr}"),
+            Instruction::Rand(r, mask) => format!("{r} := random {mask}"),
+            Instruction::Draw(r1, r2, rows) => format!("sprite {r1} {r2} {rows}"),
+            Instruction::IfNotPressed(key) => format!("if {key} -key"),
+            Instruction::IfPressed(key) => format!("if {key} key"),
+            Instruction::ReadDelay(r) => format!("{r} := delay"),
+            Instruction::ReadInput(r) => format!("{r} := key"),
+            Instruction::SetDelay(r) => format!("delay := {r}"),
+            Instruction::SetSound(r) => format!("buzzer := {r}"),
+            Instruction::AddAddress(r) => format!("i += {r}"),
+            Instruction::LoadSprite(r) => format!("i := hex {r}"),
+            Instruction::WriteDecimal(r) => format!("bcd {r}"),
+            Instruction::Write(r) => format!("save {r}"),
+            Instruction::Read(r) => format!("load {r}"),
+            Instruction::NoOp(instruction) => format!("nop {instruction:04X}"),
+        };
+
+        write!(f, "{disassembly}")
+    }
+}
+
 #[cfg(test)]
 mod test {
     use super::Instruction::*;
