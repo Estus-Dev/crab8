@@ -1,4 +1,5 @@
 pub mod character;
+pub mod color;
 pub mod input;
 pub mod instructions;
 pub mod memory;
@@ -75,6 +76,9 @@ pub struct Crab8 {
 
     // Making this public for ease of wiring to the UI, but don't mutate outside of this struct
     pub cycle_count: u64,
+
+    /// The colors specified by [chip8_db] [Metadata] for this ROM.
+    pub colors: Vec<[u8; 4]>,
 }
 
 impl Crab8 {
@@ -186,6 +190,8 @@ impl Crab8 {
         self.instructions_since_frame = 0;
         self.cycle_count = 0;
         self.frame_count = 0;
+
+        self.colors.clear();
     }
 
     pub fn reload(&mut self) {
@@ -193,6 +199,24 @@ impl Crab8 {
             self.reset();
             self.memory.set_range(Address::initial_instruction(), &rom);
         }
+
+        self.colors = self
+            .metadata
+            .as_ref()
+            .and_then(|meta| meta.rom.as_ref())
+            .as_ref()
+            .and_then(|rom| rom.colors.clone())
+            .and_then(|colors| colors.pixels)
+            .map(|colors| {
+                colors
+                    .iter()
+                    .map(|c| {
+                        color::parse_color(c)
+                            .expect("These colors come from chip8_db which guarantees their layout")
+                    })
+                    .collect()
+            })
+            .unwrap_or_else(Vec::new);
     }
 
     pub fn is_running(&self) -> bool {
@@ -300,6 +324,7 @@ impl Default for Crab8 {
             metadata: None,
             cycle_count: 0,
             frame_count: 0,
+            colors: Vec::with_capacity(16),
         }
     }
 }

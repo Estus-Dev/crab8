@@ -29,7 +29,9 @@ pub async fn run() {
     event_loop.run(move |event, _, control_flow| {
         match &event {
             Event::RedrawRequested(_) => {
-                crab8.screen.draw_screen(window.pixels.frame_mut());
+                crab8
+                    .screen
+                    .draw_screen(window.pixels.frame_mut(), &crab8.colors);
             }
 
             // Clippy insists this is the idiomatic way to handle this event...
