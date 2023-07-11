@@ -10,9 +10,10 @@ mod screen;
 mod timers;
 
 use crate::prelude::*;
+use std::fmt::Debug;
 
 /// Chip-8 instructions are 32-bit values that may contain data
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 pub enum Instruction {
     /// Clear the screen.
     /// Value: 00E0
