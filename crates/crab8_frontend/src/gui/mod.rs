@@ -1,6 +1,7 @@
 mod about;
 mod download;
 mod images;
+mod memory;
 mod playback;
 mod registers;
 pub mod renderer;
@@ -17,7 +18,7 @@ use registers::RegisterWindow;
 use rfd::AsyncFileDialog;
 use stack::StackWindow;
 
-use self::download::DownloadWindow;
+use self::{download::DownloadWindow, memory::MemoryWindow};
 
 #[derive(Default)]
 pub struct Gui {
@@ -28,6 +29,7 @@ pub struct Gui {
     rom: Arc<Mutex<Option<Vec<u8>>>>,
     error: Arc<Mutex<Option<String>>>,
     stack: StackWindow,
+    memory: MemoryWindow,
 }
 
 impl Gui {
@@ -69,6 +71,12 @@ impl Gui {
 
                         ui.close_menu();
                     }
+
+                    if ui.button("Memory").clicked() {
+                        self.memory.open = !self.memory.open;
+
+                        ui.close_menu();
+                    }
                 });
 
                 ui.menu_button("Help", |ui| {
@@ -93,6 +101,7 @@ impl Gui {
         self.about.render(context);
         self.download
             .render(context, self.rom.clone(), self.error.clone());
+        self.memory.render(context, crab8);
         self.playback.render(context, crab8);
         self.registers.render(context, crab8);
         self.stack.render(context, crab8);
