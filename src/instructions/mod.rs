@@ -161,6 +161,12 @@ pub enum Instruction {
     NoOp(u16),
 }
 
+impl From<[u8; 2]> for Instruction {
+    fn from(value: [u8; 2]) -> Self {
+        Self::from(((value[0] as u16) << 8) + value[1] as u16)
+    }
+}
+
 impl From<u16> for Instruction {
     fn from(instruction: u16) -> Self {
         let operator = ((instruction & 0xF000) >> 12) as u8;
