@@ -7,18 +7,15 @@ mod registers;
 pub mod renderer;
 mod stack;
 
-use std::sync::{Arc, Mutex};
-
 use crab8::Crab8;
 use egui::{menu, Context, TopBottomPanel, Window};
-
-use about::AboutWindow;
-use playback::PlaybackWindow;
-use registers::RegisterWindow;
 use rfd::AsyncFileDialog;
-use stack::StackWindow;
+use std::sync::{Arc, Mutex};
 
-use self::{download::DownloadWindow, memory::MemoryWindow};
+use self::{
+    about::AboutWindow, download::DownloadWindow, memory::MemoryWindow, playback::PlaybackWindow,
+    registers::RegisterWindow, stack::StackWindow,
+};
 
 #[derive(Default)]
 pub struct Gui {
