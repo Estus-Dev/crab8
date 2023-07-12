@@ -143,6 +143,22 @@ impl Memory {
 
         self.set_range(address, &instruction);
     }
+
+    /// An iterator over each address and the byte in memory at that address
+    pub fn iter(&self) -> MemoryIter {
+        MemoryIter {
+            memory: self,
+            address: Address::new(0x000),
+        }
+    }
+
+    /// An iterator over every other address and the instruction at that address
+    pub fn iter_instructions(&self) -> InstructionIter {
+        InstructionIter {
+            memory: self,
+            address: Address::new(0x000),
+        }
+    }
 }
 
 impl Debug for Memory {
@@ -202,5 +218,47 @@ impl Default for Memory {
 impl Display for Memory {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         write!(f, "{self:?}")
+    }
+}
+
+pub struct MemoryIter<'a> {
+    memory: &'a Memory,
+    address: Address,
+}
+
+impl<'a> Iterator for MemoryIter<'a> {
+    type Item = (Address, u8);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let addr = self.address;
+
+        if (addr.0 as usize) < self.memory.0.len() {
+            self.address = Address::new(self.address.0 + 1);
+
+            Some((addr, self.memory.get(self.address)))
+        } else {
+            None
+        }
+    }
+}
+
+pub struct InstructionIter<'a> {
+    memory: &'a Memory,
+    address: Address,
+}
+
+impl<'a> Iterator for InstructionIter<'a> {
+    type Item = (Address, Instruction);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let addr = self.address;
+
+        if (addr.0 as usize) < (self.memory.0.len() - 1) {
+            self.address = Address::new(self.address.0 + 2);
+
+            Some((addr, self.memory.get_instruction(self.address)))
+        } else {
+            None
+        }
     }
 }
