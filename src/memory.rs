@@ -230,11 +230,7 @@ impl<'a> Iterator for MemoryIter<'a> {
     type Item = (Address, u8);
 
     fn next(&mut self) -> Option<Self::Item> {
-        let n = self.address.0 as usize;
-
-        self.address.0 += 1;
-
-        self.nth(n)
+        self.nth(self.address.0 as usize)
     }
 
     fn nth(&mut self, n: usize) -> Option<Self::Item> {
@@ -243,6 +239,7 @@ impl<'a> Iterator for MemoryIter<'a> {
 
         if n < max {
             let addr = Address::new(n as u16);
+            self.address.0 = n as u16 + 1;
 
             Some((addr, self.memory.get(addr)))
         } else {
@@ -260,11 +257,7 @@ impl<'a> Iterator for InstructionIter<'a> {
     type Item = (Address, Instruction);
 
     fn next(&mut self) -> Option<Self::Item> {
-        let n = self.address.0 as usize;
-
-        self.address.0 += 2;
-
-        self.nth(n)
+        self.nth(self.address.0 as usize)
     }
 
     fn nth(&mut self, n: usize) -> Option<Self::Item> {
@@ -273,6 +266,7 @@ impl<'a> Iterator for InstructionIter<'a> {
 
         if n < max {
             let addr = Address::new(n as u16);
+            self.address.0 = n as u16 + 2;
 
             Some((addr, self.memory.get_instruction(addr)))
         } else {
