@@ -21,6 +21,7 @@ ehttp = { workspace = true }
 env_logger = { workspace = true }
 image = { workspace = true, features = ["png"] }
 instant = { workspace = true }
+itertools = { workspace = true }
 log = { workspace = true }
 pixels = { workspace = true }
 pollster = { workspace = true }

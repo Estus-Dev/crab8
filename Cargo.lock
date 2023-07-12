@@ -568,6 +568,7 @@ dependencies = [
  "env_logger",
  "image",
  "instant",
+ "itertools",
  "log",
  "pixels",
  "pollster 0.3.0",
