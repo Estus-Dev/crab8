@@ -230,12 +230,21 @@ impl<'a> Iterator for MemoryIter<'a> {
     type Item = (Address, u8);
 
     fn next(&mut self) -> Option<Self::Item> {
-        let addr = self.address;
+        let n = self.address.0 as usize;
 
-        if (addr.0 as usize) < self.memory.0.len() {
-            self.address = Address::new(self.address.0 + 1);
+        self.address.0 += 1;
 
-            Some((addr, self.memory.get(self.address)))
+        self.nth(n)
+    }
+
+    fn nth(&mut self, n: usize) -> Option<Self::Item> {
+        // Here we go all the way to the last address
+        let max = self.memory.0.len();
+
+        if n < max {
+            let addr = Address::new(n as u16);
+
+            Some((addr, self.memory.get(addr)))
         } else {
             None
         }
@@ -251,12 +260,21 @@ impl<'a> Iterator for InstructionIter<'a> {
     type Item = (Address, Instruction);
 
     fn next(&mut self) -> Option<Self::Item> {
-        let addr = self.address;
+        let n = self.address.0 as usize;
 
-        if (addr.0 as usize) < (self.memory.0.len() - 1) {
-            self.address = Address::new(self.address.0 + 2);
+        self.address.0 += 2;
 
-            Some((addr, self.memory.get_instruction(self.address)))
+        self.nth(n)
+    }
+
+    fn nth(&mut self, n: usize) -> Option<Self::Item> {
+        // Here we go to the address before last. Instructions are 16 bits wide.
+        let max = self.memory.0.len() - 1;
+
+        if n < max {
+            let addr = Address::new(n as u16);
+
+            Some((addr, self.memory.get_instruction(addr)))
         } else {
             None
         }
