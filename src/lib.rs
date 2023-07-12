@@ -297,23 +297,33 @@ impl Crab8 {
     }
 
     pub fn dump_registers(&self) -> String {
+        let i_memory = format!(
+            "({:02X?} {:02X?} {:02X?} {:02X?})",
+            self.memory.get(self.address_register),
+            self.memory.get(self.address_register.wrapping_add(1)),
+            self.memory.get(self.address_register.wrapping_add(2)),
+            self.memory.get(self.address_register.wrapping_add(3)),
+        );
+
+        let pc_memory = format!(
+            "({:02X?} {:02X?} {:02X?} {:02X?})",
+            self.memory.get(self.program_counter),
+            self.memory.get(self.program_counter.wrapping_add(1)),
+            self.memory.get(self.program_counter.wrapping_add(2)),
+            self.memory.get(self.program_counter.wrapping_add(3)),
+        );
+
         // Based on wheremyfoodat's gameboy test log output.
         format!(
-        "{} D: {:02X?} S: {:02X?} CS: {:02X?} I: {:04X?} ({:02X?} {:02X?} {:02X?} {:02X?}) PC: {:04X?} ({:02X?} {:02X?} {:02X?} {:02X?}) - {:?}",
+            "{} D: {:02X?} S: {:02X?} CS: {:02X?} I: {:04X?} {} PC: {:04X?} {} - {:?}",
             self.registers,
             self.delay,
             self.sound,
             self.stack.len(),
             self.address_register,
-            self.memory.get(self.address_register),
-            self.memory.get(self.address_register.wrapping_add(1)),
-            self.memory.get(self.address_register.wrapping_add(2)),
-            self.memory.get(self.address_register.wrapping_add(3)),
+            i_memory,
             self.program_counter,
-            self.memory.get(self.program_counter),
-            self.memory.get(self.program_counter.wrapping_add(1)),
-            self.memory.get(self.program_counter.wrapping_add(2)),
-            self.memory.get(self.program_counter.wrapping_add(3)),
+            pc_memory,
             self.memory.get_instruction(self.program_counter),
         )
     }
