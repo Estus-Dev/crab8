@@ -1,7 +1,7 @@
 use std::cmp::max;
 
 use crab8::{prelude::Instruction, Crab8};
-use egui::{Context, Grid, Vec2, Window};
+use egui::{Context, Grid, RichText, Vec2, Window};
 use itertools::Itertools;
 
 #[derive(Default)]
@@ -33,13 +33,20 @@ impl MemoryWindow {
                     {
                         let instr: Instruction = bytes.into();
 
+                        let mut addr_text = RichText::new(format!("{addr:04X}:"));
+                        let mut byte_text =
+                            RichText::new(format!("{:02X} {:02X}", bytes[0], bytes[1]));
+                        let mut instr_text = RichText::new(format!("{instr}"));
+
                         if crab8.program_counter == addr {
-                            ui.scroll_to_cursor(None);
+                            addr_text = addr_text.strong();
+                            byte_text = byte_text.strong();
+                            instr_text = instr_text.strong();
                         }
 
-                        ui.label(format!("{addr:04X}:"));
-                        ui.label(format!("{:02X} {:02X}", bytes[0], bytes[1]));
-                        ui.label(format!("{instr}"));
+                        ui.label(addr_text);
+                        ui.label(byte_text);
+                        ui.label(instr_text);
                         ui.end_row();
                     }
                 });
