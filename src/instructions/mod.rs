@@ -10,7 +10,7 @@ mod screen;
 mod timers;
 
 use crate::prelude::*;
-use std::fmt::Debug;
+use std::fmt::{Debug, Display};
 
 /// Chip-8 instructions are 32-bit values that may contain data
 #[derive(Clone, Copy, PartialEq, Eq)]
