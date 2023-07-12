@@ -151,14 +151,6 @@ impl Memory {
             address: Address::new(0x000),
         }
     }
-
-    /// An iterator over every other address and the instruction at that address
-    pub fn iter_instructions(&self) -> InstructionIter {
-        InstructionIter {
-            memory: self,
-            address: Address::new(0x000),
-        }
-    }
 }
 
 impl Debug for Memory {
@@ -242,33 +234,6 @@ impl<'a> Iterator for MemoryIter<'a> {
             self.address.0 = n as u16 + 1;
 
             Some((addr, self.memory.get(addr)))
-        } else {
-            None
-        }
-    }
-}
-
-pub struct InstructionIter<'a> {
-    memory: &'a Memory,
-    address: Address,
-}
-
-impl<'a> Iterator for InstructionIter<'a> {
-    type Item = (Address, Instruction);
-
-    fn next(&mut self) -> Option<Self::Item> {
-        self.nth(self.address.0 as usize)
-    }
-
-    fn nth(&mut self, n: usize) -> Option<Self::Item> {
-        // Here we go to the address before last. Instructions are 16 bits wide.
-        let max = self.memory.0.len() - 1;
-
-        if n < max {
-            let addr = Address::new(n as u16);
-            self.address.0 = n as u16 + 2;
-
-            Some((addr, self.memory.get_instruction(addr)))
         } else {
             None
         }
