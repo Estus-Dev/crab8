@@ -17,7 +17,6 @@ use self::{
     registers::RegisterWindow, stack::StackWindow,
 };
 
-#[derive(Default)]
 pub struct Gui {
     about: AboutWindow,
     pub download: DownloadWindow,
@@ -30,8 +29,17 @@ pub struct Gui {
 }
 
 impl Gui {
-    pub fn new() -> Self {
-        Self::default()
+    pub fn new(context: &Context) -> Self {
+        Self {
+            about: AboutWindow::new(context),
+            download: Default::default(),
+            playback: Default::default(),
+            registers: Default::default(),
+            rom: Default::default(),
+            error: Default::default(),
+            stack: Default::default(),
+            memory: Default::default(),
+        }
     }
 
     fn render(&mut self, context: &Context, crab8: &mut Crab8) {

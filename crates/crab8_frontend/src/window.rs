@@ -45,7 +45,6 @@ impl Crab8Window {
         let window_inner_size = winit.inner_size();
         pixels.resize_surface(window_inner_size.width, window_inner_size.height)?;
 
-        let gui = Gui::new();
         let gui_renderer = GuiRenderer::new(
             event_loop,
             WIDTH as u32,
@@ -53,6 +52,7 @@ impl Crab8Window {
             winit.scale_factor() as f32,
             &pixels,
         );
+        let gui = Gui::new(&gui_renderer.context);
 
         Ok(Crab8Window {
             gui,

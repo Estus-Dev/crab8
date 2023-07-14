@@ -14,7 +14,7 @@ use pixels::{Pixels, PixelsContext};
 use winit::{event::WindowEvent, event_loop::EventLoopWindowTarget};
 
 pub struct GuiRenderer {
-    context: Context,
+    pub context: Context,
     state: State,
     screen_descriptor: ScreenDescriptor,
     renderer: Renderer,

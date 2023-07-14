@@ -1,23 +1,28 @@
-use egui::{Context, TextureOptions, Window};
+use egui::{Context, TextureHandle, TextureOptions, Window};
 
 use super::images;
 
-#[derive(Default)]
 pub struct AboutWindow {
     pub open: bool,
+    pub logo: TextureHandle,
 }
 
 impl AboutWindow {
+    pub fn new(context: &Context) -> Self {
+        let handle = images::load_egui_image(images::LOGO).expect("Logo is built-in");
+
+        Self {
+            open: false,
+            logo: context.load_texture("crab8-logo", handle, TextureOptions::LINEAR),
+        }
+    }
+
     pub fn render(&mut self, context: &Context) {
         Window::new("About")
             .open(&mut self.open)
             .show(context, |ui| {
-                let handle = images::load_egui_image(images::LOGO).expect("Logo is built-in");
-
-                let logo = context.load_texture("crab8-logo", handle, TextureOptions::LINEAR);
-
                 ui.vertical_centered(|ui| {
-                    ui.image(logo.id(), (128.0, 128.0));
+                    ui.image(self.logo.id(), (128.0, 128.0));
                     ui.heading("CRAB-8");
                 });
 
