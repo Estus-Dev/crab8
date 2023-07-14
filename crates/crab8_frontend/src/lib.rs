@@ -1,6 +1,7 @@
 mod gui;
 mod input;
 mod screen;
+mod style;
 mod window;
 
 #[cfg(target_arch = "wasm32")]

@@ -1,4 +1,4 @@
-use crate::gui::Gui;
+use crate::{gui::Gui, style};
 use crab8::Crab8;
 use egui::{ClippedPrimitive, Context, TexturesDelta};
 use egui_wgpu::{
@@ -33,6 +33,8 @@ impl GuiRenderer {
         let max_texture_size = pixels.device().limits().max_texture_dimension_2d as usize;
 
         let context = Context::default();
+
+        style::set_font_data(&context);
 
         let mut state = State::new(event_loop);
         state.set_max_texture_side(max_texture_size);
