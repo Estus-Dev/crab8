@@ -216,15 +216,16 @@ impl Crab8 {
             self.memory.set_range(Address::initial_instruction(), &rom);
         }
 
-        self.colors = self
-            .metadata
-            .as_ref()
-            .and_then(|meta| meta.rom.as_ref())
-            .as_ref()
-            .and_then(|rom| rom.colors.clone())
-            .and_then(|colors| colors.pixels)
-            .map(color::parse_colors_unchecked)
-            .unwrap_or_else(Vec::new);
+        if let Some(metadata) = self.metadata.as_ref() {
+            if let Some(rom) = metadata.rom.as_ref() {
+                self.colors = rom
+                    .colors
+                    .clone()
+                    .and_then(|colors| colors.pixels)
+                    .map(color::parse_colors_unchecked)
+                    .unwrap_or_else(Vec::new);
+            }
+        }
     }
 
     pub fn is_running(&self) -> bool {
