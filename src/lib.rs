@@ -211,8 +211,9 @@ impl Crab8 {
     }
 
     pub fn reload(&mut self) {
+        self.reset();
+
         if let Some(rom) = self.rom.clone() {
-            self.reset();
             self.memory.set_range(Address::initial_instruction(), &rom);
         }
 
