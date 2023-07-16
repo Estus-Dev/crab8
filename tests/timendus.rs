@@ -55,6 +55,23 @@ fn timendus_3_corax_plus() {
     assert_eq!(expected_registers, crab8.dump_registers());
 }
 
+#[test]
+fn timendus_4_flags() {
+    let test_rom = include_bytes!("./timendus-test-suite/bin/4-flags.ch8");
+    let expected_screen = include_str!("./expected/4-flags.ch8s");
+    let expected_screen = Screen::from_str(expected_screen).unwrap();
+    let expected_registers = "0-F: 55 10 55 3C 70 00 0A AE A2 42 27 1B 55 0E 38 00".to_owned()
+        + " D: 00 S: 00 CS: 00 I: 053D (A0 C0 80 A0) PC: 052A (15 2A 00 00) - jump 0x52A";
+
+    let mut crab8 = Crab8::new();
+
+    crab8.load(test_rom);
+    crab8.run_to_completion(&[MaxFrames(1000), MaxCycles(10000)]);
+
+    assert_eq!(expected_screen, crab8.screen);
+    assert_eq!(expected_registers, crab8.dump_registers());
+}
+
 // TODO: Pass Display Wait quirk
 #[test]
 fn timendus_5_quirks() {
