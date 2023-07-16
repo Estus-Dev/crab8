@@ -5,7 +5,6 @@ mod memory;
 mod playback;
 mod registers;
 pub mod renderer;
-mod stack;
 
 use crab8::Crab8;
 use egui::{menu, Context, TopBottomPanel, Window};
@@ -14,7 +13,7 @@ use std::sync::{Arc, Mutex};
 
 use self::{
     about::AboutWindow, download::DownloadWindow, memory::MemoryWindow, playback::PlaybackWindow,
-    registers::RegisterWindow, stack::StackWindow,
+    registers::RegisterWindow,
 };
 
 pub struct Gui {
@@ -24,7 +23,6 @@ pub struct Gui {
     registers: RegisterWindow,
     rom: Arc<Mutex<Option<Vec<u8>>>>,
     error: Arc<Mutex<Option<String>>>,
-    stack: StackWindow,
     memory: MemoryWindow,
 }
 
@@ -37,7 +35,6 @@ impl Gui {
             registers: Default::default(),
             rom: Default::default(),
             error: Default::default(),
-            stack: Default::default(),
             memory: Default::default(),
         }
     }
@@ -67,12 +64,6 @@ impl Gui {
                     }
                     if ui.button("Registers").clicked() {
                         self.registers.open = !self.registers.open;
-
-                        ui.close_menu();
-                    }
-
-                    if ui.button("Stack").clicked() {
-                        self.stack.open = !self.stack.open;
 
                         ui.close_menu();
                     }
@@ -109,7 +100,6 @@ impl Gui {
         self.memory.render(context, crab8);
         self.playback.render(context, crab8);
         self.registers.render(context, crab8);
-        self.stack.render(context, crab8);
 
         if let Ok(mut error) = self.error.lock() {
             let mut closed = false;
