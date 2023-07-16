@@ -10,7 +10,7 @@ impl RegisterWindow {
     #[allow(non_snake_case)]
     pub fn render(&mut self, context: &Context, crab8: &Crab8) {
         Window::new("Registers")
-            .fixed_size(Vec2::new(120.0, 150.0))
+            .fixed_size(Vec2::new(128.0, 150.0))
             .open(&mut self.open)
             .show(context, |ui| {
                 let PC = crab8.program_counter;
