@@ -118,6 +118,7 @@ impl Crab8 {
             Running | StepFrame => {
                 for _ in self.instructions_since_frame..self.instructions_per_frame {
                     self.execute_instruction();
+                    self.instructions_since_frame += 1;
                 }
 
                 self.tick();
