@@ -223,15 +223,7 @@ impl Crab8 {
             .as_ref()
             .and_then(|rom| rom.colors.clone())
             .and_then(|colors| colors.pixels)
-            .map(|colors| {
-                colors
-                    .iter()
-                    .map(|c| {
-                        color::parse_color(c)
-                            .expect("These colors come from chip8_db which guarantees their layout")
-                    })
-                    .collect()
-            })
+            .map(color::parse_colors_unchecked)
             .unwrap_or_else(Vec::new);
     }
 

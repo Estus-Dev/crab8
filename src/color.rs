@@ -9,3 +9,13 @@ pub(crate) fn parse_color(color: &str) -> Result<[u8; 4], std::num::ParseIntErro
         255,
     ])
 }
+
+pub(crate) fn parse_colors_unchecked(colors: Vec<String>) -> Vec<[u8; 4]> {
+    colors
+        .iter()
+        .map(|color| {
+            parse_color(color)
+                .expect("These colors come from chip8_db which guarantees their layout")
+        })
+        .collect()
+}
