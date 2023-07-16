@@ -6,7 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-chip8_db = { workspace = true }
+chip8_db = { workspace = true, features = ["extra-data"] }
 getrandom = { workspace = true, features = ["js"] }
 itertools = { workspace = true }
 log = { workspace = true }
