@@ -172,23 +172,13 @@ impl Crab8 {
             log::warn!("Loaded unknown ROM ({})", metadata.hash);
         }
 
-        self.start_address = metadata
-            .rom
-            .as_ref()
-            .and_then(|rom| rom.start_address)
-            .map(Address::from)
-            .unwrap_or_else(Address::initial_instruction);
-
-        self.instructions_per_frame = metadata
-            .rom
-            .as_ref()
-            .and_then(|rom| rom.tickrate)
-            .unwrap_or(DEFAULT_TICKRATE);
-
         self.rom = Some(Vec::from(rom));
+
+        self.apply_metadata(&metadata);
+        self.metadata = Some(metadata);
+
         self.memory.set_range(self.start_address, rom);
 
-        self.metadata = Some(metadata);
         self.play();
     }
 
@@ -226,6 +216,13 @@ impl Crab8 {
 
     pub fn apply_metadata(&mut self, metadata: &Metadata) {
         if let Some(rom) = metadata.rom.as_ref() {
+            self.start_address = rom
+                .start_address
+                .map(Address::from)
+                .unwrap_or_else(Address::initial_instruction);
+
+            self.instructions_per_frame = rom.tickrate.unwrap_or(DEFAULT_TICKRATE);
+
             self.colors = rom
                 .colors
                 .clone()
