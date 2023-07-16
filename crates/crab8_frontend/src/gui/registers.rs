@@ -19,6 +19,20 @@ impl RegisterWindow {
                 let ST = crab8.sound;
 
                 ui.horizontal(|ui| {
+                    for column in 0u16..2 {
+                        let offset = column * 0x8;
+
+                        ui.vertical(|ui| {
+                            for register in offset..(0x8 + offset) {
+                                register_label(ui, register, crab8);
+                            }
+                        });
+                    }
+                });
+
+                ui.separator();
+
+                ui.horizontal(|ui| {
                     ui.vertical(|ui| {
                         ui.label(format!(" I={I:04?}"));
                         ui.label(format!("DT={DT:02?}"));
@@ -32,20 +46,6 @@ impl RegisterWindow {
                             ui.label(format!("{i:2?}={address:04?}"));
                         }
                     });
-                });
-
-                ui.separator();
-
-                ui.horizontal(|ui| {
-                    for column in 0u16..2 {
-                        let offset = column * 0x8;
-
-                        ui.vertical(|ui| {
-                            for register in offset..(0x8 + offset) {
-                                register_label(ui, register, crab8);
-                            }
-                        });
-                    }
                 });
             });
     }
