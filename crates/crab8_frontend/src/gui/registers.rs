@@ -34,16 +34,16 @@ impl RegisterWindow {
 
                 ui.horizontal(|ui| {
                     ui.vertical(|ui| {
-                        ui.label(format!(" I={I:04?}"));
-                        ui.label(format!("DT={DT:02?}"));
-                        ui.label(format!("ST={ST:02?}"));
+                        ui.label(format!(" I={I:04X?}"));
+                        ui.label(format!("DT={DT:02X?}"));
+                        ui.label(format!("ST={ST:02X?}"));
                     });
 
                     ui.vertical(|ui| {
-                        ui.label(format!("PC={PC:04?}"));
+                        ui.label(format!("PC={PC:04X?}"));
 
                         for (i, address) in crab8.stack.clone().into_iter().enumerate() {
-                            ui.label(format!("{i:2?}={address:04?}"));
+                            ui.label(format!("{i:2X?}={address:04X?}"));
                         }
                     });
                 });
