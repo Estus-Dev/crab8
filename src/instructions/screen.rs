@@ -12,6 +12,11 @@ impl Crab8 {
     }
 
     pub fn exec_draw(&mut self, x: Register, y: Register, row_count: u8) {
+        if self.quirks.display_wait && self.instructions_since_frame > 0 {
+            self.program_counter = self.program_counter.wrapping_sub(2);
+            return;
+        }
+
         let start = self.address_register;
         let end = start.wrapping_add(row_count as u16);
         let x = self.registers.get(x);
