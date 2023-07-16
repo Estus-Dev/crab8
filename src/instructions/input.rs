@@ -36,6 +36,7 @@ impl Crab8 {
             self.registers.set(register, key as u8);
         } else {
             self.program_counter = self.program_counter.wrapping_sub(2);
+            self.cycle_count = self.cycle_count.wrapping_sub(1);
         }
     }
 }
