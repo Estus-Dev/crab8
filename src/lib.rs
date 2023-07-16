@@ -229,6 +229,12 @@ impl Crab8 {
                 .and_then(|colors| colors.pixels)
                 .map(color::parse_colors_unchecked)
                 .unwrap_or_else(Vec::new);
+
+            self.quirks = rom
+                .platforms
+                .first()
+                .expect("A platform is required in chip8_db")
+                .into();
         }
     }
 

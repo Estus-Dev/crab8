@@ -85,10 +85,6 @@ fn timendus_5_quirks() {
 
     crab8.load(test_rom);
 
-    // TODO: Set quirks automatically
-    crab8.quirks.vf_reset = true;
-    crab8.quirks.display_wait = true;
-
     // Select default CHIP-8 platform
     crab8.memory.set(0x1FF.into(), 1);
 

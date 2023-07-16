@@ -1,3 +1,7 @@
+use chip8_db::{platform::Platform, quirk::Quirk, Database};
+
+use crate::DB;
+
 /// The selected quirks that should be used for this ROM.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct Quirks {
@@ -14,6 +18,24 @@ impl Default for Quirks {
         Quirks {
             vf_reset: false,
             display_wait: false,
+        }
+    }
+}
+
+impl From<&Platform> for Quirks {
+    fn from(value: &Platform) -> Self {
+        let platform = DB
+            .get_or_init(Database::new)
+            .platforms
+            .iter()
+            .find(|platform| platform.id == *value)
+            .expect("No matching platform is an error in chip-8-database");
+
+        // TODO: Read quirkyPlatforms
+
+        Self {
+            vf_reset: platform.quirks[&Quirk::Logic],
+            display_wait: platform.quirks[&Quirk::VBlank],
         }
     }
 }
