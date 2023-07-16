@@ -14,8 +14,7 @@ impl Crab8 {
     pub fn exec_add_register(&mut self, register: Register, other: Register) {
         let starting_value = self.registers.get(register);
         let value = self.registers.get(other);
-        let result = starting_value.wrapping_add(value);
-        let carry = result < starting_value || result < value;
+        let (result, carry) = starting_value.overflowing_add(value);
         let carry = if carry { 0x01 } else { 0x00 };
 
         self.registers.set(register, result);
@@ -25,8 +24,8 @@ impl Crab8 {
     pub fn exec_subtract_register(&mut self, register: Register, other: Register) {
         let starting_value = self.registers.get(register);
         let value = self.registers.get(other);
-        let result = starting_value.wrapping_sub(value);
-        let no_borrow = if result > starting_value { 0x00 } else { 0x01 };
+        let (result, borrow) = starting_value.overflowing_sub(value);
+        let no_borrow = if borrow { 0x00 } else { 0x01 };
 
         self.registers.set(register, result);
         self.registers.set(VF, no_borrow);
@@ -35,8 +34,8 @@ impl Crab8 {
     pub fn exec_sub_from_register(&mut self, register: Register, other: Register) {
         let starting_value = self.registers.get(other);
         let value = self.registers.get(register);
-        let result = starting_value.wrapping_sub(value);
-        let no_borrow = if result > starting_value { 0x00 } else { 0x01 };
+        let (result, borrow) = starting_value.overflowing_sub(value);
+        let no_borrow = if borrow { 0x00 } else { 0x01 };
 
         self.registers.set(register, result);
         self.registers.set(VF, no_borrow);
