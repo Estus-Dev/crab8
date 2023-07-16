@@ -27,7 +27,10 @@ use chip8_db::{Database, Metadata};
 use conditions::StopCondition;
 use input::InputBuilder;
 use quirks::Quirks;
-use std::{fmt, fmt::Display};
+use std::{fmt, fmt::Display, sync::OnceLock};
+
+// A global copy of the CHIP-8 Database
+pub static DB: OnceLock<Database> = OnceLock::new();
 
 const DEFAULT_TICKRATE: usize = 10;
 
@@ -69,9 +72,6 @@ pub struct Crab8 {
     instructions_since_frame: usize,
 
     rom: Option<Vec<u8>>,
-
-    // TODO: This should not be owned by Crab8, lazy_static/once_cell instead?
-    pub database: Database,
 
     pub metadata: Option<Metadata>,
 
@@ -164,7 +164,7 @@ impl Crab8 {
     }
 
     pub fn load(&mut self, rom: &[u8]) {
-        let metadata = self.database.get_metadata(rom);
+        let metadata = DB.get_or_init(Database::new).get_metadata(rom);
 
         if let Some(program) = &metadata.program {
             log::info!(r#"Loaded ROM "{}" ({})"#, program.title, metadata.hash);
@@ -345,7 +345,6 @@ impl Default for Crab8 {
             instructions_per_frame: DEFAULT_TICKRATE,
             instructions_since_frame: 0,
             rom: None,
-            database: Database::new(),
             metadata: None,
             cycle_count: 0,
             frame_count: 0,
