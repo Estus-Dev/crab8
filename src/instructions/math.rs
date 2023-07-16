@@ -26,20 +26,20 @@ impl Crab8 {
         let starting_value = self.registers.get(register);
         let value = self.registers.get(other);
         let result = starting_value.wrapping_sub(value);
-        let borrow = if result > starting_value { 0x01 } else { 0x00 };
+        let no_borrow = if result > starting_value { 0x00 } else { 0x01 };
 
         self.registers.set(register, result);
-        self.registers.set(VF, borrow);
+        self.registers.set(VF, no_borrow);
     }
 
     pub fn exec_sub_from_register(&mut self, register: Register, other: Register) {
         let starting_value = self.registers.get(other);
         let value = self.registers.get(register);
         let result = starting_value.wrapping_sub(value);
-        let borrow = if result > starting_value { 0x01 } else { 0x00 };
+        let no_borrow = if result > starting_value { 0x00 } else { 0x01 };
 
         self.registers.set(register, result);
-        self.registers.set(VF, borrow);
+        self.registers.set(VF, no_borrow);
     }
 }
 
@@ -112,15 +112,15 @@ mod test {
 
         crab8.exec(SubtractRegister(V3, V0));
 
-        assert_eq!(crab8.registers, 0x12000077000000000000000000000000.into());
+        assert_eq!(crab8.registers, 0x12000077000000000000000000000001.into());
 
         crab8.exec(SubtractRegister(V0, V3));
 
-        assert_eq!(crab8.registers, 0x9B000077000000000000000000000001.into());
+        assert_eq!(crab8.registers, 0x9B000077000000000000000000000000.into());
 
         crab8.exec(SubtractRegister(V0, V3));
 
-        assert_eq!(crab8.registers, 0x24000077000000000000000000000000.into());
+        assert_eq!(crab8.registers, 0x24000077000000000000000000000001.into());
     }
 
     #[test]
@@ -136,14 +136,14 @@ mod test {
 
         crab8.exec(SubtractFromRegister(V3, V0));
 
-        assert_eq!(crab8.registers, 0x89000077000000000000000000000000.into());
+        assert_eq!(crab8.registers, 0x89000077000000000000000000000001.into());
 
         crab8.exec(SubtractFromRegister(V0, V3));
 
-        assert_eq!(crab8.registers, 0xEE000077000000000000000000000001.into());
+        assert_eq!(crab8.registers, 0xEE000077000000000000000000000000.into());
 
         crab8.exec(SubtractFromRegister(V2, V0));
 
-        assert_eq!(crab8.registers, 0xEE00EE77000000000000000000000000.into());
+        assert_eq!(crab8.registers, 0xEE00EE77000000000000000000000001.into());
     }
 }
