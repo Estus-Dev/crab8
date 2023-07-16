@@ -43,7 +43,7 @@ impl RegisterWindow {
                         ui.label(format!("PC={PC:04X?}"));
 
                         for (i, address) in crab8.stack.clone().into_iter().enumerate() {
-                            ui.label(format!("{i:2X?}={address:04X?}"));
+                            ui.label(format!("{i:02X?}={address:04X?}"));
                         }
                     });
                 });
