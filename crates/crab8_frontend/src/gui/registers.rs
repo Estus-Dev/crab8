@@ -21,7 +21,7 @@ impl RegisterWindow {
                 ui.horizontal(|ui| {
                     ui.vertical(|ui| {
                         ui.label(format!("PC={PC}"));
-                        ui.label(format!("I={I}"));
+                        ui.label(format!(" I={I}"));
                     });
 
                     ui.vertical(|ui| {
