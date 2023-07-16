@@ -55,5 +55,5 @@ fn register_label(ui: &mut Ui, register: u16, crab8: &Crab8) {
     let register = register.into();
     let value = crab8.registers.get(register);
 
-    ui.label(format!("{register:?}={value:#04X}"));
+    ui.label(format!("{register:?}={value:02X}  "));
 }
