@@ -85,6 +85,8 @@ pub struct Crab8 {
     pub colors: Vec<[u8; 4]>,
 
     pub quirks: Quirks,
+
+    start_address: Address,
 }
 
 impl Crab8 {
@@ -170,7 +172,7 @@ impl Crab8 {
             log::warn!("Loaded unknown ROM ({})", metadata.hash);
         }
 
-        let start_address = metadata
+        self.start_address = metadata
             .rom
             .as_ref()
             .and_then(|rom| rom.start_address)
@@ -184,7 +186,7 @@ impl Crab8 {
             .unwrap_or(DEFAULT_TICKRATE);
 
         self.rom = Some(Vec::from(rom));
-        self.memory.set_range(start_address, rom);
+        self.memory.set_range(self.start_address, rom);
 
         self.metadata = Some(metadata);
         self.play();
@@ -214,7 +216,7 @@ impl Crab8 {
         self.reset();
 
         if let Some(rom) = self.rom.clone() {
-            self.memory.set_range(Address::initial_instruction(), &rom);
+            self.memory.set_range(self.start_address, &rom);
         }
 
         if let Some(metadata) = self.metadata.clone() {
@@ -351,6 +353,7 @@ impl Default for Crab8 {
             cycle_count: 0,
             frame_count: 0,
             colors: Vec::with_capacity(16),
+            start_address: Address::initial_instruction(),
         }
     }
 }
