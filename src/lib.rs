@@ -164,6 +164,8 @@ impl Crab8 {
     }
 
     pub fn load(&mut self, rom: &[u8]) {
+        self.reset();
+
         let metadata = DB.get_or_init(Database::new).get_metadata(rom);
 
         if let Some(program) = &metadata.program {
