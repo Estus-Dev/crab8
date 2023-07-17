@@ -10,6 +10,9 @@ pub struct Quirks {
 
     /// Whether DXYN instructions wait for the next frame before they occur.
     pub display_wait: bool,
+
+    /// Whether shift instructions ignore VY.
+    pub shift: bool,
 }
 
 #[allow(clippy::derivable_impls)]
@@ -18,6 +21,7 @@ impl Default for Quirks {
         Quirks {
             vf_reset: false,
             display_wait: false,
+            shift: false,
         }
     }
 }
@@ -36,6 +40,7 @@ impl From<&Platform> for Quirks {
         Self {
             vf_reset: platform.quirks[&Quirk::Logic],
             display_wait: platform.quirks[&Quirk::VBlank],
+            shift: platform.quirks[&Quirk::Shift],
         }
     }
 }

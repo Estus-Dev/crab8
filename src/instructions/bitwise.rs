@@ -41,7 +41,12 @@ impl Crab8 {
     }
 
     pub fn exec_shift_right(&mut self, register: Register, other: Register) {
-        let value = self.registers.get(other);
+        let value = if self.quirks.shift {
+            self.registers.get(register)
+        } else {
+            self.registers.get(other)
+        };
+
         let result = value >> 1;
         let least_significant_bit = value & 0b00000001;
 
@@ -50,7 +55,12 @@ impl Crab8 {
     }
 
     pub fn exec_shift_left(&mut self, register: Register, other: Register) {
-        let value = self.registers.get(other);
+        let value = if self.quirks.shift {
+            self.registers.get(register)
+        } else {
+            self.registers.get(other)
+        };
+
         let result = value << 1;
         let most_significant_bit = (value & 0b10000000) >> 7;
 
