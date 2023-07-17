@@ -168,15 +168,23 @@ impl Crab8 {
 
         let metadata = DB.get_or_init(Database::new).get_metadata(rom);
 
+        self.apply_metadata(&metadata);
+
         if let Some(program) = &metadata.program {
-            log::info!(r#"Loaded ROM "{}" ({})"#, program.title, metadata.hash);
+            let rom = metadata.rom.as_ref().unwrap();
+
+            log::info!(
+                r#"Loaded {:?} ROM "{}" ({})"#,
+                rom.platforms.first().unwrap(),
+                program.title,
+                metadata.hash
+            );
         } else {
             log::warn!("Loaded unknown ROM ({})", metadata.hash);
         }
 
         self.rom = Some(Vec::from(rom));
 
-        self.apply_metadata(&metadata);
         self.metadata = Some(metadata);
 
         self.memory.set_range(self.start_address, rom);
