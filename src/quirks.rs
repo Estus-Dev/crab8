@@ -42,10 +42,13 @@ impl From<&Platform> for Quirks {
         // TODO: Read quirkyPlatforms
 
         Self {
-            vf_reset: platform.quirks[&Quirk::Logic],
-            display_wait: platform.quirks[&Quirk::VBlank],
-            shift: platform.quirks[&Quirk::Shift],
-            memory_increment_by_x: platform.quirks[&Quirk::MemoryIncrementByX],
+            vf_reset: *platform.quirks.get(&Quirk::Logic).unwrap_or(&false),
+            display_wait: *platform.quirks.get(&Quirk::VBlank).unwrap_or(&false),
+            shift: *platform.quirks.get(&Quirk::Shift).unwrap_or(&false),
+            memory_increment_by_x: *platform
+                .quirks
+                .get(&Quirk::MemoryIncrementByX)
+                .unwrap_or(&false),
         }
     }
 }
