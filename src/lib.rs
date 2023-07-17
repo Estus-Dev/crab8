@@ -23,7 +23,7 @@ pub mod prelude {
 }
 
 use crate::prelude::*;
-use chip8_db::{Database, Metadata};
+use chip8_db::{platform::Platform, Database, Metadata};
 use conditions::StopCondition;
 use input::InputBuilder;
 use quirks::Quirks;
@@ -164,24 +164,32 @@ impl Crab8 {
     }
 
     pub fn load(&mut self, rom: &[u8]) {
-        self.reset();
+        const SUPPORTED_PLATFORMS: &[Platform] = &[Platform::OriginalChip8, Platform::ModernChip8];
 
         let metadata = DB.get_or_init(Database::new).get_metadata(rom);
 
-        self.apply_metadata(&metadata);
-
         if let Some(program) = &metadata.program {
             let rom = metadata.rom.as_ref().unwrap();
+            let platform = rom.platforms.first().unwrap_or(&Platform::ModernChip8);
+
+            if !SUPPORTED_PLATFORMS.contains(platform) {
+                log::error!(r#"Failed to load ROM for unsupported platform "{platform:?}""#);
+
+                // TODO: return Result<>
+                return;
+            }
 
             log::info!(
-                r#"Loaded {:?} ROM "{}" ({})"#,
-                rom.platforms.first().unwrap(),
+                r#"Loaded {platform:?} ROM "{}" ({})"#,
                 program.title,
                 metadata.hash
             );
         } else {
             log::warn!("Loaded unknown ROM ({})", metadata.hash);
         }
+
+        self.reset();
+        self.apply_metadata(&metadata);
 
         self.rom = Some(Vec::from(rom));
 
