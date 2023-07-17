@@ -13,6 +13,9 @@ pub struct Quirks {
 
     /// Whether shift instructions ignore VY.
     pub shift: bool,
+
+    // Whether to increment I by the value of X, instead of the default behavior of X + 1.
+    pub memory_increment_by_x: bool,
 }
 
 #[allow(clippy::derivable_impls)]
@@ -22,6 +25,7 @@ impl Default for Quirks {
             vf_reset: false,
             display_wait: false,
             shift: false,
+            memory_increment_by_x: false,
         }
     }
 }
@@ -41,6 +45,7 @@ impl From<&Platform> for Quirks {
             vf_reset: platform.quirks[&Quirk::Logic],
             display_wait: platform.quirks[&Quirk::VBlank],
             shift: platform.quirks[&Quirk::Shift],
+            memory_increment_by_x: platform.quirks[&Quirk::MemoryIncrementByX],
         }
     }
 }

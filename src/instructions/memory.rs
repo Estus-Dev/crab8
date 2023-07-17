@@ -29,18 +29,20 @@ impl Crab8 {
     pub fn exec_write(&mut self, register: Register) {
         let address = self.address_register;
         let values = self.registers.get_range(register);
+        let offset: u16 = (!self.quirks.memory_increment_by_x).into();
 
         self.memory.set_range(address, values);
-        self.address_register = self.address_register.wrapping_add(1 + register as u16);
+        self.address_register = self.address_register.wrapping_add(offset + register as u16);
     }
 
     pub fn exec_read(&mut self, register: Register) {
         let start = self.address_register;
         let end = start.wrapping_add(1 + register as u16);
         let values = self.memory.get_range(start, end);
+        let offset: u16 = (!self.quirks.memory_increment_by_x).into();
 
         self.registers.set_range(values);
-        self.address_register = self.address_register.wrapping_add(1 + register as u16);
+        self.address_register = self.address_register.wrapping_add(offset + register as u16);
     }
 }
 
@@ -141,6 +143,45 @@ mod test {
 
         crab8.exec(Write(V5));
         assert_eq!(crab8.address_register, address.wrapping_add(5 + 1));
+
+        let start = address;
+        let end = start.wrapping_add(result.len() as u16);
+        assert_eq!(crab8.memory.get_range(start, end), result);
+
+        for register in 0x0..=0xF {
+            let register = Register::from(register);
+            crab8.exec(Store(register, 0xBC));
+        }
+
+        crab8.exec(StoreAddress(address));
+        crab8.exec(Read(V5));
+
+        assert_eq!(crab8.registers.get_range(V5), result);
+    }
+
+    #[test]
+    fn read_write_quirky() {
+        let mut crab8 = Crab8::new();
+        let mut address = Address::new(FIRST_CHAR_ADDRESS);
+        crab8.quirks.memory_increment_by_x = true;
+
+        crab8.address_register = address;
+        crab8.exec(Read(V4));
+        assert_eq!(crab8.registers.get_range(V4), Char0.sprite());
+        assert_eq!(crab8.address_register, address.wrapping_add(4));
+
+        address = Address::new(0x210);
+        crab8.address_register = address;
+
+        let result: [u8; 6] = [0x54, 0x74, 0x12, 0x62, 0xBE, 0xC0];
+
+        for (offset, &byte) in result.iter().enumerate() {
+            let register = Register::from(offset);
+            crab8.exec(Store(register, byte));
+        }
+
+        crab8.exec(Write(V5));
+        assert_eq!(crab8.address_register, address.wrapping_add(5));
 
         let start = address;
         let end = start.wrapping_add(result.len() as u16);
