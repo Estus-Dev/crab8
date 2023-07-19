@@ -12,7 +12,7 @@ impl Instruction {
         crab8.registers.set(register, result);
     }
 
-    pub fn add_register(crab8: &mut Crab8, register: Register, other: Register) {
+    pub fn add_reg(crab8: &mut Crab8, register: Register, other: Register) {
         let starting_value = crab8.registers.get(register);
         let value = crab8.registers.get(other);
         let (result, carry) = starting_value.overflowing_add(value);
@@ -22,7 +22,7 @@ impl Instruction {
         crab8.registers.set(VF, carry);
     }
 
-    pub fn subtract_register(crab8: &mut Crab8, register: Register, other: Register) {
+    pub fn sub_reg(crab8: &mut Crab8, register: Register, other: Register) {
         let starting_value = crab8.registers.get(register);
         let value = crab8.registers.get(other);
         let (result, borrow) = starting_value.overflowing_sub(value);
@@ -32,7 +32,7 @@ impl Instruction {
         crab8.registers.set(VF, no_borrow);
     }
 
-    pub fn sub_from_register(crab8: &mut Crab8, register: Register, other: Register) {
+    pub fn sub_from_reg(crab8: &mut Crab8, register: Register, other: Register) {
         let starting_value = crab8.registers.get(other);
         let value = crab8.registers.get(register);
         let (result, borrow) = starting_value.overflowing_sub(value);
@@ -86,15 +86,15 @@ mod test {
 
         assert_eq!(crab8.registers, 0x12000089000000000000000000000000.into());
 
-        crab8.exec(AddRegister(V3, V0));
+        crab8.exec(AddReg(V3, V0));
 
         assert_eq!(crab8.registers, 0x1200009B000000000000000000000000.into());
 
-        crab8.exec(AddRegister(V0, V3));
+        crab8.exec(AddReg(V0, V3));
 
         assert_eq!(crab8.registers, 0xAD00009B000000000000000000000000.into());
 
-        crab8.exec(AddRegister(V0, V3));
+        crab8.exec(AddReg(V0, V3));
 
         assert_eq!(crab8.registers, 0x4800009B000000000000000000000001.into());
     }
@@ -110,15 +110,15 @@ mod test {
 
         assert_eq!(crab8.registers, 0x12000089000000000000000000000000.into());
 
-        crab8.exec(SubtractRegister(V3, V0));
+        crab8.exec(SubReg(V3, V0));
 
         assert_eq!(crab8.registers, 0x12000077000000000000000000000001.into());
 
-        crab8.exec(SubtractRegister(V0, V3));
+        crab8.exec(SubReg(V0, V3));
 
         assert_eq!(crab8.registers, 0x9B000077000000000000000000000000.into());
 
-        crab8.exec(SubtractRegister(V0, V3));
+        crab8.exec(SubReg(V0, V3));
 
         assert_eq!(crab8.registers, 0x24000077000000000000000000000001.into());
     }
@@ -134,15 +134,15 @@ mod test {
 
         assert_eq!(crab8.registers, 0x89000012000000000000000000000000.into());
 
-        crab8.exec(SubtractFromRegister(V3, V0));
+        crab8.exec(SubFromReg(V3, V0));
 
         assert_eq!(crab8.registers, 0x89000077000000000000000000000001.into());
 
-        crab8.exec(SubtractFromRegister(V0, V3));
+        crab8.exec(SubFromReg(V0, V3));
 
         assert_eq!(crab8.registers, 0xEE000077000000000000000000000000.into());
 
-        crab8.exec(SubtractFromRegister(V2, V0));
+        crab8.exec(SubFromReg(V2, V0));
 
         assert_eq!(crab8.registers, 0xEE00EE77000000000000000000000001.into());
     }

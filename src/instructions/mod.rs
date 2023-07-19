@@ -41,7 +41,7 @@ pub enum Instruction {
 
     /// Skip the next instruction if the current values of both registers are equal.
     /// Value: 5XY0 where X and Y are the registers to compare
-    IfNotRegisters(Register, Register),
+    IfNotRegs(Register, Register),
 
     /// Store a value in the specified register
     /// Value: 6XNN where X is the register and NN is the value to store
@@ -69,11 +69,11 @@ pub enum Instruction {
 
     /// Add a value to the specified register and carry the result to VF
     /// Value: 8XY4 where X is the register and Y is the register to add
-    AddRegister(Register, Register),
+    AddReg(Register, Register),
 
     /// Subtract a value from the specified register and flag VF on borrow
     /// Value: 8XY5 where X is the register and Y is the register to subtract
-    SubtractRegister(Register, Register),
+    SubReg(Register, Register),
 
     /// Shift the value of Y right one bit and store in X, storing the shifted bit in VF
     /// Value: 8XY6 where X is the destination and Y is the value to be shifted
@@ -86,11 +86,11 @@ pub enum Instruction {
     /// Subtract the value in the specified register from another register and flag VF on borrow
     /// The difference between this and SubtractRegister is the order, they go to the same register
     /// Value: 8XY7 where X is the register and Y is the register to subtract from
-    SubtractFromRegister(Register, Register),
+    SubFromReg(Register, Register),
 
     /// Skip the next instruction if the current values of both registers are not equal.
     /// Value: 9XY0 where X and Y are the registers to compare
-    IfRegisters(Register, Register),
+    IfRegs(Register, Register),
 
     /// Store a memory address in I.
     /// Value: ANNN where NNN is the address to store.
@@ -183,7 +183,7 @@ impl From<u16> for Instruction {
             0x2 => Self::Call(address),
             0x3 => Self::IfNot(x, value),
             0x4 => Self::If(x, value),
-            0x5 if sub_operator == 0 => Self::IfNotRegisters(x, y),
+            0x5 if sub_operator == 0 => Self::IfNotRegs(x, y),
             0x6 => Self::Store(x, value),
             0x7 => Self::Add(x, value),
 
@@ -192,15 +192,15 @@ impl From<u16> for Instruction {
                 0x1 => Self::Or(x, y),
                 0x2 => Self::And(x, y),
                 0x3 => Self::Xor(x, y),
-                0x4 => Self::AddRegister(x, y),
-                0x5 => Self::SubtractRegister(x, y),
+                0x4 => Self::AddReg(x, y),
+                0x5 => Self::SubReg(x, y),
                 0x6 => Self::ShiftRight(x, y),
-                0x7 => Self::SubtractFromRegister(x, y),
+                0x7 => Self::SubFromReg(x, y),
                 0xE => Self::ShiftLeft(x, y),
                 _ => Self::NoOp(instruction),
             },
 
-            0x9 if sub_operator == 0x0 => Self::IfRegisters(x, y),
+            0x9 if sub_operator == 0x0 => Self::IfRegs(x, y),
             0xA => Self::StoreAddress(address),
             0xB => Self::JumpOffset(address),
             0xC => Self::Rand(x, value),
@@ -237,23 +237,19 @@ impl Crab8 {
             Call(address) => Instruction::call(self, address),
             IfNot(register, value) => Instruction::if_not(self, register, value),
             If(register, value) => Instruction::if_then(self, register, value),
-            IfNotRegisters(register, other) => Instruction::if_not_registers(self, register, other),
+            IfNotRegs(register, other) => Instruction::if_not_regs(self, register, other),
             Store(register, value) => Instruction::store(self, register, value),
             Add(register, value) => Instruction::add(self, register, value),
             Copy(register, other) => Instruction::copy(self, register, other),
             Or(register, other) => Instruction::or(self, register, other),
             And(register, other) => Instruction::and(self, register, other),
             Xor(register, other) => Instruction::xor(self, register, other),
-            AddRegister(register, other) => Instruction::add_register(self, register, other),
-            SubtractRegister(register, other) => {
-                Instruction::subtract_register(self, register, other)
-            }
+            AddReg(register, other) => Instruction::add_reg(self, register, other),
+            SubReg(register, other) => Instruction::sub_reg(self, register, other),
             ShiftRight(register, other) => Instruction::shift_right(self, register, other),
-            SubtractFromRegister(register, other) => {
-                Instruction::sub_from_register(self, register, other)
-            }
+            SubFromReg(register, other) => Instruction::sub_from_reg(self, register, other),
             ShiftLeft(register, other) => Instruction::shift_left(self, register, other),
-            IfRegisters(register, other) => Instruction::if_registers(self, register, other),
+            IfRegs(register, other) => Instruction::if_regs(self, register, other),
             StoreAddress(address) => Instruction::store_address(self, address),
             JumpOffset(address) => Instruction::jump_offset(self, address),
             Rand(register, bitmask) => Instruction::rand(self, register, bitmask),
@@ -287,19 +283,19 @@ impl Debug for Instruction {
             Instruction::Call(addr) => format!("call {addr:#03X}"),
             Instruction::IfNot(r, value) => format!("if {r} != {value:#02X}"),
             Instruction::If(r, value) => format!("if {r} == {value:#02X}"),
-            Instruction::IfNotRegisters(r1, r2) => format!("if {r1} != {r2}"),
+            Instruction::IfNotRegs(r1, r2) => format!("if {r1} != {r2}"),
             Instruction::Store(r, value) => format!("{r} := {value:#02X}"),
             Instruction::Add(r, value) => format!("{r} += {value:#02X}"),
             Instruction::Copy(r1, r2) => format!("{r1} := {r2}"),
             Instruction::Or(r1, r2) => format!("{r1} |= {r2}"),
             Instruction::And(r1, r2) => format!("{r1} &= {r2}"),
             Instruction::Xor(r1, r2) => format!("{r1} ^= {r2}"),
-            Instruction::AddRegister(r1, r2) => format!("{r1} += {r2}"),
-            Instruction::SubtractRegister(r1, r2) => format!("{r1} -= {r2}"),
+            Instruction::AddReg(r1, r2) => format!("{r1} += {r2}"),
+            Instruction::SubReg(r1, r2) => format!("{r1} -= {r2}"),
             Instruction::ShiftRight(r1, r2) => format!("{r1} >>= {r2}"),
             Instruction::ShiftLeft(r1, r2) => format!("{r1} <<= {r2}"),
-            Instruction::SubtractFromRegister(r1, r2) => format!("{r1} =- {r2}"),
-            Instruction::IfRegisters(r1, r2) => format!("if {r1} == {r2}"),
+            Instruction::SubFromReg(r1, r2) => format!("{r1} =- {r2}"),
+            Instruction::IfRegs(r1, r2) => format!("if {r1} == {r2}"),
             Instruction::StoreAddress(addr) => format!("i := {addr:#03X}"),
             Instruction::JumpOffset(addr) => format!("jump0  {addr:#03X}"),
             Instruction::Rand(r, mask) => format!("{r} := random {mask:#02X}"),
@@ -348,8 +344,8 @@ mod test {
             (0x3EDD, IfNot(VE, 0xDD)),
             (0x4567, If(V5, 0x67)),
             (0x4712, If(V7, 0x12)),
-            (0x5AD0, IfNotRegisters(VA, VD)),
-            (0x5040, IfNotRegisters(V0, V4)),
+            (0x5AD0, IfNotRegs(VA, VD)),
+            (0x5040, IfNotRegs(V0, V4)),
             (0x5049, NoOp(0x5049)),
             (0x64AC, Store(V4, 0xAC)),
             (0x6000, Store(V0, 0x00)),
@@ -369,18 +365,18 @@ mod test {
             (0x86B2, And(V6, VB)),
             (0x8933, Xor(V9, V3)),
             (0x8AF3, Xor(VA, VF)),
-            (0x8DE4, AddRegister(VD, VE)),
-            (0x8C44, AddRegister(VC, V4)),
-            (0x8E05, SubtractRegister(VE, V0)),
-            (0x8725, SubtractRegister(V7, V2)),
+            (0x8DE4, AddReg(VD, VE)),
+            (0x8C44, AddReg(VC, V4)),
+            (0x8E05, SubReg(VE, V0)),
+            (0x8725, SubReg(V7, V2)),
             (0x8126, ShiftRight(V1, V2)),
             (0x8546, ShiftRight(V5, V4)),
-            (0x8D57, SubtractFromRegister(VD, V5)),
-            (0x8AA7, SubtractFromRegister(VA, VA)),
+            (0x8D57, SubFromReg(VD, V5)),
+            (0x8AA7, SubFromReg(VA, VA)),
             (0x89FE, ShiftLeft(V9, VF)),
             (0x8CAE, ShiftLeft(VC, VA)),
-            (0x9AD0, IfRegisters(VA, VD)),
-            (0x9040, IfRegisters(V0, V4)),
+            (0x9AD0, IfRegs(VA, VD)),
+            (0x9040, IfRegs(V0, V4)),
             (0x9049, NoOp(0x9049)),
             (0xA000, StoreAddress(0x000.into())),
             (0xA123, StoreAddress(0x123.into())),

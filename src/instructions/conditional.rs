@@ -18,7 +18,7 @@ impl Instruction {
         }
     }
 
-    pub fn if_not_registers(crab8: &mut Crab8, register: Register, other: Register) {
+    pub fn if_not_regs(crab8: &mut Crab8, register: Register, other: Register) {
         let current_value = crab8.registers.get(register);
         let value = crab8.registers.get(other);
 
@@ -27,7 +27,7 @@ impl Instruction {
         }
     }
 
-    pub fn if_registers(crab8: &mut Crab8, register: Register, other: Register) {
+    pub fn if_regs(crab8: &mut Crab8, register: Register, other: Register) {
         let current_value = crab8.registers.get(register);
         let value = crab8.registers.get(other);
 
