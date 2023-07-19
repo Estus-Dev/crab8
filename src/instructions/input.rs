@@ -1,42 +1,43 @@
+use super::Instruction;
 use crate::{input::KeyState, registers::Register, Crab8};
 
-impl Crab8 {
-    pub fn exec_if_not_pressed(&mut self, register: Register) {
-        let key = self.registers.get(register);
+impl Instruction {
+    pub fn if_not_pressed(crab8: &mut Crab8, register: Register) {
+        let key = crab8.registers.get(register);
         let pressed = if key <= 0xF {
-            self.input.is_key_pressed(key.into())
+            crab8.input.is_key_pressed(key.into())
         } else {
             false
         };
 
         if pressed {
-            self.program_counter = self.program_counter.next_instruction();
+            crab8.program_counter = crab8.program_counter.next_instruction();
         }
     }
 
-    pub fn exec_if_pressed(&mut self, register: Register) {
-        let key = self.registers.get(register);
+    pub fn if_pressed(crab8: &mut Crab8, register: Register) {
+        let key = crab8.registers.get(register);
         let pressed = if key <= 0xF {
-            self.input.is_key_pressed(key.into())
+            crab8.input.is_key_pressed(key.into())
         } else {
             false
         };
 
         if !pressed {
-            self.program_counter = self.program_counter.next_instruction();
+            crab8.program_counter = crab8.program_counter.next_instruction();
         }
     }
 
-    pub fn exec_read_input(&mut self, register: Register) {
-        if let Some((key, _)) = self
+    pub fn read_input(crab8: &mut Crab8, register: Register) {
+        if let Some((key, _)) = crab8
             .input
             .into_iter()
             .find(|&(_, state)| state == KeyState::Released)
         {
-            self.registers.set(register, key as u8);
+            crab8.registers.set(register, key as u8);
         } else {
-            self.program_counter = self.program_counter.wrapping_sub(2);
-            self.cycle_count = self.cycle_count.wrapping_sub(1);
+            crab8.program_counter = crab8.program_counter.wrapping_sub(2);
+            crab8.cycle_count = crab8.cycle_count.wrapping_sub(1);
         }
     }
 }

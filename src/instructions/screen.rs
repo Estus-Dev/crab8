@@ -1,3 +1,4 @@
+use super::Instruction;
 use crate::{
     character::Character,
     memory::{Address, CHAR_SPRITE_WIDTH, FIRST_CHAR_ADDRESS},
@@ -6,33 +7,33 @@ use crate::{
     Crab8,
 };
 
-impl Crab8 {
-    pub fn exec_clear_screen(&mut self) {
-        self.screen = Screen::default();
+impl Instruction {
+    pub fn clear_screen(crab8: &mut Crab8) {
+        crab8.screen = Screen::default();
     }
 
-    pub fn exec_draw(&mut self, x: Register, y: Register, row_count: u8) {
-        if self.quirks.display_wait && self.instructions_since_frame > 0 {
-            self.program_counter = self.program_counter.wrapping_sub(2);
-            self.cycle_count = self.cycle_count.wrapping_sub(1);
+    pub fn draw(crab8: &mut Crab8, x: Register, y: Register, row_count: u8) {
+        if crab8.quirks.display_wait && crab8.instructions_since_frame > 0 {
+            crab8.program_counter = crab8.program_counter.wrapping_sub(2);
+            crab8.cycle_count = crab8.cycle_count.wrapping_sub(1);
             return;
         }
 
-        let start = self.address_register;
+        let start = crab8.address_register;
         let end = start.wrapping_add(row_count as u16);
-        let x = self.registers.get(x);
-        let y = self.registers.get(y);
-        let sprite = self.memory.get_range(start, end);
+        let x = crab8.registers.get(x);
+        let y = crab8.registers.get(y);
+        let sprite = crab8.memory.get_range(start, end);
 
-        let (screen, collision_flag) = self.screen.draw(x, y, sprite);
+        let (screen, collision_flag) = crab8.screen.draw(x, y, sprite);
 
-        self.screen = screen;
-        self.registers.set(VF, collision_flag as u8);
+        crab8.screen = screen;
+        crab8.registers.set(VF, collision_flag as u8);
     }
 
-    pub fn exec_load_sprite(&mut self, register: Register) {
+    pub fn load_sprite(crab8: &mut Crab8, register: Register) {
         let first_address = Address::new(FIRST_CHAR_ADDRESS);
-        let current_value = self.registers.get(register);
+        let current_value = crab8.registers.get(register);
 
         // Converting to character here will wrap out of bounds values
         let character: Character = current_value.into();
@@ -40,7 +41,7 @@ impl Crab8 {
         let offset = CHAR_SPRITE_WIDTH * character as u16;
         let result = first_address.wrapping_add(offset);
 
-        self.address_register = result;
+        crab8.address_register = result;
     }
 }
 

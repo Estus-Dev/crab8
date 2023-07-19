@@ -1,37 +1,38 @@
+use super::Instruction;
 use crate::{registers::Register, Crab8};
 
-impl Crab8 {
-    pub fn exec_if_not(&mut self, register: Register, value: u8) {
-        let current_value = self.registers.get(register);
+impl Instruction {
+    pub fn if_not(crab8: &mut Crab8, register: Register, value: u8) {
+        let current_value = crab8.registers.get(register);
 
         if current_value == value {
-            self.program_counter = self.program_counter.next_instruction();
+            crab8.program_counter = crab8.program_counter.next_instruction();
         }
     }
 
-    pub fn exec_if(&mut self, register: Register, value: u8) {
-        let current_value = self.registers.get(register);
+    pub fn if_then(crab8: &mut Crab8, register: Register, value: u8) {
+        let current_value = crab8.registers.get(register);
 
         if current_value != value {
-            self.program_counter = self.program_counter.next_instruction();
+            crab8.program_counter = crab8.program_counter.next_instruction();
         }
     }
 
-    pub fn exec_if_not_registers(&mut self, register: Register, other: Register) {
-        let current_value = self.registers.get(register);
-        let value = self.registers.get(other);
+    pub fn if_not_registers(crab8: &mut Crab8, register: Register, other: Register) {
+        let current_value = crab8.registers.get(register);
+        let value = crab8.registers.get(other);
 
         if current_value == value {
-            self.program_counter = self.program_counter.next_instruction();
+            crab8.program_counter = crab8.program_counter.next_instruction();
         }
     }
 
-    pub fn exec_if_registers(&mut self, register: Register, other: Register) {
-        let current_value = self.registers.get(register);
-        let value = self.registers.get(other);
+    pub fn if_registers(crab8: &mut Crab8, register: Register, other: Register) {
+        let current_value = crab8.registers.get(register);
+        let value = crab8.registers.get(other);
 
         if current_value != value {
-            self.program_counter = self.program_counter.next_instruction();
+            crab8.program_counter = crab8.program_counter.next_instruction();
         }
     }
 }

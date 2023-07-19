@@ -1,71 +1,72 @@
+use super::Instruction;
 use crate::{
     registers::Register::{self, *},
     Crab8,
 };
 
-impl Crab8 {
-    pub fn exec_or(&mut self, register: Register, other: Register) {
-        let starting_value = self.registers.get(register);
-        let value = self.registers.get(other);
+impl Instruction {
+    pub fn or(crab8: &mut Crab8, register: Register, other: Register) {
+        let starting_value = crab8.registers.get(register);
+        let value = crab8.registers.get(other);
         let result = starting_value | value;
 
-        self.registers.set(register, result);
+        crab8.registers.set(register, result);
 
-        if self.quirks.vf_reset {
-            self.registers.set(VF, 0);
+        if crab8.quirks.vf_reset {
+            crab8.registers.set(VF, 0);
         }
     }
 
-    pub fn exec_and(&mut self, register: Register, other: Register) {
-        let starting_value = self.registers.get(register);
-        let value = self.registers.get(other);
+    pub fn and(crab8: &mut Crab8, register: Register, other: Register) {
+        let starting_value = crab8.registers.get(register);
+        let value = crab8.registers.get(other);
         let result = starting_value & value;
 
-        self.registers.set(register, result);
+        crab8.registers.set(register, result);
 
-        if self.quirks.vf_reset {
-            self.registers.set(VF, 0);
+        if crab8.quirks.vf_reset {
+            crab8.registers.set(VF, 0);
         }
     }
 
-    pub fn exec_xor(&mut self, register: Register, other: Register) {
-        let starting_value = self.registers.get(register);
-        let value = self.registers.get(other);
+    pub fn xor(crab8: &mut Crab8, register: Register, other: Register) {
+        let starting_value = crab8.registers.get(register);
+        let value = crab8.registers.get(other);
         let result = starting_value ^ value;
 
-        self.registers.set(register, result);
+        crab8.registers.set(register, result);
 
-        if self.quirks.vf_reset {
-            self.registers.set(VF, 0);
+        if crab8.quirks.vf_reset {
+            crab8.registers.set(VF, 0);
         }
     }
 
-    pub fn exec_shift_right(&mut self, register: Register, other: Register) {
-        let value = if self.quirks.shift {
-            self.registers.get(register)
+    pub fn shift_right(crab8: &mut Crab8, register: Register, other: Register) {
+        let value = if crab8.quirks.shift {
+            crab8.registers.get(register)
         } else {
-            self.registers.get(other)
+            crab8.registers.get(other)
         };
 
         let result = value >> 1;
         let least_significant_bit = value & 0b00000001;
 
-        self.registers.set(register, result);
-        self.registers.set(VF, least_significant_bit);
+        crab8.registers.set(register, result);
+        crab8.registers.set(VF, least_significant_bit);
     }
 
-    pub fn exec_shift_left(&mut self, register: Register, other: Register) {
-        let value = if self.quirks.shift {
-            self.registers.get(register)
+    pub fn shift_left(crab8: &mut Crab8, register: Register, other: Register) {
+        let value = if crab8.quirks.shift {
+            crab8.registers.get(register)
         } else {
-            self.registers.get(other)
+            crab8.registers.get(other)
         };
 
         let result = value << 1;
         let most_significant_bit = (value & 0b10000000) >> 7;
 
-        self.registers.set(register, result);
-        self.registers.set(VF, most_significant_bit);
+        crab8.registers.set(register, result);
+        crab8.registers.set(VF, most_significant_bit);
     }
 }
 

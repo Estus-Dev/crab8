@@ -231,45 +231,51 @@ impl Crab8 {
         use Instruction::*;
 
         match instruction.into() {
-            ClearScreen => self.exec_clear_screen(),
-            Return => self.exec_return(),
-            Jump(address) => self.exec_jump(address),
-            Call(address) => self.exec_call(address),
-            IfNot(register, value) => self.exec_if_not(register, value),
-            If(register, value) => self.exec_if(register, value),
-            IfNotRegisters(register, other) => self.exec_if_not_registers(register, other),
-            Store(register, value) => self.exec_store(register, value),
-            Add(register, value) => self.exec_add(register, value),
-            Copy(register, other) => self.exec_copy(register, other),
-            Or(register, other) => self.exec_or(register, other),
-            And(register, other) => self.exec_and(register, other),
-            Xor(register, other) => self.exec_xor(register, other),
-            AddRegister(register, other) => self.exec_add_register(register, other),
-            SubtractRegister(register, other) => self.exec_subtract_register(register, other),
-            ShiftRight(register, other) => self.exec_shift_right(register, other),
-            SubtractFromRegister(register, other) => self.exec_sub_from_register(register, other),
-            ShiftLeft(register, other) => self.exec_shift_left(register, other),
-            IfRegisters(register, other) => self.exec_if_registers(register, other),
-            StoreAddress(address) => self.exec_store_address(address),
-            JumpOffset(address) => self.exec_jump_offset(address),
-            Rand(register, bitmask) => self.exec_rand(register, bitmask),
-            Draw(x, y, row_count) => self.exec_draw(x, y, row_count),
-            IfNotPressed(register) => self.exec_if_not_pressed(register),
-            IfPressed(register) => self.exec_if_pressed(register),
-            ReadDelay(register) => self.exec_read_delay(register),
-            ReadInput(register) => self.exec_read_input(register),
-            SetDelay(register) => self.exec_set_delay(register),
-            SetSound(register) => self.exec_set_sound(register),
-            AddAddress(register) => self.exec_add_address(register),
-            LoadSprite(register) => self.exec_load_sprite(register),
-            WriteDecimal(register) => self.exec_write_decimal(register),
-            Write(register) => self.exec_write(register),
-            Read(register) => self.exec_read(register),
-            NoOp(instruction) => self.exec_no_op(instruction),
+            ClearScreen => Instruction::clear_screen(self),
+            Return => Instruction::return_value(self),
+            Jump(address) => Instruction::jump(self, address),
+            Call(address) => Instruction::call(self, address),
+            IfNot(register, value) => Instruction::if_not(self, register, value),
+            If(register, value) => Instruction::if_then(self, register, value),
+            IfNotRegisters(register, other) => Instruction::if_not_registers(self, register, other),
+            Store(register, value) => Instruction::store(self, register, value),
+            Add(register, value) => Instruction::add(self, register, value),
+            Copy(register, other) => Instruction::copy(self, register, other),
+            Or(register, other) => Instruction::or(self, register, other),
+            And(register, other) => Instruction::and(self, register, other),
+            Xor(register, other) => Instruction::xor(self, register, other),
+            AddRegister(register, other) => Instruction::add_register(self, register, other),
+            SubtractRegister(register, other) => {
+                Instruction::subtract_register(self, register, other)
+            }
+            ShiftRight(register, other) => Instruction::shift_right(self, register, other),
+            SubtractFromRegister(register, other) => {
+                Instruction::sub_from_register(self, register, other)
+            }
+            ShiftLeft(register, other) => Instruction::shift_left(self, register, other),
+            IfRegisters(register, other) => Instruction::if_registers(self, register, other),
+            StoreAddress(address) => Instruction::store_address(self, address),
+            JumpOffset(address) => Instruction::jump_offset(self, address),
+            Rand(register, bitmask) => Instruction::rand(self, register, bitmask),
+            Draw(x, y, row_count) => Instruction::draw(self, x, y, row_count),
+            IfNotPressed(register) => Instruction::if_not_pressed(self, register),
+            IfPressed(register) => Instruction::if_pressed(self, register),
+            ReadDelay(register) => Instruction::read_delay(self, register),
+            ReadInput(register) => Instruction::read_input(self, register),
+            SetDelay(register) => Instruction::set_delay(self, register),
+            SetSound(register) => Instruction::set_sound(self, register),
+            AddAddress(register) => Instruction::add_address(self, register),
+            LoadSprite(register) => Instruction::load_sprite(self, register),
+            WriteDecimal(register) => Instruction::write_decimal(self, register),
+            Write(register) => Instruction::write(self, register),
+            Read(register) => Instruction::read(self, register),
+            NoOp(instruction) => Instruction::exec_no_op(self, instruction),
         }
     }
+}
 
-    fn exec_no_op(&mut self, _instruction: u16) {}
+impl Instruction {
+    fn exec_no_op(_crab8: &mut Crab8, _instruction: u16) {}
 }
 
 impl Debug for Instruction {

@@ -1,14 +1,15 @@
+use super::Instruction;
 use crate::{registers::Register, Crab8};
 
-impl Crab8 {
-    pub fn exec_store(&mut self, register: Register, value: u8) {
-        self.registers.set(register, value);
+impl Instruction {
+    pub fn store(crab8: &mut Crab8, register: Register, value: u8) {
+        crab8.registers.set(register, value);
     }
 
-    pub fn exec_copy(&mut self, register: Register, other: Register) {
-        let value = self.registers.get(other);
+    pub fn copy(crab8: &mut Crab8, register: Register, other: Register) {
+        let value = crab8.registers.get(other);
 
-        self.registers.set(register, value);
+        crab8.registers.set(register, value);
     }
 }
 

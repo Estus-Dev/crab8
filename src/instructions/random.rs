@@ -1,12 +1,12 @@
+use super::Instruction;
+use crate::{prelude::Register, Crab8};
 use rand::random;
 
-use crate::{prelude::Register, Crab8};
-
-impl Crab8 {
-    pub fn exec_rand(&mut self, register: Register, bitmask: u8) {
+impl Instruction {
+    pub fn rand(crab8: &mut Crab8, register: Register, bitmask: u8) {
         let result = random::<u8>() & bitmask;
 
-        self.registers.set(register, result);
+        crab8.registers.set(register, result);
     }
 }
 

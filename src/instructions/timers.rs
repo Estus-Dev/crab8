@@ -1,22 +1,23 @@
+use super::Instruction;
 use crate::{registers::Register, Crab8};
 
-impl Crab8 {
-    pub fn exec_read_delay(&mut self, register: Register) {
-        let result = self.delay.into();
+impl Instruction {
+    pub fn read_delay(crab8: &mut Crab8, register: Register) {
+        let result = crab8.delay.into();
 
-        self.registers.set(register, result);
+        crab8.registers.set(register, result);
     }
 
-    pub fn exec_set_delay(&mut self, register: Register) {
-        let result = self.registers.get(register);
+    pub fn set_delay(crab8: &mut Crab8, register: Register) {
+        let result = crab8.registers.get(register);
 
-        self.delay = result.into();
+        crab8.delay = result.into();
     }
 
-    pub fn exec_set_sound(&mut self, register: Register) {
-        let result = self.registers.get(register);
+    pub fn set_sound(crab8: &mut Crab8, register: Register) {
+        let result = crab8.registers.get(register);
 
-        self.sound = result.into();
+        crab8.sound = result.into();
     }
 }
 

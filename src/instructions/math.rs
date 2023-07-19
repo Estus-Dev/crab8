@@ -1,44 +1,45 @@
+use super::Instruction;
 use crate::{
     registers::Register::{self, *},
     Crab8,
 };
 
-impl Crab8 {
-    pub fn exec_add(&mut self, register: Register, value: u8) {
-        let starting_value = self.registers.get(register);
+impl Instruction {
+    pub fn add(crab8: &mut Crab8, register: Register, value: u8) {
+        let starting_value = crab8.registers.get(register);
         let result = starting_value.wrapping_add(value);
 
-        self.registers.set(register, result);
+        crab8.registers.set(register, result);
     }
 
-    pub fn exec_add_register(&mut self, register: Register, other: Register) {
-        let starting_value = self.registers.get(register);
-        let value = self.registers.get(other);
+    pub fn add_register(crab8: &mut Crab8, register: Register, other: Register) {
+        let starting_value = crab8.registers.get(register);
+        let value = crab8.registers.get(other);
         let (result, carry) = starting_value.overflowing_add(value);
         let carry = if carry { 0x01 } else { 0x00 };
 
-        self.registers.set(register, result);
-        self.registers.set(VF, carry);
+        crab8.registers.set(register, result);
+        crab8.registers.set(VF, carry);
     }
 
-    pub fn exec_subtract_register(&mut self, register: Register, other: Register) {
-        let starting_value = self.registers.get(register);
-        let value = self.registers.get(other);
+    pub fn subtract_register(crab8: &mut Crab8, register: Register, other: Register) {
+        let starting_value = crab8.registers.get(register);
+        let value = crab8.registers.get(other);
         let (result, borrow) = starting_value.overflowing_sub(value);
         let no_borrow = if borrow { 0x00 } else { 0x01 };
 
-        self.registers.set(register, result);
-        self.registers.set(VF, no_borrow);
+        crab8.registers.set(register, result);
+        crab8.registers.set(VF, no_borrow);
     }
 
-    pub fn exec_sub_from_register(&mut self, register: Register, other: Register) {
-        let starting_value = self.registers.get(other);
-        let value = self.registers.get(register);
+    pub fn sub_from_register(crab8: &mut Crab8, register: Register, other: Register) {
+        let starting_value = crab8.registers.get(other);
+        let value = crab8.registers.get(register);
         let (result, borrow) = starting_value.overflowing_sub(value);
         let no_borrow = if borrow { 0x00 } else { 0x01 };
 
-        self.registers.set(register, result);
-        self.registers.set(VF, no_borrow);
+        crab8.registers.set(register, result);
+        crab8.registers.set(VF, no_borrow);
     }
 }
 

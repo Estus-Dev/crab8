@@ -1,35 +1,39 @@
+use super::Instruction;
 use crate::{memory::Address, registers::Register::*, Crab8};
 
-impl Crab8 {
-    pub fn exec_return(&mut self) {
-        let address = self.stack.pop().unwrap_or(Address::default());
+impl Instruction {
+    pub fn return_value(crab8: &mut Crab8) {
+        let address = crab8.stack.pop().unwrap_or(Address::default());
 
-        self.program_counter = address;
+        crab8.program_counter = address;
     }
 
-    pub fn exec_jump(&mut self, address: Address) {
-        self.halt_on_jump_to_self(address);
-        self.program_counter = address;
+    pub fn jump(crab8: &mut Crab8, address: Address) {
+        crab8.halt_on_jump_to_self(address);
+        crab8.program_counter = address;
     }
 
-    pub fn exec_call(&mut self, address: Address) {
-        self.stack
-            .push(self.program_counter)
+    pub fn call(crab8: &mut Crab8, address: Address) {
+        crab8
+            .stack
+            .push(crab8.program_counter)
             .expect("Stack Overflow");
 
-        self.halt_on_jump_to_self(address);
-        self.program_counter = address;
+        crab8.halt_on_jump_to_self(address);
+        crab8.program_counter = address;
     }
 
-    pub fn exec_jump_offset(&mut self, address: Address) {
-        let offset = self.registers.get(V0);
+    pub fn jump_offset(crab8: &mut Crab8, address: Address) {
+        let offset = crab8.registers.get(V0);
         // UNDEFINED BEHAVIOR: I'm choosing to implement overflow by wrapping.
         let address = address.wrapping_add(offset as u16);
 
-        self.halt_on_jump_to_self(address);
-        self.program_counter = address;
+        crab8.halt_on_jump_to_self(address);
+        crab8.program_counter = address;
     }
+}
 
+impl Crab8 {
     fn halt_on_jump_to_self(&mut self, address: Address) {
         if address == self.program_counter.wrapping_sub(2) {
             self.stop();

@@ -1,48 +1,53 @@
+use super::Instruction;
 use crate::{memory::Address, registers::Register, Crab8};
 
-impl Crab8 {
-    pub fn exec_store_address(&mut self, address: Address) {
-        self.address_register = address;
+impl Instruction {
+    pub fn store_address(crab8: &mut Crab8, address: Address) {
+        crab8.address_register = address;
     }
 
-    pub fn exec_add_address(&mut self, register: Register) {
-        let current_value = self.address_register;
-        let value = self.registers.get(register);
+    pub fn add_address(crab8: &mut Crab8, register: Register) {
+        let current_value = crab8.address_register;
+        let value = crab8.registers.get(register);
         let result = current_value.wrapping_add(value as u16);
 
-        self.address_register = result;
+        crab8.address_register = result;
     }
 
     #[allow(clippy::identity_op)]
-    pub fn exec_write_decimal(&mut self, register: Register) {
-        let address = self.address_register;
-        let current_value = self.registers.get(register);
+    pub fn write_decimal(crab8: &mut Crab8, register: Register) {
+        let address = crab8.address_register;
+        let current_value = crab8.registers.get(register);
         let bcd = [
             (current_value / 100) % 10,
             (current_value / 10) % 10,
             (current_value / 1) % 10,
         ];
 
-        self.memory.set_range(address, &bcd);
+        crab8.memory.set_range(address, &bcd);
     }
 
-    pub fn exec_write(&mut self, register: Register) {
-        let address = self.address_register;
-        let values = self.registers.get_range(register);
-        let offset: u16 = (!self.quirks.memory_increment_by_x).into();
+    pub fn write(crab8: &mut Crab8, register: Register) {
+        let address = crab8.address_register;
+        let values = crab8.registers.get_range(register);
+        let offset: u16 = (!crab8.quirks.memory_increment_by_x).into();
 
-        self.memory.set_range(address, values);
-        self.address_register = self.address_register.wrapping_add(offset + register as u16);
+        crab8.memory.set_range(address, values);
+        crab8.address_register = crab8
+            .address_register
+            .wrapping_add(offset + register as u16);
     }
 
-    pub fn exec_read(&mut self, register: Register) {
-        let start = self.address_register;
+    pub fn read(crab8: &mut Crab8, register: Register) {
+        let start = crab8.address_register;
         let end = start.wrapping_add(1 + register as u16);
-        let values = self.memory.get_range(start, end);
-        let offset: u16 = (!self.quirks.memory_increment_by_x).into();
+        let values = crab8.memory.get_range(start, end);
+        let offset: u16 = (!crab8.quirks.memory_increment_by_x).into();
 
-        self.registers.set_range(values);
-        self.address_register = self.address_register.wrapping_add(offset + register as u16);
+        crab8.registers.set_range(values);
+        crab8.address_register = crab8
+            .address_register
+            .wrapping_add(offset + register as u16);
     }
 }
 
