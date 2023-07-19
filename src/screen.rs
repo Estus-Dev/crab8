@@ -8,7 +8,7 @@ const HEIGHT: usize = 32;
 #[derive(Clone, PartialEq, Eq)]
 /// The CHIP-8 screen is a monochrome display with a width of 64px and a height of 32px.
 /// https://github.com/mattmikolay/chip-8/wiki/CHIP%E2%80%908-Technical-Reference#graphics
-pub struct Screen([[bool; WIDTH]; HEIGHT]);
+pub struct Screen([bool; WIDTH * HEIGHT]);
 
 impl Screen {
     pub fn startup() -> Self {
@@ -38,10 +38,12 @@ impl Screen {
                     break 'x;
                 }
 
-                if sprite_pixel > 0 {
-                    let collided = self.0[screen_y][screen_x];
+                let i = Screen::index(screen_x, screen_y);
 
-                    screen.0[screen_y][screen_x] = !collided;
+                if sprite_pixel > 0 {
+                    let collided = self.0[i];
+
+                    screen.0[i] = !collided;
                     collision_flag = collision_flag || collided;
                 }
             }
@@ -51,22 +53,27 @@ impl Screen {
     }
 
     pub fn get_row(&self, y: usize) -> &[bool] {
-        &self.0[y]
+        &self.0[Screen::index(0, y)..Screen::index(0, y + 1)]
     }
 
     pub fn lit(&self, x: usize, y: usize) -> bool {
-        self.0[y][x]
+        self.0[Screen::index(x, y)]
     }
 
     pub fn size(&self) -> (usize, usize) {
         (WIDTH, HEIGHT)
     }
+
+    fn index(x: usize, y: usize) -> usize {
+        (y * WIDTH) + x
+    }
 }
 
 impl Debug for Screen {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        for row in self.0 {
-            for pixel in row {
+        for row in 0..HEIGHT {
+            let row = self.get_row(row);
+            for &pixel in row {
                 write!(f, "{}", if pixel { "██" } else { "  " })?;
             }
 
@@ -79,7 +86,7 @@ impl Debug for Screen {
 
 impl Default for Screen {
     fn default() -> Self {
-        Self([[false; 64]; 32])
+        Self([false; WIDTH * HEIGHT])
     }
 }
 
@@ -87,10 +94,11 @@ impl Display for Screen {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         writeln!(f, "╭{}╮", "──".repeat(WIDTH))?;
 
-        for row in self.0 {
+        for row in 0..HEIGHT {
+            let row = self.get_row(row);
             write!(f, "│")?;
 
-            for pixel in row {
+            for &pixel in row {
                 write!(f, "{}", if pixel { "██" } else { "  " })?;
             }
 
@@ -107,62 +115,46 @@ impl FromStr for Screen {
     type Err = ScreenParseError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let mut pixel_lines: Vec<[bool; WIDTH]> = Vec::with_capacity(HEIGHT);
+        let mut pixels = [false; WIDTH * HEIGHT];
 
-        for (line_num, line) in s.lines().enumerate() {
-            let mut pixels = Vec::with_capacity(WIDTH);
+        for (y, line) in s.lines().enumerate() {
+            if y > HEIGHT {
+                return Err(ScreenParseError::InvalidHeight {
+                    len: y,
+                    expected: HEIGHT,
+                });
+            }
 
-            for (column, pixel) in line
+            for (x, pixel) in line
                 .chars()
                 .chunks(2)
                 .into_iter()
                 .enumerate()
                 .map(|(column, chars)| (column, chars.collect::<String>()))
             {
-                pixels.push(match pixel.as_str() {
+                if x > WIDTH {
+                    return Err(ScreenParseError::InvalidWidth {
+                        line_num: y,
+                        len: x,
+                        expected: WIDTH * 2,
+                    });
+                }
+
+                pixels[Screen::index(x, y)] = match pixel.as_str() {
                     "██" => true,
                     "  " => false,
                     _ => {
                         return Err(ScreenParseError::InvalidPixel {
                             pixel: pixel.to_owned(),
-                            line_num,
-                            column,
+                            line_num: y,
+                            column: x,
                         })
                     }
-                });
+                };
             }
-
-            if pixels.len() != WIDTH {
-                return Err(ScreenParseError::InvalidWidth {
-                    line_num,
-                    len: line.len(),
-                    expected: WIDTH * 2,
-                });
-            }
-
-            if pixels.len() != WIDTH {
-                return Err(ScreenParseError::InvalidWidth {
-                    line_num,
-                    len: line.len(),
-                    expected: WIDTH * 2,
-                });
-            }
-
-            let pixels = pixels[0..WIDTH].try_into().unwrap();
-
-            pixel_lines.push(pixels);
         }
 
-        if pixel_lines.len() != HEIGHT {
-            return Err(ScreenParseError::InvalidHeight {
-                len: pixel_lines.len(),
-                expected: HEIGHT,
-            });
-        }
-
-        let pixel_lines = pixel_lines[0..HEIGHT].try_into().unwrap();
-
-        Ok(Screen(pixel_lines))
+        Ok(Screen(pixels))
     }
 }
 
