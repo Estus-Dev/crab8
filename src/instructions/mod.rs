@@ -157,8 +157,8 @@ pub enum Instruction {
     /// Value: FX65 where X is the final register
     Read(Register),
 
-    /// Rather than fail parsing we'll return an invalid instruction
-    NoOp(u16),
+    /// Rather than fail parsing we'll return an invalid instruction/no-op
+    Nop(u16),
 }
 
 impl From<[u8; 2]> for Instruction {
@@ -197,7 +197,7 @@ impl From<u16> for Instruction {
                 0x6 => Self::ShiftRight(x, y),
                 0x7 => Self::SubFromReg(x, y),
                 0xE => Self::ShiftLeft(x, y),
-                _ => Self::NoOp(instruction),
+                _ => Self::Nop(instruction),
             },
 
             0x9 if sub_operator == 0x0 => Self::IfRegs(x, y),
@@ -218,10 +218,10 @@ impl From<u16> for Instruction {
                 0x33 => Self::WriteDecimal(x),
                 0x55 => Self::Write(x),
                 0x65 => Self::Read(x),
-                _ => Self::NoOp(instruction),
+                _ => Self::Nop(instruction),
             },
 
-            _ => Self::NoOp(instruction),
+            _ => Self::Nop(instruction),
         }
     }
 }
@@ -265,13 +265,13 @@ impl Crab8 {
             WriteDecimal(register) => Instruction::write_decimal(self, register),
             Write(register) => Instruction::write(self, register),
             Read(register) => Instruction::read(self, register),
-            NoOp(instruction) => Instruction::exec_no_op(self, instruction),
+            Nop(instruction) => Instruction::nop(self, instruction),
         }
     }
 }
 
 impl Instruction {
-    fn exec_no_op(_crab8: &mut Crab8, _instruction: u16) {}
+    fn nop(_crab8: &mut Crab8, _instruction: u16) {}
 }
 
 impl Debug for Instruction {
@@ -311,7 +311,7 @@ impl Debug for Instruction {
             Instruction::WriteDecimal(r) => format!("bcd {r}"),
             Instruction::Write(r) => format!("save {r}"),
             Instruction::Read(r) => format!("load {r}"),
-            Instruction::NoOp(instruction) => format!("nop {instruction:#04X}"),
+            Instruction::Nop(instruction) => format!("nop {instruction:#04X}"),
         };
 
         write!(f, "{disassembly}")
@@ -346,7 +346,7 @@ mod test {
             (0x4712, If(V7, 0x12)),
             (0x5AD0, IfNotRegs(VA, VD)),
             (0x5040, IfNotRegs(V0, V4)),
-            (0x5049, NoOp(0x5049)),
+            (0x5049, Nop(0x5049)),
             (0x64AC, Store(V4, 0xAC)),
             (0x6000, Store(V0, 0x00)),
             (0x6123, Store(V1, 0x23)),
@@ -377,7 +377,7 @@ mod test {
             (0x8CAE, ShiftLeft(VC, VA)),
             (0x9AD0, IfRegs(VA, VD)),
             (0x9040, IfRegs(V0, V4)),
-            (0x9049, NoOp(0x9049)),
+            (0x9049, Nop(0x9049)),
             (0xA000, StoreAddress(0x000.into())),
             (0xA123, StoreAddress(0x123.into())),
             (0xAF24, StoreAddress(0xF24.into())),
@@ -394,23 +394,23 @@ mod test {
             (0xE2A1, IfPressed(V2)),
             (0xE9A1, IfPressed(V9)),
             (0xEBA1, IfPressed(VB)),
-            (0xE09F, NoOp(0xE09F)),
-            (0xE1A2, NoOp(0xE1A2)),
-            (0xE200, NoOp(0xE200)),
-            (0xE3FF, NoOp(0xE3FF)),
+            (0xE09F, Nop(0xE09F)),
+            (0xE1A2, Nop(0xE1A2)),
+            (0xE200, Nop(0xE200)),
+            (0xE3FF, Nop(0xE3FF)),
             (0xF507, ReadDelay(V5)),
             (0xF207, ReadDelay(V2)),
-            (0xF000, NoOp(0xF000)),
-            (0xF114, NoOp(0xF114)),
+            (0xF000, Nop(0xF000)),
+            (0xF114, Nop(0xF114)),
             (0xF115, SetDelay(V1)),
             (0xF015, SetDelay(V0)),
-            (0xFA16, NoOp(0xFA16)),
-            (0xFC17, NoOp(0xFC17)),
+            (0xFA16, Nop(0xFA16)),
+            (0xFC17, Nop(0xFC17)),
             (0xFB18, SetSound(VB)),
             (0xF618, SetSound(V6)),
             (0xF01E, AddAddress(V0)),
             (0xF41E, AddAddress(V4)),
-            (0xF41F, NoOp(0xF41F)),
+            (0xF41F, Nop(0xF41F)),
             (0xF129, LoadSprite(V1)),
             (0xF729, LoadSprite(V7)),
             (0xFE33, WriteDecimal(VE)),
