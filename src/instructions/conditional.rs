@@ -40,7 +40,6 @@ impl Instruction {
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::instructions::Instruction::*;
 
     #[test]
     fn if_not() {
@@ -55,12 +54,13 @@ mod test {
 
         for (instruction, value, skipped) in cases {
             let register = Register::from((instruction & 0x0F00) >> 8);
+            let instruction: Instruction = instruction.into();
 
             let previous_pc = crab8.program_counter;
             let incremented_pc = crab8.program_counter.next_instruction();
 
-            crab8.exec(Store(register, value));
-            crab8.exec(instruction);
+            Instruction::store(&mut crab8, register, value);
+            instruction.exec(&mut crab8);
 
             let pc = crab8.program_counter;
 
@@ -85,12 +85,13 @@ mod test {
 
         for (instruction, value, skipped) in cases {
             let register = Register::from((instruction & 0x0F00) >> 8);
+            let instruction: Instruction = instruction.into();
 
             let previous_pc = crab8.program_counter;
             let incremented_pc = crab8.program_counter.next_instruction();
 
-            crab8.exec(Store(register, value));
-            crab8.exec(instruction);
+            Instruction::store(&mut crab8, register, value);
+            instruction.exec(&mut crab8);
 
             let pc = crab8.program_counter;
 
@@ -117,13 +118,14 @@ mod test {
         for (instruction, x_value, y_value, skipped) in cases {
             let x = Register::from((instruction & 0x0F00) >> 8);
             let y = Register::from((instruction & 0x00F0) >> 4);
+            let instruction: Instruction = instruction.into();
 
             let previous_pc = crab8.program_counter;
             let incremented_pc = crab8.program_counter.next_instruction();
 
-            crab8.exec(Store(x, x_value));
-            crab8.exec(Store(y, y_value));
-            crab8.exec(instruction);
+            Instruction::store(&mut crab8, x, x_value);
+            Instruction::store(&mut crab8, y, y_value);
+            instruction.exec(&mut crab8);
 
             let pc = crab8.program_counter;
 
@@ -150,13 +152,14 @@ mod test {
         for (instruction, x_value, y_value, skipped) in cases {
             let x = Register::from((instruction & 0x0F00) >> 8);
             let y = Register::from((instruction & 0x00F0) >> 4);
+            let instruction: Instruction = instruction.into();
 
             let previous_pc = crab8.program_counter;
             let incremented_pc = crab8.program_counter.next_instruction();
 
-            crab8.exec(Store(x, x_value));
-            crab8.exec(Store(y, y_value));
-            crab8.exec(instruction);
+            Instruction::store(&mut crab8, x, x_value);
+            Instruction::store(&mut crab8, y, y_value);
+            instruction.exec(&mut crab8);
 
             let pc = crab8.program_counter;
 

@@ -48,7 +48,6 @@ impl Instruction {
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::instructions::Instruction::*;
 
     #[test]
     fn load_sprite() {
@@ -57,19 +56,19 @@ mod test {
 
         assert_eq!(crab8.address_register, 0x000.into());
 
-        crab8.exec(Store(V5, 0x00));
-        crab8.exec(LoadSprite(V5));
+        Instruction::store(&mut crab8, V5, 0x00);
+        Instruction::load_sprite(&mut crab8, V5);
 
         assert_eq!(crab8.address_register, (FIRST_CHAR_ADDRESS + offset).into());
 
-        crab8.exec(Store(V3, 0x04));
-        crab8.exec(LoadSprite(V3));
+        Instruction::store(&mut crab8, V3, 0x04);
+        Instruction::load_sprite(&mut crab8, V3);
 
         offset = 0x04 * CHAR_SPRITE_WIDTH;
         assert_eq!(crab8.address_register, (FIRST_CHAR_ADDRESS + offset).into());
 
-        crab8.exec(Store(VB, 0x0F));
-        crab8.exec(LoadSprite(VB));
+        Instruction::store(&mut crab8, VB, 0x0F);
+        Instruction::load_sprite(&mut crab8, VB);
 
         offset = 0x0F * CHAR_SPRITE_WIDTH;
         assert_eq!(crab8.address_register, (FIRST_CHAR_ADDRESS + offset).into());

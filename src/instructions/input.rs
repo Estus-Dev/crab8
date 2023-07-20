@@ -46,7 +46,6 @@ impl Instruction {
 mod test {
     use crate::{
         input::{Input, Key},
-        instructions::Instruction::*,
         registers::Register::{self, *},
     };
 
@@ -66,7 +65,7 @@ mod test {
                     let incremented_pc = crab8.program_counter.next_instruction();
 
                     crab8.registers.set(register, key as u8);
-                    crab8.exec(IfNotPressed(register));
+                    Instruction::if_not_pressed(&mut crab8, register);
 
                     let pc = crab8.program_counter;
 
@@ -93,7 +92,7 @@ mod test {
                     let incremented_pc = crab8.program_counter.next_instruction();
 
                     crab8.registers.set(register, key as u8);
-                    crab8.exec(IfNotPressed(register));
+                    Instruction::if_not_pressed(&mut crab8, register);
 
                     let pc = crab8.program_counter;
 
@@ -121,7 +120,7 @@ mod test {
                     let incremented_pc = crab8.program_counter.next_instruction();
 
                     crab8.registers.set(register, key as u8);
-                    crab8.exec(IfPressed(register));
+                    Instruction::if_pressed(&mut crab8, register);
 
                     let pc = crab8.program_counter;
 
@@ -148,7 +147,7 @@ mod test {
                     let incremented_pc = crab8.program_counter.next_instruction();
 
                     crab8.registers.set(register, key as u8);
-                    crab8.exec(IfPressed(register));
+                    Instruction::if_pressed(&mut crab8, register);
 
                     let pc = crab8.program_counter;
 
@@ -170,13 +169,13 @@ mod test {
         let key = Key::KeyC;
 
         crab8.registers.set(V0, key.into());
-        crab8.exec(ReadInput(V0));
+        Instruction::read_input(&mut crab8, V0);
 
         assert_eq!(expected, crab8.program_counter);
 
         crab8.program_counter = crab8.program_counter.wrapping_add(2);
 
-        crab8.exec(ReadInput(V0));
+        Instruction::read_input(&mut crab8, V0);
 
         assert_eq!(expected, crab8.program_counter);
 
@@ -184,7 +183,7 @@ mod test {
 
         crab8.program_counter = crab8.program_counter.wrapping_add(2);
 
-        crab8.exec(ReadInput(V0));
+        Instruction::read_input(&mut crab8, V0);
 
         assert_eq!(expected, crab8.program_counter);
 
@@ -192,7 +191,7 @@ mod test {
 
         crab8.program_counter = crab8.program_counter.wrapping_add(2);
 
-        crab8.exec(ReadInput(V0));
+        Instruction::read_input(&mut crab8, V0);
 
         assert_eq!(expected, crab8.program_counter);
 
@@ -201,7 +200,7 @@ mod test {
         crab8.program_counter = crab8.program_counter.wrapping_add(2);
         let expected = crab8.program_counter;
 
-        crab8.exec(ReadInput(V0));
+        Instruction::read_input(&mut crab8, V0);
 
         assert_eq!(expected, crab8.program_counter);
     }

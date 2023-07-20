@@ -24,7 +24,6 @@ impl Instruction {
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::instructions::Instruction::*;
     use crate::registers::Register::*;
 
     #[test]
@@ -33,12 +32,12 @@ mod test {
 
         assert_eq!(crab8.delay, 0x00.into());
 
-        crab8.exec(Store(V5, 0x14));
-        crab8.exec(SetDelay(V5));
+        Instruction::store(&mut crab8, V5, 0x14);
+        Instruction::set_delay(&mut crab8, V5);
 
         assert_eq!(crab8.delay, 0x14.into());
 
-        crab8.exec(ReadDelay(V8));
+        Instruction::read_delay(&mut crab8, V8);
 
         assert_eq!(crab8.registers.get(V8), 0x14);
 
@@ -46,13 +45,13 @@ mod test {
 
         assert_eq!(crab8.delay, 0x13.into());
 
-        crab8.exec(ReadDelay(V8));
+        Instruction::read_delay(&mut crab8, V8);
 
         assert_eq!(crab8.registers.get(V8), 0x13);
 
-        crab8.exec(Store(V0, 0xFF));
-        crab8.exec(SetDelay(V0));
-        crab8.exec(ReadDelay(VF));
+        Instruction::store(&mut crab8, V0, 0xFF);
+        Instruction::set_delay(&mut crab8, V0);
+        Instruction::read_delay(&mut crab8, VF);
 
         assert_eq!(crab8.registers.get(VF), 0xFF);
     }
@@ -63,8 +62,8 @@ mod test {
 
         assert_eq!(crab8.sound, 0x00.into());
 
-        crab8.exec(Store(V5, 0x14));
-        crab8.exec(SetSound(V5));
+        Instruction::store(&mut crab8, V5, 0x14);
+        Instruction::set_sound(&mut crab8, V5);
 
         assert_eq!(crab8.sound, 0x14.into());
 
@@ -72,7 +71,7 @@ mod test {
 
         assert_eq!(crab8.sound, 0x13.into());
 
-        crab8.exec(Store(V0, 0xFF));
-        crab8.exec(SetSound(V0));
+        Instruction::store(&mut crab8, V0, 0xFF);
+        Instruction::set_sound(&mut crab8, V0);
     }
 }

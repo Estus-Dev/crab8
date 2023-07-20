@@ -44,7 +44,6 @@ impl Crab8 {
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::instructions::Instruction::*;
 
     #[test]
     fn jump() {
@@ -55,8 +54,11 @@ mod test {
         assert_eq!(crab8.program_counter, 0x200.into());
 
         for instruction in cases {
-            crab8.exec(instruction);
-            assert_eq!(crab8.program_counter, (instruction & 0x0FFF).into());
+            let expected: Address = (instruction & 0x0FFF).into();
+            let instruction: Instruction = instruction.into();
+
+            instruction.exec(&mut crab8);
+            assert_eq!(expected, crab8.program_counter);
         }
     }
 
@@ -67,21 +69,24 @@ mod test {
         let mut crab8 = Crab8::new();
 
         for instruction in cases {
-            crab8.exec(instruction);
-            assert_eq!(crab8.program_counter, (instruction & 0x0FFF).into());
+            let expected: Address = (instruction & 0x0FFF).into();
+            let instruction: Instruction = instruction.into();
+
+            instruction.exec(&mut crab8);
+            assert_eq!(expected, crab8.program_counter);
         }
 
         for (i, address) in cases.iter().map(|a| a & 0x0FFF).rev().skip(1).enumerate() {
-            crab8.exec(Return);
+            Instruction::return_value(&mut crab8);
 
             assert_eq!(crab8.program_counter, address.into(), "{i}");
         }
 
-        crab8.exec(Return);
+        Instruction::return_value(&mut crab8);
 
         assert_eq!(crab8.program_counter, Address::initial_instruction());
 
-        crab8.exec(Return);
+        Instruction::return_value(&mut crab8);
 
         assert_eq!(crab8.program_counter, Address::default());
     }
@@ -97,8 +102,10 @@ mod test {
         let mut crab8 = Crab8::new();
 
         for (instruction, offset, expected) in cases {
+            let instruction: Instruction = instruction.into();
+
             crab8.registers.set(V0, offset);
-            crab8.exec(instruction);
+            instruction.exec(&mut crab8);
 
             assert_eq!(crab8.program_counter, expected.into());
         }

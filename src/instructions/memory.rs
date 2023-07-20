@@ -55,7 +55,6 @@ impl Instruction {
 mod test {
     use super::*;
     use crate::character::Character::*;
-    use crate::instructions::Instruction::*;
     use crate::memory::FIRST_CHAR_ADDRESS;
     use crate::registers::Register::*;
 
@@ -65,15 +64,15 @@ mod test {
 
         assert_eq!(crab8.address_register, 0x000.into());
 
-        crab8.exec(StoreAddress(0xFFF.into()));
+        Instruction::store_address(&mut crab8, 0xFFF.into());
 
         assert_eq!(crab8.address_register, 0xFFF.into());
 
-        crab8.exec(StoreAddress(0x032.into()));
+        Instruction::store_address(&mut crab8, 0x032.into());
 
         assert_eq!(crab8.address_register, 0x032.into());
 
-        crab8.exec(StoreAddress(0x14E.into()));
+        Instruction::store_address(&mut crab8, 0x14E.into());
 
         assert_eq!(crab8.address_register, 0x14E.into());
     }
@@ -84,21 +83,21 @@ mod test {
 
         assert_eq!(crab8.address_register, 0x000.into());
 
-        crab8.exec(AddAddress(V0));
+        Instruction::add_address(&mut crab8, V0);
 
         assert_eq!(crab8.address_register, 0x000.into());
 
-        crab8.exec(Store(V0, 0x15));
-        crab8.exec(AddAddress(V0));
+        Instruction::store(&mut crab8, V0, 0x15);
+        Instruction::add_address(&mut crab8, V0);
 
         assert_eq!(crab8.address_register, 0x015.into());
 
-        crab8.exec(StoreAddress(0x123.into()));
+        Instruction::store_address(&mut crab8, 0x123.into());
 
         assert_eq!(crab8.address_register, 0x123.into());
 
-        crab8.exec(Store(V6, 0x64));
-        crab8.exec(AddAddress(V6));
+        Instruction::store(&mut crab8, V6, 0x64);
+        Instruction::add_address(&mut crab8, V6);
 
         assert_eq!(crab8.address_register, 0x187.into());
     }
@@ -110,18 +109,18 @@ mod test {
         let start = crab8.address_register;
         let end = start.wrapping_add(3);
 
-        crab8.exec(Store(V8, 42));
-        crab8.exec(WriteDecimal(V8));
+        Instruction::store(&mut crab8, V8, 42);
+        Instruction::write_decimal(&mut crab8, V8);
 
         assert_eq!(crab8.memory.get_range(start, end), &[0, 4, 2]);
 
-        crab8.exec(StoreAddress(0x52C.into()));
+        Instruction::store_address(&mut crab8, 0x52C.into());
 
         let start = crab8.address_register;
         let end = start.wrapping_add(3);
 
-        crab8.exec(Store(V3, 120));
-        crab8.exec(WriteDecimal(V3));
+        Instruction::store(&mut crab8, V3, 120);
+        Instruction::write_decimal(&mut crab8, V3);
 
         assert_eq!(crab8.memory.get_range(start, end), &[1, 2, 0]);
     }
@@ -132,7 +131,7 @@ mod test {
         let mut address = Address::new(FIRST_CHAR_ADDRESS);
 
         crab8.address_register = address;
-        crab8.exec(Read(V4));
+        Instruction::read(&mut crab8, V4);
         assert_eq!(crab8.registers.get_range(V4), Char0.sprite());
         assert_eq!(crab8.address_register, address.wrapping_add(4 + 1));
 
@@ -143,10 +142,10 @@ mod test {
 
         for (offset, &byte) in result.iter().enumerate() {
             let register = Register::from(offset);
-            crab8.exec(Store(register, byte));
+            Instruction::store(&mut crab8, register, byte);
         }
 
-        crab8.exec(Write(V5));
+        Instruction::write(&mut crab8, V5);
         assert_eq!(crab8.address_register, address.wrapping_add(5 + 1));
 
         let start = address;
@@ -155,11 +154,11 @@ mod test {
 
         for register in 0x0..=0xF {
             let register = Register::from(register);
-            crab8.exec(Store(register, 0xBC));
+            Instruction::store(&mut crab8, register, 0xBC);
         }
 
-        crab8.exec(StoreAddress(address));
-        crab8.exec(Read(V5));
+        Instruction::store_address(&mut crab8, address);
+        Instruction::read(&mut crab8, V5);
 
         assert_eq!(crab8.registers.get_range(V5), result);
     }
@@ -171,7 +170,7 @@ mod test {
         crab8.quirks.memory_increment_by_x = true;
 
         crab8.address_register = address;
-        crab8.exec(Read(V4));
+        Instruction::read(&mut crab8, V4);
         assert_eq!(crab8.registers.get_range(V4), Char0.sprite());
         assert_eq!(crab8.address_register, address.wrapping_add(4));
 
@@ -182,10 +181,10 @@ mod test {
 
         for (offset, &byte) in result.iter().enumerate() {
             let register = Register::from(offset);
-            crab8.exec(Store(register, byte));
+            Instruction::store(&mut crab8, register, byte);
         }
 
-        crab8.exec(Write(V5));
+        Instruction::write(&mut crab8, V5);
         assert_eq!(crab8.address_register, address.wrapping_add(5));
 
         let start = address;
@@ -194,11 +193,11 @@ mod test {
 
         for register in 0x0..=0xF {
             let register = Register::from(register);
-            crab8.exec(Store(register, 0xBC));
+            Instruction::store(&mut crab8, register, 0xBC);
         }
 
-        crab8.exec(StoreAddress(address));
-        crab8.exec(Read(V5));
+        Instruction::store_address(&mut crab8, address);
+        Instruction::read(&mut crab8, V5);
 
         assert_eq!(crab8.registers.get_range(V5), result);
     }

@@ -46,7 +46,6 @@ impl Instruction {
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::instructions::Instruction::*;
 
     #[test]
     fn add() {
@@ -54,23 +53,23 @@ mod test {
 
         assert_eq!(crab8.registers, 0x00000000000000000000000000000000.into());
 
-        crab8.exec(Store(V0, 0x12));
+        Instruction::store(&mut crab8, V0, 0x12);
 
         assert_eq!(crab8.registers, 0x12000000000000000000000000000000.into());
 
-        crab8.exec(Add(V0, 0x34));
+        Instruction::add(&mut crab8, V0, 0x34);
 
         assert_eq!(crab8.registers, 0x46000000000000000000000000000000.into());
 
-        crab8.exec(Add(V5, 0x47));
+        Instruction::add(&mut crab8, V5, 0x47);
 
         assert_eq!(crab8.registers, 0x46000000004700000000000000000000.into());
 
-        crab8.exec(Store(V2, 0xAA));
+        Instruction::store(&mut crab8, V2, 0xAA);
 
         assert_eq!(crab8.registers, 0x4600AA00004700000000000000000000.into());
 
-        crab8.exec(Add(V2, 0x66));
+        Instruction::add(&mut crab8, V2, 0x66);
 
         assert_eq!(crab8.registers, 0x46001000004700000000000000000000.into());
     }
@@ -81,20 +80,20 @@ mod test {
 
         assert_eq!(crab8.registers, 0x00000000000000000000000000000000.into());
 
-        crab8.exec(Store(V0, 0x12));
-        crab8.exec(Store(V3, 0x89));
+        Instruction::store(&mut crab8, V0, 0x12);
+        Instruction::store(&mut crab8, V3, 0x89);
 
         assert_eq!(crab8.registers, 0x12000089000000000000000000000000.into());
 
-        crab8.exec(AddReg(V3, V0));
+        Instruction::add_reg(&mut crab8, V3, V0);
 
         assert_eq!(crab8.registers, 0x1200009B000000000000000000000000.into());
 
-        crab8.exec(AddReg(V0, V3));
+        Instruction::add_reg(&mut crab8, V0, V3);
 
         assert_eq!(crab8.registers, 0xAD00009B000000000000000000000000.into());
 
-        crab8.exec(AddReg(V0, V3));
+        Instruction::add_reg(&mut crab8, V0, V3);
 
         assert_eq!(crab8.registers, 0x4800009B000000000000000000000001.into());
     }
@@ -105,20 +104,20 @@ mod test {
 
         assert_eq!(crab8.registers, 0x00000000000000000000000000000000.into());
 
-        crab8.exec(Store(V0, 0x12));
-        crab8.exec(Store(V3, 0x89));
+        Instruction::store(&mut crab8, V0, 0x12);
+        Instruction::store(&mut crab8, V3, 0x89);
 
         assert_eq!(crab8.registers, 0x12000089000000000000000000000000.into());
 
-        crab8.exec(SubReg(V3, V0));
+        Instruction::sub_reg(&mut crab8, V3, V0);
 
         assert_eq!(crab8.registers, 0x12000077000000000000000000000001.into());
 
-        crab8.exec(SubReg(V0, V3));
+        Instruction::sub_reg(&mut crab8, V0, V3);
 
         assert_eq!(crab8.registers, 0x9B000077000000000000000000000000.into());
 
-        crab8.exec(SubReg(V0, V3));
+        Instruction::sub_reg(&mut crab8, V0, V3);
 
         assert_eq!(crab8.registers, 0x24000077000000000000000000000001.into());
     }
@@ -129,20 +128,20 @@ mod test {
 
         assert_eq!(crab8.registers, 0x00000000000000000000000000000000.into());
 
-        crab8.exec(Store(V0, 0x89));
-        crab8.exec(Store(V3, 0x12));
+        Instruction::store(&mut crab8, V0, 0x89);
+        Instruction::store(&mut crab8, V3, 0x12);
 
         assert_eq!(crab8.registers, 0x89000012000000000000000000000000.into());
 
-        crab8.exec(SubFromReg(V3, V0));
+        Instruction::sub_from_reg(&mut crab8, V3, V0);
 
         assert_eq!(crab8.registers, 0x89000077000000000000000000000001.into());
 
-        crab8.exec(SubFromReg(V0, V3));
+        Instruction::sub_from_reg(&mut crab8, V0, V3);
 
         assert_eq!(crab8.registers, 0xEE000077000000000000000000000000.into());
 
-        crab8.exec(SubFromReg(V2, V0));
+        Instruction::sub_from_reg(&mut crab8, V2, V0);
 
         assert_eq!(crab8.registers, 0xEE00EE77000000000000000000000001.into());
     }
