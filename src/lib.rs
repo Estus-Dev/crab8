@@ -151,7 +151,7 @@ impl Crab8 {
 
         self.program_counter = self.program_counter.next_instruction();
 
-        self.exec(instruction);
+        instruction.exec(self);
         self.cycle_count += 1;
     }
 

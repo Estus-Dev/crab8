@@ -228,49 +228,53 @@ impl From<u16> for Instruction {
 
 impl Crab8 {
     pub fn exec(&mut self, instruction: impl Into<Instruction>) {
-        use Instruction::*;
-
-        match instruction.into() {
-            ClearScreen => Instruction::clear_screen(self),
-            Return => Instruction::return_value(self),
-            Jump(address) => Instruction::jump(self, address),
-            Call(address) => Instruction::call(self, address),
-            IfNot(register, value) => Instruction::if_not(self, register, value),
-            If(register, value) => Instruction::if_then(self, register, value),
-            IfNotRegs(register, other) => Instruction::if_not_regs(self, register, other),
-            Store(register, value) => Instruction::store(self, register, value),
-            Add(register, value) => Instruction::add(self, register, value),
-            Copy(register, other) => Instruction::copy(self, register, other),
-            Or(register, other) => Instruction::or(self, register, other),
-            And(register, other) => Instruction::and(self, register, other),
-            Xor(register, other) => Instruction::xor(self, register, other),
-            AddReg(register, other) => Instruction::add_reg(self, register, other),
-            SubReg(register, other) => Instruction::sub_reg(self, register, other),
-            ShiftRight(register, other) => Instruction::shift_right(self, register, other),
-            SubFromReg(register, other) => Instruction::sub_from_reg(self, register, other),
-            ShiftLeft(register, other) => Instruction::shift_left(self, register, other),
-            IfRegs(register, other) => Instruction::if_regs(self, register, other),
-            StoreAddress(address) => Instruction::store_address(self, address),
-            JumpOffset(address) => Instruction::jump_offset(self, address),
-            Rand(register, bitmask) => Instruction::rand(self, register, bitmask),
-            Draw(x, y, row_count) => Instruction::draw(self, x, y, row_count),
-            IfNotPressed(register) => Instruction::if_not_pressed(self, register),
-            IfPressed(register) => Instruction::if_pressed(self, register),
-            ReadDelay(register) => Instruction::read_delay(self, register),
-            ReadInput(register) => Instruction::read_input(self, register),
-            SetDelay(register) => Instruction::set_delay(self, register),
-            SetSound(register) => Instruction::set_sound(self, register),
-            AddAddress(register) => Instruction::add_address(self, register),
-            LoadSprite(register) => Instruction::load_sprite(self, register),
-            WriteDecimal(register) => Instruction::write_decimal(self, register),
-            Write(register) => Instruction::write(self, register),
-            Read(register) => Instruction::read(self, register),
-            Nop(instruction) => Instruction::nop(self, instruction),
-        }
+        instruction.into().exec(self);
     }
 }
 
 impl Instruction {
+    pub fn exec(&self, crab8: &mut Crab8) {
+        use Instruction::*;
+
+        match *self {
+            ClearScreen => Self::clear_screen(crab8),
+            Return => Self::return_value(crab8),
+            Jump(address) => Self::jump(crab8, address),
+            Call(address) => Self::call(crab8, address),
+            IfNot(register, value) => Self::if_not(crab8, register, value),
+            If(register, value) => Self::if_then(crab8, register, value),
+            IfNotRegs(register, other) => Self::if_not_regs(crab8, register, other),
+            Store(register, value) => Self::store(crab8, register, value),
+            Add(register, value) => Self::add(crab8, register, value),
+            Copy(register, other) => Self::copy(crab8, register, other),
+            Or(register, other) => Self::or(crab8, register, other),
+            And(register, other) => Self::and(crab8, register, other),
+            Xor(register, other) => Self::xor(crab8, register, other),
+            AddReg(register, other) => Self::add_reg(crab8, register, other),
+            SubReg(register, other) => Self::sub_reg(crab8, register, other),
+            ShiftRight(register, other) => Self::shift_right(crab8, register, other),
+            SubFromReg(register, other) => Self::sub_from_reg(crab8, register, other),
+            ShiftLeft(register, other) => Self::shift_left(crab8, register, other),
+            IfRegs(register, other) => Self::if_regs(crab8, register, other),
+            StoreAddress(address) => Self::store_address(crab8, address),
+            JumpOffset(address) => Self::jump_offset(crab8, address),
+            Rand(register, bitmask) => Self::rand(crab8, register, bitmask),
+            Draw(x, y, row_count) => Self::draw(crab8, x, y, row_count),
+            IfNotPressed(register) => Self::if_not_pressed(crab8, register),
+            IfPressed(register) => Self::if_pressed(crab8, register),
+            ReadDelay(register) => Self::read_delay(crab8, register),
+            ReadInput(register) => Self::read_input(crab8, register),
+            SetDelay(register) => Self::set_delay(crab8, register),
+            SetSound(register) => Self::set_sound(crab8, register),
+            AddAddress(register) => Self::add_address(crab8, register),
+            LoadSprite(register) => Self::load_sprite(crab8, register),
+            WriteDecimal(register) => Self::write_decimal(crab8, register),
+            Write(register) => Self::write(crab8, register),
+            Read(register) => Self::read(crab8, register),
+            Nop(instruction) => Self::nop(crab8, instruction),
+        }
+    }
+
     fn nop(_crab8: &mut Crab8, _instruction: u16) {}
 }
 
