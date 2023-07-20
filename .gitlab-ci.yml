@@ -1,4 +1,4 @@
-image: "estusdev/rust-ci:rust-wasm-1.69"
+image: "estusdev/rust-ci:rust-wasm-1.70"
 
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
